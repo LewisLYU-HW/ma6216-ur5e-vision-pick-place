@@ -2,6 +2,8 @@
 
 仓库 `LewisLYU-HW/ma6216-ur5e-vision-pick-place` 为公开仓库，所有人均可浏览和直接克隆。需要直接向仓库推送分支的组员，由所有者在 GitHub 的 Settings → Collaborators 中邀请并授予相应权限。
 
+本仓库使用 `main` 保存最新整合代码、功能分支进行调试，并以 `v0.2.0`、`v0.3.0` 固定两个阶段。按阶段拉取和复现见 [VERSIONS.md](VERSIONS.md)。已有同名版本标签保持不变，后续码垛另建分支并发布新版本。
+
 ## 首次拉取
 
 仓库创建完成后，在 WSL 终端进入希望放项目的目录。下面按已确认的账号 `LewisLYU-HW` 和计划仓库名给出命令。若最终地址有调整，从 GitHub 的 Code 按钮复制 HTTPS 地址替换即可。

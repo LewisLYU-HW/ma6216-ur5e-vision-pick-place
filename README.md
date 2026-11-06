@@ -6,6 +6,15 @@ UR5e + Robotiq 2F-85 在 MuJoCo 中完成视觉引导的物理抓放。固定 RG
 
 [绿色工件抓放视频](docs/media/green-workpiece-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md) · [依赖与验证版本](docs/DEPENDENCIES.md)
 
+## 按阶段选择版本
+
+| 固定版本 | 自动抓放内容 | 入口 |
+|---|---|---|
+| [v0.2.0：三工件](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | 绿色、橙色、紫色异形工件 | `scripts/run_multi_pick_place.py` |
+| [v0.3.0：多种类物品](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | 锤子、红球、带孔螺母 | 同一入口加 `--collection diverse` |
+
+`main` 保持最新整合代码；两个固定版本均提供源码和打印文件下载。绿色螺丝刀仅出现在 `scripts/preview_object_library.py` 的四物件预览中，尚未验证抓取，不在三物件自动抓放场景里。组员首次拉取、分别保留两版、运行预览和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
+
 ## 已验证的功能
 
 - 1280 × 960 固定虚拟 RGB-D 相机及米制深度。
