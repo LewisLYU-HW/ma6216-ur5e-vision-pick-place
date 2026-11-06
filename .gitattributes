@@ -6,3 +6,6 @@
 *.json text eol=lf
 *.png binary
 *.mp4 binary
+# Preserve exported CAD bytes for manifest checksums; trimesh ends OBJ with a blank line.
+/assets/printable/*.obj -text whitespace=-blank-at-eof
+/assets/printable/*.stl binary

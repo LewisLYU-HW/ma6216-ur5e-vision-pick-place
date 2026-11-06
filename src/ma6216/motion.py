@@ -22,7 +22,8 @@ class MotionFailure(RuntimeError):
 
 
 class Robot:
-    def __init__(self, model, data, *, target_vertices=None):
+    def __init__(self, model, data, *, target_vertices=None, target_body="target_cube",
+                 target_geom="target_cube_geom", target_joint="target_cube_freejoint"):
         self.model, self.data = model, data
         self.target_vertices = None if target_vertices is None else np.asarray(target_vertices, dtype=float)
         self.joints=np.array([model.joint(n).id for n in JOINT_NAMES])
@@ -31,9 +32,10 @@ class Robot:
         self.aids=np.array([model.actuator(n).id for n in ACTUATOR_NAMES])
         self.gid=model.actuator('gripper_fingers_actuator').id
         self.sid=model.site('gripper_pinch').id
-        self.cbid=model.body('target_cube').id
-        self.cgid=model.geom('target_cube_geom').id
-        self.cube_qposadr=int(model.jnt_qposadr[model.joint('target_cube_freejoint').id])
+        self.cbid=model.body(target_body).id
+        self.cgid=model.geom(target_geom).id
+        self.target_joint = model.joint(target_joint).id
+        self.cube_qposadr=int(model.jnt_qposadr[self.target_joint])
         self.low=np.maximum(model.jnt_range[self.joints,0],model.actuator_ctrlrange[self.aids,0])+.001
         self.high=np.minimum(model.jnt_range[self.joints,1],model.actuator_ctrlrange[self.aids,1])-.001
         self.scratch=mujoco.MjData(model)
@@ -42,7 +44,10 @@ class Robot:
         self.scratch.qvel[:]=0
         self.home=data.qpos[self.qids].copy()
         self.pad_sides={model.geom('gripper_'+side+'_pad'+str(i)).id:side for side in ('left','right') for i in (1,2)}
-        self.robot_bodies=set(range(1,self.cbid))
+        self.robot_bodies = {model.body('base').id}
+        for body in range(1, model.nbody):
+            if int(model.body_parentid[body]) in self.robot_bodies:
+                self.robot_bodies.add(body)
         self.max_tracking_error=0.
         self.min_transport_height=math.inf
         self.min_transfer_height=math.inf
@@ -268,13 +273,22 @@ class Robot:
             print(json.dumps(metric),flush=True)
         hold('FINAL_SETTLE',2.)
         p=self.data.xpos[self.cbid].copy()
-        cube_jid=self.model.joint('target_cube_freejoint').id
+        cube_jid=self.target_joint
         dq=int(self.model.jnt_dofadr[cube_jid]);speed=float(np.linalg.norm(self.data.qvel[dq:dq+3]));omega=float(np.linalg.norm(self.data.qvel[dq+3:dq+6]))
         corners = self.target_vertices
         if corners is None:
             corners=np.array([[x,y,z] for x in (-.025,.025) for y in (-.025,.025) for z in (-.025,.025)])
         corners=corners@self.data.xmat[self.cbid].reshape(3,3).T+p
-        inside=bool(np.all(np.abs(corners[:,0]-.5)<.09) and np.all(np.abs(corners[:,1]-.18)<.09))
+        left = self.model.geom('tray_wall_left').id
+        right = self.model.geom('tray_wall_right').id
+        front = self.model.geom('tray_wall_front').id
+        back = self.model.geom('tray_wall_back').id
+        xmin = self.data.geom_xpos[left, 0] + self.model.geom_size[left, 0]
+        xmax = self.data.geom_xpos[right, 0] - self.model.geom_size[right, 0]
+        ymin = self.data.geom_xpos[front, 1] + self.model.geom_size[front, 1]
+        ymax = self.data.geom_xpos[back, 1] - self.model.geom_size[back, 1]
+        inside = bool(np.all((corners[:, 0] > xmin) & (corners[:, 0] < xmax)) and
+                      np.all((corners[:, 1] > ymin) & (corners[:, 1] < ymax)))
         tray_bottom=self.model.geom('tray_bottom').id
         support_force=0.
         for i,contact in enumerate(self.data.contact):

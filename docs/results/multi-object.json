@@ -1,0 +1,153 @@
+{
+  "success": true,
+  "mode": "multi-object planar pick-and-place",
+  "control_source": "FoundationPose + estimated calibration",
+  "object_count": 3,
+  "final_outcomes_evaluation_only": [
+    {
+      "id": "green",
+      "position_m": [
+        0.3691409840957832,
+        0.17903968244136967,
+        0.41081303743960934
+      ],
+      "tray_support_force_n": 0.9809997654198148,
+      "inside_tray": true,
+      "linear_speed_m_s": 4.208500480664943e-06,
+      "angular_speed_rad_s": 8.555326983737239e-07,
+      "success": true,
+      "slot_error_mm": 1.2884557179472922
+    },
+    {
+      "id": "orange",
+      "position_m": [
+        0.4690175562465838,
+        0.17981591520947987,
+        0.4098158787032515
+      ],
+      "tray_support_force_n": 0.980999997518448,
+      "inside_tray": true,
+      "linear_speed_m_s": 4.30989144062212e-07,
+      "angular_speed_rad_s": 1.5837730028146451e-09,
+      "success": true,
+      "slot_error_mm": 0.9995413641902342
+    },
+    {
+      "id": "purple",
+      "position_m": [
+        0.5690759069312297,
+        0.18059220014276445,
+        0.4128141522901614
+      ],
+      "tray_support_force_n": 0.9809998274022347,
+      "inside_tray": true,
+      "linear_speed_m_s": 3.6050142057618748e-06,
+      "angular_speed_rad_s": 9.438587005929416e-07,
+      "success": true,
+      "slot_error_mm": 1.097565036268702
+    }
+  ],
+  "simulation_time_s": 87.60799999997722,
+  "scope": "One fixed layout, three distinct upright CAD objects, one continuous vision-controlled scene; not a general success-rate study.",
+  "picks": [
+    {
+      "id": "green",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "green",
+          "mask_iou": 0.993000318167356,
+          "translation_error_mm": 4.260525848024257,
+          "rotation_error_deg": 0.7076142186580854
+        },
+        {
+          "id": "orange",
+          "mask_iou": 0.9903640256959315,
+          "translation_error_mm": 4.175294519283129,
+          "rotation_error_deg": 0.5782072677870458
+        },
+        {
+          "id": "purple",
+          "mask_iou": 0.9948761742100769,
+          "translation_error_mm": 3.9829822486251754,
+          "rotation_error_deg": 1.0600432832191342
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 4209,
+      "min_holding_finger_normal_force_n": 45.20730278161423,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "max_joint_tracking_error_rad": 0.12148983992222973,
+      "final_cube_position_m": [
+        0.3688732368428122,
+        0.17897264646402886,
+        0.41081303743962966
+      ],
+      "tray_bottom_normal_force_n": 0.9809997646622167
+    },
+    {
+      "id": "orange",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "orange",
+          "mask_iou": 0.9903605855051767,
+          "translation_error_mm": 4.179275394163282,
+          "rotation_error_deg": 0.5525014542963103
+        },
+        {
+          "id": "purple",
+          "mask_iou": 0.9940256045519203,
+          "translation_error_mm": 3.993235532110775,
+          "rotation_error_deg": 0.9589313962509142
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 4108,
+      "min_holding_finger_normal_force_n": 45.122721543990885,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "max_joint_tracking_error_rad": 0.12227894546373186,
+      "final_cube_position_m": [
+        0.46903621562158754,
+        0.17981593561490267,
+        0.40981587870321545
+      ],
+      "tray_bottom_normal_force_n": 0.9809999976256327
+    },
+    {
+      "id": "purple",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "purple",
+          "mask_iou": 0.9940239043824701,
+          "translation_error_mm": 3.985272583555497,
+          "rotation_error_deg": 0.9010661975955749
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 8184,
+      "min_holding_finger_normal_force_n": 45.432144964981795,
+      "max_unexpected_robot_penetration_m": 3.259527906530085e-05,
+      "max_joint_tracking_error_rad": 0.07330542002161772,
+      "final_cube_position_m": [
+        0.5690691338867707,
+        0.18058972823191458,
+        0.41281415229015844
+      ],
+      "tray_bottom_normal_force_n": 0.9809998274362248
+    }
+  ],
+  "physics_baseline": {
+    "success": true,
+    "source": "artifacts/multi_gt_compact/summary.json",
+    "completed_picks": 3
+  },
+  "single_object_physics_regressions": [
+    "multi_regression_single_green",
+    "multi_regression_single_cube"
+  ]
+}

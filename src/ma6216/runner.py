@@ -10,11 +10,12 @@ from .scene import mujoco
 from .motion import Robot
 
 
-def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=False, robot=None):
+def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=False, robot=None,
+              shared_viewer=None):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     robot = Robot(model, data) if robot is None else robot
-    viewer_handle = None
+    viewer_handle = shared_viewer
     renderer = None
     writer = None
     next_frame = float(data.time)
@@ -47,7 +48,7 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
     try:
         plan = robot.plan(object_pose=pose, yaw=yaw)
         (output / "plan.json").write_text(json.dumps(plan, indent=2))
-        if viewer:
+        if viewer and viewer_handle is None:
             from mujoco import viewer as mujoco_viewer
 
             viewer_handle = mujoco_viewer.launch_passive(model, data)
@@ -62,7 +63,8 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
                                      cv2.VideoWriter_fourcc(*"mp4v"), 25., (640, 480))
             if not writer.isOpened():
                 raise RuntimeError("MP4 encoder unavailable")
-        result = robot.execute(plan, frame_callback=on_frame if viewer or record else None, realtime=viewer)
+        result = robot.execute(plan, frame_callback=on_frame if viewer_handle is not None or record else None,
+                               realtime=viewer_handle is not None)
     except Exception as exc:
         result = {"success": False, "error": str(exc), "traceback": traceback.format_exc(),
                   "max_unexpected_robot_penetration_m": robot.max_robot_penetration,
@@ -73,7 +75,7 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
             writer.release()
         if renderer is not None:
             renderer.close()
-        if viewer_handle is not None:
+        if viewer_handle is not None and shared_viewer is None:
             viewer_handle.close()
     (output / "result.json").write_text(json.dumps(result, indent=2))
     if robot.samples:

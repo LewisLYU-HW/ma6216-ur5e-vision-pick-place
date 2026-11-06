@@ -14,6 +14,12 @@ UR5e + Robotiq 2F-85 在 MuJoCo 中完成视觉引导的物理抓放。固定 RG
 - 桌前接近、垂直夹取、同一关节分支横移、落盘和撤离。
 - 双指有载接触、抬升、搬运保持、托盘支撑和静止释放的物理验收。
 
+## 三工件扩展与打印交接（2026-11-06）
+
+同一场景中同时存在原绿色工件、新橙色斜肩棱柱和紫色渐缩切角块。完整视觉流程在一次固定布局中完成连续 3/3 抓放；这是单层分槽放置，尚未实现堆叠。[运行方法与实测范围](docs/MULTI_OBJECT.md) · [视频](docs/media/multi-object-pick-place.mp4)。
+
+三个模型的毫米制 STL、米制 OBJ 和尺寸清单已放在 `assets/printable`。[3D 打印及真机交接说明](docs/PRINTING.md) 说明单位、原点和实物测量；[码垛评估](docs/PALLETIZING_ASSESSMENT.md) 区分现有基础与待实现工作。
+
 ## 开始运行
 
 先在 WSL 或 Linux 中克隆。

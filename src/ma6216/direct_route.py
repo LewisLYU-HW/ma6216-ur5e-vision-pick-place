@@ -49,7 +49,7 @@ def set_front_ready(model, data):
     mujoco.mj_forward(model, data)
 
 
-def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source):
+def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source, *, destination_xy=None):
     """Plan a vertical pick, horizontal loaded transfer, and vertical place.
 
     Every IK sample is seeded from the previous configuration. Collision
@@ -57,7 +57,8 @@ def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source):
     """
     xyz = np.asarray(xyz, dtype=float)
     rotation = Rotation.from_euler("z", yaw).as_matrix() @ np.diag([1., -1., -1.])
-    tray = robot.model.body("target_tray").pos[:2].copy()
+    tray = (robot.model.body("target_tray").pos[:2].copy() if destination_xy is None
+            else np.asarray(destination_xy, dtype=float))
     pick_hover = np.r_[xyz[:2], TRANSFER_Z]
     tray_hover = np.r_[tray, TRANSFER_Z]
     positions = [
