@@ -1,0 +1,252 @@
+[
+  {
+    "success": true,
+    "target": "workpiece",
+    "initial_xy_m": [
+      0.46,
+      -0.18
+    ],
+    "initial_yaw_deg": 0.0,
+    "pose_evaluation_only": {
+      "translation_error_mm": 4.119319884660903,
+      "raw_rotation_error_deg": 0.5628276746006801
+    },
+    "motion": {
+      "success": true,
+      "control_source": "vision_pose_file",
+      "final_cube_position_m": [
+        0.4991824168902542,
+        0.18007896428300368,
+        0.4108130374396074
+      ],
+      "final_linear_speed_m_s": 4.208513811897136e-06,
+      "final_angular_speed_rad_s": 8.555088271382025e-07,
+      "supported_at_tray_bottom": true,
+      "final_finger_normal_forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "max_joint_tracking_error_rad": 0.11580830799941016,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "robot_penetration_abort_tolerance_m": 0.0005,
+      "max_cube_support_contact_penetration_m": 0.0040883654184295706,
+      "min_lift_and_transport_cube_z_m": 0.3963213275606783,
+      "min_transfer_cube_z_m": 0.5510208692609373,
+      "min_holding_finger_normal_force_n": 45.273425506665475,
+      "max_holding_opposing_normals_dot": -0.9999999999999999,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 4112,
+      "stages": [
+        {
+          "stage": "APPROACH",
+          "time_s": 4.301999999999748,
+          "tcp_error_m": 0.010062334763082036,
+          "cube_position_m": [
+            0.4600319992722556,
+            -0.17999179511818278,
+            0.3968130374396219
+          ]
+        },
+        {
+          "stage": "GRASP",
+          "time_s": 7.185999999999431,
+          "tcp_error_m": 0.010117869015346479,
+          "cube_position_m": [
+            0.4600437552077246,
+            -0.1799887762079101,
+            0.39681303743961766
+          ],
+          "normal_forces_n": {
+            "left": 45.27284875082694,
+            "right": 45.2767639841928
+          },
+          "opposing_normals_dot": -1.0000000000000002
+        },
+        {
+          "stage": "LIFT",
+          "time_s": 11.570000000000533,
+          "tcp_error_m": 0.010898928038046386,
+          "cube_position_m": [
+            0.4639750992139638,
+            -0.18287264462950978,
+            0.5525713649972424
+          ],
+          "lift_height_m": 0.15575832755761543
+        },
+        {
+          "stage": "HOVER_TRAY",
+          "time_s": 14.292000000001442,
+          "tcp_error_m": 0.012134172446030447,
+          "cube_position_m": [
+            0.5019824860238404,
+            0.18175540846662552,
+            0.5510208692609373
+          ]
+        },
+        {
+          "stage": "PLACE",
+          "time_s": 16.910000000001506,
+          "tcp_error_m": 0.011602506934249591,
+          "cube_position_m": [
+            0.4989786359290421,
+            0.18033252291878926,
+            0.4275358213794848
+          ]
+        },
+        {
+          "stage": "RETREAT",
+          "time_s": 20.72799999999939,
+          "tcp_error_m": 0.012233750810783024,
+          "cube_position_m": [
+            0.499174255510374,
+            0.1800769055301792,
+            0.4108130374395865
+          ]
+        }
+      ],
+      "simulation_time_s": 22.727999999998282,
+      "tray_bottom_normal_force_n": 0.9809997646461326,
+      "all_target_vertices_inside_tray": true
+    },
+    "route_metrics": {
+      "total_tcp_travel_m": 1.0878679099970712,
+      "transfer_tcp_travel_m": 0.3666868091238187,
+      "transfer_xy_displacement_m": 0.3665253661712321,
+      "transfer_max_xy_line_deviation_m": 0.0026369444096364073,
+      "transfer_z_span_m": 0.002032863529391582,
+      "transfer_joint_travel_deg": [
+        40.24950828312752,
+        10.95874548860852,
+        13.13045927678929,
+        2.3921637594466203,
+        0.02588700663232866,
+        40.245475274842384
+      ]
+    }
+  },
+  {
+    "success": true,
+    "target": "workpiece",
+    "initial_xy_m": [
+      0.44,
+      -0.19
+    ],
+    "initial_yaw_deg": 15.0,
+    "pose_evaluation_only": {
+      "translation_error_mm": 4.320362683464103,
+      "raw_rotation_error_deg": 0.9063579383761169
+    },
+    "motion": {
+      "success": true,
+      "control_source": "vision_pose_file",
+      "final_cube_position_m": [
+        0.5002436084144383,
+        0.18003538281729398,
+        0.4108130374396151
+      ],
+      "final_linear_speed_m_s": 4.2085195003403374e-06,
+      "final_angular_speed_rad_s": 8.555000832817872e-07,
+      "supported_at_tray_bottom": true,
+      "final_finger_normal_forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "max_joint_tracking_error_rad": 0.11447423178365213,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "robot_penetration_abort_tolerance_m": 0.0005,
+      "max_cube_support_contact_penetration_m": 0.0038469783104433516,
+      "min_lift_and_transport_cube_z_m": 0.3963407156716669,
+      "min_transfer_cube_z_m": 0.5504921908832199,
+      "min_holding_finger_normal_force_n": 45.28776817026114,
+      "max_holding_opposing_normals_dot": -0.9999999999999998,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 4134,
+      "stages": [
+        {
+          "stage": "APPROACH",
+          "time_s": 4.37799999999974,
+          "tcp_error_m": 0.009521720620278321,
+          "cube_position_m": [
+            0.4400290639933176,
+            -0.1899836356467979,
+            0.3968130374396125
+          ]
+        },
+        {
+          "stage": "GRASP",
+          "time_s": 7.167999999999433,
+          "tcp_error_m": 0.009598189239373625,
+          "cube_position_m": [
+            0.44003929335817976,
+            -0.18997787115864243,
+            0.3968130374396042
+          ],
+          "normal_forces_n": {
+            "left": 45.287204793389975,
+            "right": 45.30625543656308
+          },
+          "opposing_normals_dot": -1.0
+        },
+        {
+          "stage": "LIFT",
+          "time_s": 11.458000000000496,
+          "tcp_error_m": 0.010304122048596029,
+          "cube_position_m": [
+            0.44493793040295126,
+            -0.19322800664626905,
+            0.5525635003217522
+          ],
+          "lift_height_m": 0.15575046288212518
+        },
+        {
+          "stage": "HOVER_TRAY",
+          "time_s": 14.318000000001451,
+          "tcp_error_m": 0.012131927856314638,
+          "cube_position_m": [
+            0.5032112674344495,
+            0.18174800352006035,
+            0.5504921908832199
+          ]
+        },
+        {
+          "stage": "PLACE",
+          "time_s": 16.936000000001492,
+          "tcp_error_m": 0.011602902810731147,
+          "cube_position_m": [
+            0.5002593979108738,
+            0.1802643498275182,
+            0.4270075370948758
+          ]
+        },
+        {
+          "stage": "RETREAT",
+          "time_s": 20.753999999999376,
+          "tcp_error_m": 0.012233658799058234,
+          "cube_position_m": [
+            0.5002362258182574,
+            0.18003134006400154,
+            0.4108130374396129
+          ]
+        }
+      ],
+      "simulation_time_s": 22.753999999998268,
+      "tray_bottom_normal_force_n": 0.9809997646738245,
+      "all_target_vertices_inside_tray": true
+    },
+    "route_metrics": {
+      "total_tcp_travel_m": 1.090687358276592,
+      "transfer_tcp_travel_m": 0.3794934346957469,
+      "transfer_xy_displacement_m": 0.3793072308270719,
+      "transfer_max_xy_line_deviation_m": 0.0025649578657237423,
+      "transfer_z_span_m": 0.0024767841686382797,
+      "transfer_joint_travel_deg": [
+        41.76660956338003,
+        12.446159903325942,
+        14.639588565508536,
+        2.452180220463297,
+        0.023877959117228564,
+        41.76292409698238
+      ]
+    }
+  }
+]

@@ -1,0 +1,19 @@
+# 第三方来源与许可记录
+
+本项目连接外部机器人模型和位姿估计实现。上游仓库和权重由使用者按各自许可单独获取。本清单记录当前使用来源，许可原文以对应上游提交为准。本项目没有替小组选择统一的对外开源许可证。
+
+| 来源 | 在本项目中的用途 | 已核对的许可与版本 |
+|---|---|---|
+| [MuJoCo](https://github.com/google-deepmind/mujoco) | 场景、相机渲染、接触动力学与关节执行 | 当前使用 Python 包 3.17.0。许可见上游仓库。 |
+| [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) | UR5e 与 Robotiq 2F-85 模型 | 当前提交 `fb36886b3023db08c198264e1e9956ab202c3e3b`。模型分别有自己的许可。 |
+| `universal_robots_ur5e` | 机械臂 MJCF、网格、关节和执行器 | 本地模型 README 标注 **BSD-3-Clause**，见该目录 `LICENSE`。 |
+| `robotiq_2f85` | 夹爪 MJCF、网格与指垫接触 | 本地模型 README 标注 **BSD-2-Clause**，见该目录 `LICENSE`。 |
+| [FoundationPose](https://github.com/NVlabs/FoundationPose) | Model-based RGB-D 6D 位姿估计与跟踪 | 当前提交 `a1b694b83e633c2cb6115b9063d940a687759392`。README 标注 **NVIDIA Source Code License**，实际 `LICENSE` 含 non-commercial 使用限制及保留许可和归属声明的要求。权重遵从上游发布条款。 |
+| [ros2_vision_grasp](https://github.com/Cyanat-qt/ros2_vision_grasp) | 阶段组织、轨迹执行与物理验收的设计参考 | 当前实现自行调用 MuJoCo；参考项目的 ROS 2/MoveIt 2 软件栈未作为本项目运行依赖。 |
+
+本项目的绿色斜角工件由项目中的参数化几何生成，物理模型与导出 OBJ 使用同一组三角面。若以后加入其他 CAD、网格、纹理、数据或第三方代码，应同时记录其来源与适用许可。原课程材料、个人交接记录和下载权重不属于仓库源码分发清单。
+
+论文引用可在项目技术展示中使用。
+
+- Bowen Wen, Wei Yang, Jan Kautz, Stan Birchfield. *FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects*. CVPR 2024. [论文](https://openaccess.thecvf.com/content/CVPR2024/html/Wen_FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects_CVPR_2024_paper.html)
+- Zhengyou Zhang. *A Flexible New Technique for Camera Calibration*. IEEE TPAMI, 2000. [作者机构资料](https://www.microsoft.com/en-us/research/project/a-flexible-new-technique-for-camera-calibration-2/publications/)

@@ -1,0 +1,47 @@
+# Generated experiments and personal handoff snapshots
+/artifacts/
+/logs/
+/context/
+*.log
+/.log
+/MUJOCO_LOG.TXT
+/scene_preview.png
+
+# Historical developer-only inspection helpers
+/scripts/audit_existing.py
+/scripts/probe_geometry.py
+/scripts/inspect_physical_samples.py
+
+# Dependencies, model weights and local tooling
+/third_party/
+/weights/
+**/model_best.pth
+*.pt
+*.pth
+*.ckpt
+/.tools/
+
+# Python / environments
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.conda/
+build/
+dist/
+
+# Local editor, credentials and operating-system files
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.DS_Store
+Thumbs.db
