@@ -1,10 +1,10 @@
-# MA6216 UR5e Vision Pick-and-Place
+# MA6216 UR5e Vision-Guided Manipulation
 
-面向 MA6216 Project 1 的视觉引导机器人抓放仿真。UR5e + Robotiq 2F-85 在 MuJoCo 中完成接近、夹取、抬升、横向搬运、放置和撤离。固定 RGB-D 相机提供观测，OpenCV 估计相机参数并分割目标，FoundationPose Model-based 估计物体位姿；坐标变换与 Python 运动规划将视觉结果转换为经过碰撞检查的关节轨迹。
+面向 MA6216 Project 1 的视觉引导机器人抓放与码垛仿真。UR5e + Robotiq 2F-85 在 MuJoCo 中完成接近、夹取、抬升、横向搬运、放置和撤离，并支持四料块、两列两层的物理码垛。固定 RGB-D 相机提供观测，OpenCV 估计相机参数并分割目标，FoundationPose Model-based 估计物体位姿；坐标变换与 Python 运动规划将视觉结果转换为经过碰撞检查的关节轨迹。
 
-![UR5e 与 Robotiq 2F-85 的视觉抓放工作站：锤子、球体与带孔螺母](docs/media/diverse-object-initial.png)
+![FoundationPose 视觉引导四料块两列两层物理码垛](docs/media/palletizing-final.png)
 
-[多物品抓放视频](docs/media/diverse-object-pick-place.mp4) · [三工件抓放视频](docs/media/multi-object-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md) · [依赖与验证版本](docs/DEPENDENCIES.md)
+[码垛录像](docs/media/palletizing.mp4) · [码垛复现](docs/PALLETIZING.md) · [Project 1 任务与选型](docs/PROJECT1_PALLETIZING.md) · [多物品抓放视频](docs/media/diverse-object-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md)
 
 ## FoundationPose 接入与来源
 
@@ -22,19 +22,32 @@
 |---|---|---|
 | [v0.2.0：三工件](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | 绿色、橙色、紫色异形工件 | `scripts/run_multi_pick_place.py` |
 | [v0.3.0：多种类物品](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | 锤子、红球、带孔螺母 | 同一入口加 `--collection diverse` |
+| [v0.4.0：视觉码垛](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.4.0) | 四料块、两列两层，包含指定下层支撑与整垛稳定性验收 | `scripts/run_palletizing.py` |
 
-`main` 保持最新整合代码；两个固定版本均提供源码和打印文件下载。绿色螺丝刀仅出现在 `scripts/preview_object_library.py` 的四物件预览中，尚未验证抓取，不在三物件自动抓放场景里。组员首次拉取、分别保留两版、运行预览和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
+`main` 保持最新整合代码；各固定版本提供源码和打印文件下载，原 Pick-and-Place 入口继续保留。绿色螺丝刀仅出现在四物件预览中，尚未验证抓取。组员按阶段拉取、运行和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
+
+## 运行视觉码垛
+
+在已有环境的 WSL 项目目录运行：
+
+```bash
+conda activate foundationpose
+python -u scripts/run_palletizing.py \
+  --output "artifacts/pallet_$(date +%Y%m%d_%H%M%S)" --record --viewer
+```
+
+使用默认相机的估计标定样例。`--layout 1` 验证另一组位置和朝向；新机器先按安装说明配置依赖。平顶料块为 80×50×40 mm，打印四份，文件在 `assets/palletizing`。已完成两组完整视觉试验，各 4/4；完整指标、层间支撑判据和复现标定命令见 [PALLETIZING.md](docs/PALLETIZING.md)。
 
 ## Project 1 实现情况
 
 | 课程任务 | 当前实现与证据 |
 |---|---|
-| Task 1：技术选型 | 采用 MuJoCo、OpenCV 和 FoundationPose Model-based；来源、论文引用和许可记录在 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。文献比较和最终技术汇报由小组整理。 |
+| Task 1：技术选型 | 采用 MuJoCo、OpenCV 和 FoundationPose Model-based；文献比较、方案选择和实验设计见 [课程对应说明](docs/PROJECT1_PALLETIZING.md)，来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。最终展示由小组整理。 |
 | Task 2：虚拟相机内参标定 | 1280 × 960 固定 RGB-D 相机；从渲染棋盘角点估计内参，以留出图像和重投影误差评价。 |
 | Task 3：相机—机器人标定 | 固定 eye-to-hand 配置；估计相机到机器人安装坐标的变换，并独立验证误差。 |
 | Task 4：物体定位 | 从 RGB 图像生成颜色分割 mask；覆盖异形工件、锤子、球体和螺母，并记录多物体场景的 mask IoU。 |
 | Task 5：位姿估计 | RGB-D、mask 与已知 CAD 输入 FoundationPose；将相机坐标下的物体位姿变换到机器人安装坐标，并评价位置、方向及几何对称性。 |
-| Task 6：机器人操作 | 根据估计位姿和物体抓取配置执行离线 IK、轨迹碰撞检查与物理抓放；检查双指有载接触、抬升保持、托盘支撑及释放后的静止状态。 |
+| Task 6：机器人操作 | 根据估计位姿和 CAD 抓取关系执行离线 IK、载荷碰撞检查、朝向对齐与物理抓放；码垛增加指定下层接触力、质心支撑余量、层高及五秒稳定性验收。 |
 
 ## 三工件扩展与打印交接（2026-11-06）
 
@@ -86,6 +99,8 @@ CPU 机器可按安装说明运行 `--ground-truth` 物理对照，它会明确�
 |---|---|
 | `scripts/run_front_pick_place.py` | 单物体视觉抓放入口，支持绿色工件与红方块 |
 | `scripts/run_multi_pick_place.py` | 三工件与多种类物品的连续视觉抓放 |
+| `scripts/run_palletizing.py`、`src/ma6216/palletizing.py` | 四料块码垛、层位、抓取关系、带载规划与支撑验收 |
+| `scripts/check_palletizing.py`、`export_pallet_blocks.py` | 悬空负例/物理支撑检查、料块打印和感知模型导出 |
 | `scripts/preview_object_library.py` | 包含螺丝刀的四物件待机预览 |
 | `scripts/run_camera_calibration.py` | 棋盘格采图、标定和独立评价 |
 | `scripts/run_foundationpose.py` | 对保存的 RGB-D、mask 和网格执行注册或跟踪 |
@@ -110,6 +125,7 @@ CPU 机器可按安装说明运行 `--ground-truth` 物理对照，它会明确�
 | 绿色工件单物体抓放 | 两种摆放 2/2，位姿误差 4.12–4.32 mm / 0.56–0.91°，落盘中心误差 0.25–0.82 mm |
 | 绿色、橙色、紫色三工件 | 一次固定布局的连续视觉抓放 3/3；最终槽位 XY 误差分别为 1.288、1.000、1.098 mm |
 | 锤子、球体、带孔螺母 | 一次固定布局的连续视觉抓放 3/3；最终槽位 XY 误差分别为 2.500、2.225、0.713 mm |
+| 四料块视觉码垛 | 两种布局各 4/4，整垛 2/2；名义槽位 XY 误差 1.15–5.37 mm，五秒最大漂移 0.16 mm |
 
 每次抓取前从 RGB-D 图像估计目标位姿，执行过程中监测关节误差和接触；多物体场景在两次抓取之间重新观测剩余目标。当前采用已知 CAD、受控颜色和预先定义的抓取部位，部分模型使用近似直立或平放先验。球体不报告唯一朝向，螺母按 60° 对称性评价。上述结果的适用范围和失败记录见 [MULTI_OBJECT.md](docs/MULTI_OBJECT.md)、[OBJECT_LIBRARY.md](docs/OBJECT_LIBRARY.md) 及 [实测摘要](docs/results/)。
 

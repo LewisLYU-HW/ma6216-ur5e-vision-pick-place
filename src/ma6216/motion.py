@@ -277,6 +277,10 @@ class Robot:
             self.stage_metrics.append(metric)
             print(json.dumps(metric),flush=True)
         hold('FINAL_SETTLE',2.)
+        return self.evaluate_placement(plan)
+
+    def evaluate_placement(self, plan):
+        """Default tray placement acceptance; stacking supplies its own support graph."""
         p=self.data.xpos[self.cbid].copy()
         cube_jid=self.target_joint
         dq=int(self.model.jnt_dofadr[cube_jid]);speed=float(np.linalg.norm(self.data.qvel[dq:dq+3]));omega=float(np.linalg.norm(self.data.qvel[dq+3:dq+6]))

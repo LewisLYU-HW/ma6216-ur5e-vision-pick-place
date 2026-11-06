@@ -65,4 +65,4 @@ FoundationPose 仍使用直立桌面先验和 24 个水平角候选。颜色用�
 
 [完整连续抓放视频](media/multi-object-pick-place.mp4)。本轮总仿真时间约 87.6 s，视频只拼接三个物理执行段，省略初始稳定、推理等待及最后额外稳定时间；视频不代表实际推理墙钟耗时。
 
-新增模型导出及真机交接见 [PRINTING.md](PRINTING.md)。未来码垛的可行性与尚未完成项见 [PALLETIZING_ASSESSMENT.md](PALLETIZING_ASSESSMENT.md)。
+模型导出及真机交接见 [PRINTING.md](PRINTING.md)。当前四料块码垛的实现与验证见 [PALLETIZING.md](PALLETIZING.md)；早期选型评估保留在历史文档中。

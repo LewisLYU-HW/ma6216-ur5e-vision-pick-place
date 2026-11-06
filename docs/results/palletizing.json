@@ -1,0 +1,1395 @@
+{
+  "application": "two-column two-layer palletizing",
+  "block_size_mm": [
+    80,
+    50,
+    40
+  ],
+  "mass_kg_each": 0.1,
+  "scope": "Two deterministic initial layouts, four known CAD blocks each; no random clutter, hardware or continuous visual servoing claim.",
+  "runs": [
+    {
+      "success": true,
+      "application": "two-column two-layer palletizing",
+      "layout": 0,
+      "object_count": 4,
+      "columns": 2,
+      "layers": 2,
+      "control_source": "ground_truth_control_baseline",
+      "final_evaluation_only": [
+        {
+          "id": "green",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.4011932580923302,
+            0.17918268643004587,
+            0.40866628020331636
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 1.4463285748897459,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619997492415062,
+          "support_surface_gap_mm": -0.35464996923001424,
+          "max_support_contact_penetration_mm": 0.352673859679969,
+          "support_polygon_margin_mm": 81.19325809233018,
+          "inside_pallet": true,
+          "tilt_deg": 0.028964167294479662,
+          "yaw_error_deg": 0.09773039629562597,
+          "linear_speed_m_s": 5.6272064183768935e-06,
+          "angular_speed_rad_s": 1.2064207044589474e-06,
+          "five_second_max_drift_mm": 0.027437296743406992,
+          "displacement_since_placement_mm": 0.29906715453214
+        },
+        {
+          "id": "orange",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.5405148456954886,
+            0.1802115530997886,
+            0.4086663422120119
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 0.556615490435942,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619997212760374,
+          "support_surface_gap_mm": -0.35863534302943423,
+          "max_support_contact_penetration_mm": 0.35863484379285193,
+          "support_polygon_margin_mm": 79.48515430451141,
+          "inside_pallet": true,
+          "tilt_deg": 0.03053702389961269,
+          "yaw_error_deg": 0.02289075346867606,
+          "linear_speed_m_s": 5.935953702347564e-06,
+          "angular_speed_rad_s": 1.910150582370194e-06,
+          "five_second_max_drift_mm": 0.028925615751169496,
+          "displacement_since_placement_mm": 0.19347176009308728
+        },
+        {
+          "id": "purple",
+          "level": 1,
+          "support": "green",
+          "success": true,
+          "position_m": [
+            0.40345251559471645,
+            0.178797048641582,
+            0.44833077104372127
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 3.656084777802597,
+          "relative_support_xy_error_mm": 2.2919338921487027,
+          "support_normal_force_n": 0.980999468322501,
+          "support_surface_gap_mm": -0.3999474777384715,
+          "max_support_contact_penetration_mm": 0.3532370352610994,
+          "support_polygon_margin_mm": 24.798716199036814,
+          "inside_pallet": true,
+          "tilt_deg": 0.05965350867701349,
+          "yaw_error_deg": 0.006581789485070367,
+          "linear_speed_m_s": 1.7241315432344788e-05,
+          "angular_speed_rad_s": 2.936915846954164e-06,
+          "five_second_max_drift_mm": 0.08404273740800064,
+          "displacement_since_placement_mm": 0.45769599141761363
+        },
+        {
+          "id": "red",
+          "level": 1,
+          "support": "orange",
+          "success": true,
+          "position_m": [
+            0.5426392437640949,
+            0.18115951248553178,
+            0.4483309487987862
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 2.8827203906063588,
+          "relative_support_xy_error_mm": 2.326304827600381,
+          "support_normal_force_n": 0.9809994543491873,
+          "support_surface_gap_mm": -0.40990230956078344,
+          "max_support_contact_penetration_mm": 0.35751760185349085,
+          "support_polygon_margin_mm": 23.877023526104267,
+          "inside_pallet": true,
+          "tilt_deg": 0.06043104097024131,
+          "yaw_error_deg": 0.04445124478201762,
+          "linear_speed_m_s": 1.7708459722471375e-05,
+          "angular_speed_rad_s": 4.803912926124313e-06,
+          "five_second_max_drift_mm": 0.08628940244806144,
+          "displacement_since_placement_mm": 0.08802462495220621
+        }
+      ],
+      "simulation_time_s": 110.65399999992351,
+      "artifact_directory": "artifacts/pallet_gt_trial01",
+      "picks": [
+        {
+          "id": "green",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "green",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.4009340901967069,
+              0.17918171318416362,
+              0.408815518997169
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 1.2418203608233804,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802533262,
+            "support_surface_gap_mm": -0.1932196328885416,
+            "max_support_contact_penetration_mm": 0.1932191814584767,
+            "support_polygon_margin_mm": 80.93409019670689,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516657684009,
+            "yaw_error_deg": 0.0880633066689601,
+            "linear_speed_m_s": 1.2190989324867935e-06,
+            "angular_speed_rad_s": 5.613634009582083e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4480,
+          "min_holding_finger_normal_force_n": 46.711684499584166,
+          "max_unexpected_robot_penetration_m": 1.6899645597775972e-06,
+          "max_target_support_penetration_m": 0.0033295675900273654,
+          "max_joint_tracking_error_rad": 0.12343516952110495
+        },
+        {
+          "id": "orange",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "orange",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.5403987413993042,
+              0.1801703535715165,
+              0.4088155189971737
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 0.4336070142969184,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802597542,
+            "support_surface_gap_mm": -0.193219633161823,
+            "max_support_contact_penetration_mm": 0.19321918173175792,
+            "support_polygon_margin_mm": 79.60125860069579,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516816277713,
+            "yaw_error_deg": 0.017605845652018573,
+            "linear_speed_m_s": 1.2190980038986005e-06,
+            "angular_speed_rad_s": 5.6188312079738113e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 7460,
+          "min_holding_finger_normal_force_n": 44.1006863902499,
+          "max_unexpected_robot_penetration_m": 0.00022387175593555395,
+          "max_target_support_penetration_m": 0.0029667383990995408,
+          "max_joint_tracking_error_rad": 0.09090385033769965
+        },
+        {
+          "id": "purple",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "purple",
+            "level": 1,
+            "support": "green",
+            "success": true,
+            "position_m": [
+              0.4029967029079908,
+              0.17883852505746092,
+              0.44833112047971124
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 3.2139154252883486,
+            "relative_support_xy_error_mm": 1.9849153461121158,
+            "support_normal_force_n": 0.9809995298248464,
+            "support_surface_gap_mm": -0.3955863144107785,
+            "max_support_contact_penetration_mm": 0.3522199717817513,
+            "support_polygon_margin_mm": 24.826021168958768,
+            "inside_pallet": true,
+            "tilt_deg": 0.0560975002840082,
+            "yaw_error_deg": 0.008997412404482402,
+            "linear_speed_m_s": 1.6235583018775486e-05,
+            "angular_speed_rad_s": 2.6250069670479897e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 3754,
+          "min_holding_finger_normal_force_n": 46.62838103690044,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.0026288695997708947,
+          "max_joint_tracking_error_rad": 0.10967761450260594
+        },
+        {
+          "id": "red",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "red",
+            "level": 1,
+            "support": "orange",
+            "success": true,
+            "position_m": [
+              0.5425603632772121,
+              0.18112044588157314,
+              0.4483310107847065
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 2.7947914206306144,
+            "relative_support_xy_error_mm": 2.267850113472484,
+            "support_normal_force_n": 0.9809994670050097,
+            "support_surface_gap_mm": -0.40893273982206546,
+            "max_support_contact_penetration_mm": 0.3572428098396298,
+            "support_polygon_margin_mm": 23.903230220915813,
+            "inside_pallet": true,
+            "tilt_deg": 0.059726266194561166,
+            "yaw_error_deg": 0.045559994089462444,
+            "linear_speed_m_s": 1.750203860041282e-05,
+            "angular_speed_rad_s": 4.670153432613797e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4036,
+          "min_holding_finger_normal_force_n": 44.948396636457275,
+          "max_unexpected_robot_penetration_m": 0.00010607889793342652,
+          "max_target_support_penetration_m": 0.0012647892977951862,
+          "max_joint_tracking_error_rad": 0.10332233435121263
+        }
+      ]
+    },
+    {
+      "success": true,
+      "application": "two-column two-layer palletizing",
+      "layout": 1,
+      "object_count": 4,
+      "columns": 2,
+      "layers": 2,
+      "control_source": "ground_truth_control_baseline",
+      "final_evaluation_only": [
+        {
+          "id": "green",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.40108195850132455,
+            0.17918194251060263,
+            0.4086662801930632
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 1.356411535835474,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619997497830624,
+          "support_surface_gap_mm": -0.35449751071592317,
+          "max_support_contact_penetration_mm": 0.35291750089348306,
+          "support_polygon_margin_mm": 81.08195850132455,
+          "inside_pallet": true,
+          "tilt_deg": 0.02893010762426169,
+          "yaw_error_deg": 0.08440287376438235,
+          "linear_speed_m_s": 5.620421809485016e-06,
+          "angular_speed_rad_s": 1.1755517455946872e-06,
+          "five_second_max_drift_mm": 0.02740521795739581,
+          "displacement_since_placement_mm": 0.29251376878218993
+        },
+        {
+          "id": "orange",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.5405122829698767,
+            0.18022167977774156,
+            0.40866634088000287
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 0.558189721407742,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619997188929112,
+          "support_surface_gap_mm": -0.3587312830272693,
+          "max_support_contact_penetration_mm": 0.3587307833308038,
+          "support_polygon_margin_mm": 79.48771703012325,
+          "inside_pallet": true,
+          "tilt_deg": 0.03066817842844921,
+          "yaw_error_deg": 0.019159938678431392,
+          "linear_speed_m_s": 5.961362875604696e-06,
+          "angular_speed_rad_s": 1.907975363673275e-06,
+          "five_second_max_drift_mm": 0.029049861638078624,
+          "displacement_since_placement_mm": 0.1942755576009317
+        },
+        {
+          "id": "purple",
+          "level": 1,
+          "support": "green",
+          "success": true,
+          "position_m": [
+            0.40334735645654146,
+            0.17884212124814375,
+            0.44833077374246166
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 3.541959690785574,
+          "relative_support_xy_error_mm": 2.2907436316445566,
+          "support_normal_force_n": 0.9809994695420341,
+          "support_surface_gap_mm": -0.3993879172172199,
+          "max_support_contact_penetration_mm": 0.35349257515449456,
+          "support_polygon_margin_mm": 24.844245615985,
+          "inside_pallet": true,
+          "tilt_deg": 0.0595860950729841,
+          "yaw_error_deg": 0.05961650239728585,
+          "linear_speed_m_s": 1.7220948181630885e-05,
+          "angular_speed_rad_s": 2.8003948784864618e-06,
+          "five_second_max_drift_mm": 0.08394643793403925,
+          "displacement_since_placement_mm": 0.4532198107635071
+        },
+        {
+          "id": "red",
+          "level": 1,
+          "support": "orange",
+          "success": true,
+          "position_m": [
+            0.5426709437619175,
+            0.1811654114308533,
+            0.4483309138460628
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 2.914124977156832,
+          "relative_support_xy_error_mm": 2.3559384219836867,
+          "support_normal_force_n": 0.9809994491197208,
+          "support_surface_gap_mm": -0.41024421532365185,
+          "max_support_contact_penetration_mm": 0.3576277676004564,
+          "support_polygon_margin_mm": 23.881119745268855,
+          "inside_pallet": true,
+          "tilt_deg": 0.06071985489553689,
+          "yaw_error_deg": 0.04477765321716533,
+          "linear_speed_m_s": 1.778989265340231e-05,
+          "angular_speed_rad_s": 4.804763723491674e-06,
+          "five_second_max_drift_mm": 0.08668760379214416,
+          "displacement_since_placement_mm": 0.08843080273483847
+        }
+      ],
+      "simulation_time_s": 108.62599999992824,
+      "artifact_directory": "artifacts/pallet_gt_layout1",
+      "picks": [
+        {
+          "id": "green",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "green",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.400830379352649,
+              0.1791820698871304,
+              0.4088155189971795
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 1.1655640432188075,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802537788,
+            "support_surface_gap_mm": -0.1932196336601466,
+            "max_support_contact_penetration_mm": 0.19321918223008108,
+            "support_polygon_margin_mm": 80.83037935264898,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490517577527462,
+            "yaw_error_deg": 0.08863646446393851,
+            "linear_speed_m_s": 1.219093987125166e-06,
+            "angular_speed_rad_s": 5.616396459043962e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4758,
+          "min_holding_finger_normal_force_n": 46.63342169463407,
+          "max_unexpected_robot_penetration_m": 2.6867502491894826e-06,
+          "max_target_support_penetration_m": 0.0033317894518224635,
+          "max_joint_tracking_error_rad": 0.12504132778490823
+        },
+        {
+          "id": "orange",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "orange",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.5403948892643652,
+              0.18018035666622445,
+              0.40881551899717145
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 0.4341267766015473,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999804977461,
+            "support_surface_gap_mm": -0.19321963296536904,
+            "max_support_contact_penetration_mm": 0.19321918153524836,
+            "support_polygon_margin_mm": 79.60511073563481,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516943152675,
+            "yaw_error_deg": 0.013328986796397256,
+            "linear_speed_m_s": 1.219066038803851e-06,
+            "angular_speed_rad_s": 5.6717921748761253e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 6795,
+          "min_holding_finger_normal_force_n": 43.99594518688452,
+          "max_unexpected_robot_penetration_m": 4.60309002703476e-05,
+          "max_target_support_penetration_m": 0.0027680159250037108,
+          "max_joint_tracking_error_rad": 0.09090385033773285
+        },
+        {
+          "id": "purple",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "purple",
+            "level": 1,
+            "support": "green",
+            "success": true,
+            "position_m": [
+              0.40289532616269985,
+              0.17887493422095213,
+              0.4483311188996047
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 3.106233506290004,
+            "relative_support_xy_error_mm": 1.9866703382511115,
+            "support_normal_force_n": 0.9809995300103735,
+            "support_surface_gap_mm": -0.3951380217093181,
+            "max_support_contact_penetration_mm": 0.35245688867119146,
+            "support_polygon_margin_mm": 24.865820324649206,
+            "inside_pallet": true,
+            "tilt_deg": 0.05608610026443362,
+            "yaw_error_deg": 0.057506856897011,
+            "linear_speed_m_s": 1.6231399244790722e-05,
+            "angular_speed_rad_s": 2.5249561658628836e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 3934,
+          "min_holding_finger_normal_force_n": 46.36615659471142,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.0026283618206122917,
+          "max_joint_tracking_error_rad": 0.1104370576289373
+        },
+        {
+          "id": "red",
+          "success": true,
+          "perception_evaluation_only": [],
+          "placement_evaluation_only": {
+            "id": "red",
+            "level": 1,
+            "support": "orange",
+            "success": true,
+            "position_m": [
+              0.5425915141908592,
+              0.18112654053959978,
+              0.4483309765116438
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 2.82578119973681,
+            "relative_support_xy_error_mm": 2.2972125569722053,
+            "support_normal_force_n": 0.9809994618595468,
+            "support_surface_gap_mm": -0.409271391649757,
+            "max_support_contact_penetration_mm": 0.357351947715583,
+            "support_polygon_margin_mm": 23.9071982854652,
+            "inside_pallet": true,
+            "tilt_deg": 0.060013810245066,
+            "yaw_error_deg": 0.04588640358313865,
+            "linear_speed_m_s": 1.7583165911862927e-05,
+            "angular_speed_rad_s": 4.670579403457406e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4006,
+          "min_holding_finger_normal_force_n": 44.99117390209179,
+          "max_unexpected_robot_penetration_m": 4.7546597537223134e-05,
+          "max_target_support_penetration_m": 0.0012077224265116136,
+          "max_joint_tracking_error_rad": 0.10442422525653178
+        }
+      ]
+    },
+    {
+      "success": true,
+      "application": "two-column two-layer palletizing",
+      "layout": 0,
+      "object_count": 4,
+      "columns": 2,
+      "layers": 2,
+      "control_source": "FoundationPose + estimated calibration",
+      "final_evaluation_only": [
+        {
+          "id": "green",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.398816186092255,
+            0.17890566775457523,
+            0.40866671758989476
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 1.6121347436076667,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619991885483337,
+          "support_surface_gap_mm": -0.3674431645143139,
+          "max_support_contact_penetration_mm": 0.36744256651218093,
+          "support_polygon_margin_mm": 78.816186092255,
+          "inside_pallet": true,
+          "tilt_deg": 0.052111286783376294,
+          "yaw_error_deg": 0.09042792606850729,
+          "linear_speed_m_s": 1.0171707933550787e-05,
+          "angular_speed_rad_s": 6.148935958050055e-06,
+          "five_second_max_drift_mm": 0.04929693714827056,
+          "displacement_since_placement_mm": 0.3751302741785528
+        },
+        {
+          "id": "orange",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.5388619302150888,
+            0.18019193946502415,
+            0.4086664012799599
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 1.1541419295570787,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619996207654595,
+          "support_surface_gap_mm": -0.3590909307767953,
+          "max_support_contact_penetration_mm": 0.3587673744839658,
+          "support_polygon_margin_mm": 81.13806978491122,
+          "inside_pallet": true,
+          "tilt_deg": 0.03562146103593306,
+          "yaw_error_deg": 0.08301410073585387,
+          "linear_speed_m_s": 6.940779429701625e-06,
+          "angular_speed_rad_s": 3.53530151296613e-06,
+          "five_second_max_drift_mm": 0.0337218105793681,
+          "displacement_since_placement_mm": 0.1843533084092966
+        },
+        {
+          "id": "purple",
+          "level": 1,
+          "support": "green",
+          "success": true,
+          "position_m": [
+            0.4001792995598075,
+            0.17490896132180658,
+            0.44832759289421537
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 5.094195044853354,
+          "relative_support_xy_error_mm": 4.222764572546913,
+          "support_normal_force_n": 0.9809981427302978,
+          "support_surface_gap_mm": -0.44917523869636433,
+          "max_support_contact_penetration_mm": 0.3691783767215583,
+          "support_polygon_margin_mm": 21.197593140435483,
+          "inside_pallet": true,
+          "tilt_deg": 0.11148908163796686,
+          "yaw_error_deg": 0.013295037293773106,
+          "linear_speed_m_s": 3.202297906272451e-05,
+          "angular_speed_rad_s": 1.8317231033127875e-05,
+          "five_second_max_drift_mm": 0.15507746659862362,
+          "displacement_since_placement_mm": 0.8225839718207095
+        },
+        {
+          "id": "red",
+          "level": 1,
+          "support": "orange",
+          "success": true,
+          "position_m": [
+            0.5404731294533536,
+            0.17799405814350422,
+            0.4483302606006126
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 2.060983796945607,
+          "relative_support_xy_error_mm": 2.7251872025369743,
+          "support_normal_force_n": 0.980999192864792,
+          "support_surface_gap_mm": -0.41737160858362765,
+          "max_support_contact_penetration_mm": 0.35945453763031887,
+          "support_polygon_margin_mm": 22.988358634938784,
+          "inside_pallet": true,
+          "tilt_deg": 0.07349927731630528,
+          "yaw_error_deg": 0.0663401794133562,
+          "linear_speed_m_s": 2.1308101817128686e-05,
+          "angular_speed_rad_s": 9.970251181994101e-06,
+          "five_second_max_drift_mm": 0.1034874545461307,
+          "displacement_since_placement_mm": 0.10557525461744724
+        }
+      ],
+      "simulation_time_s": 113.29799999991735,
+      "artifact_directory": "artifacts/pallet_vision_layout0",
+      "picks": [
+        {
+          "id": "green",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "green",
+              "mask_iou": 0.9933409873708381,
+              "translation_error_mm": 4.323318526238756,
+              "rotation_error_deg": 0.3971116280804471,
+              "raw_rotation_error_deg": 0.3971116280804471,
+              "orientation_observable": true
+            },
+            {
+              "id": "orange",
+              "mask_iou": 0.9940366029200082,
+              "translation_error_mm": 4.01289321495486,
+              "rotation_error_deg": 0.3889389607830445,
+              "raw_rotation_error_deg": 0.3889389607830445,
+              "orientation_observable": true
+            },
+            {
+              "id": "purple",
+              "mask_iou": 0.9938219601235608,
+              "translation_error_mm": 4.077110821678005,
+              "rotation_error_deg": 0.7134351884617198,
+              "raw_rotation_error_deg": 0.7134351884617198,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.9836358987471235,
+              "translation_error_mm": 3.8387823093474047,
+              "rotation_error_deg": 0.2625427373928147,
+              "raw_rotation_error_deg": 0.2625427373928147,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "green",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.39858505053933757,
+              0.17916092687776952,
+              0.4088155189971761
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 1.6450306017453151,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802263742,
+            "support_surface_gap_mm": -0.1932196334276104,
+            "max_support_contact_penetration_mm": 0.19321918199754526,
+            "support_polygon_margin_mm": 78.58505053933756,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516974871415,
+            "yaw_error_deg": 0.09825868206776149,
+            "linear_speed_m_s": 1.2190837102882126e-06,
+            "angular_speed_rad_s": 5.6220104819905403e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4475,
+          "min_holding_finger_normal_force_n": 46.54411703392821,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.00328691612769735,
+          "max_joint_tracking_error_rad": 0.12368316728663495
+        },
+        {
+          "id": "orange",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "orange",
+              "mask_iou": 0.9938271604938271,
+              "translation_error_mm": 4.022004127099981,
+              "rotation_error_deg": 0.4057328977954556,
+              "raw_rotation_error_deg": 0.4057328977954556,
+              "orientation_observable": true
+            },
+            {
+              "id": "purple",
+              "mask_iou": 0.993542953396968,
+              "translation_error_mm": 4.10594081592389,
+              "rotation_error_deg": 0.59850881156362,
+              "raw_rotation_error_deg": 0.59850881156362,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.9833844580777096,
+              "translation_error_mm": 3.8644064435888543,
+              "rotation_error_deg": 0.1272916865053596,
+              "raw_rotation_error_deg": 0.1272916865053596,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "orange",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.5387641353904836,
+              0.1802386965074208,
+              0.4088155189971776
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 1.2587046340226322,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802556055,
+            "support_surface_gap_mm": -0.19321963346968785,
+            "max_support_contact_penetration_mm": 0.19321918203956706,
+            "support_polygon_margin_mm": 81.23586460951637,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490517133465114,
+            "yaw_error_deg": 0.08795953816759812,
+            "linear_speed_m_s": 1.2190952430920747e-06,
+            "angular_speed_rad_s": 5.6169170916820124e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 8062,
+          "min_holding_finger_normal_force_n": 45.14357194743543,
+          "max_unexpected_robot_penetration_m": 4.0677643328514515e-05,
+          "max_target_support_penetration_m": 0.002873881795036783,
+          "max_joint_tracking_error_rad": 0.09092911714270335
+        },
+        {
+          "id": "purple",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "purple",
+              "mask_iou": 0.9932659932659933,
+              "translation_error_mm": 4.087492749067218,
+              "rotation_error_deg": 0.5368231986782737,
+              "raw_rotation_error_deg": 0.5368231986782737,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.9831417624521073,
+              "translation_error_mm": 3.841507144235283,
+              "rotation_error_deg": 0.27551713686825036,
+              "raw_rotation_error_deg": 0.27551713686825036,
+              "orientation_observable": true
+            },
+            {
+              "id": "green",
+              "mask_iou": 0.9956363636363637,
+              "translation_error_mm": 3.694266000482816,
+              "rotation_error_deg": 0.2710101962408422,
+              "raw_rotation_error_deg": 0.2710101962408422,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "purple",
+            "level": 1,
+            "support": "green",
+            "success": true,
+            "position_m": [
+              0.3997745701951167,
+              0.17562508770415225,
+              0.44832883247551675
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 4.380716401833096,
+            "relative_support_xy_error_mm": 3.672453026696416,
+            "support_normal_force_n": 0.980998574790106,
+            "support_surface_gap_mm": -0.43614767045879743,
+            "max_support_contact_penetration_mm": 0.3653446369969089,
+            "support_polygon_margin_mm": 21.68607582862353,
+            "inside_pallet": true,
+            "tilt_deg": 0.09769123174702156,
+            "yaw_error_deg": 0.008468925513896663,
+            "linear_speed_m_s": 2.8152312554613455e-05,
+            "angular_speed_rad_s": 1.5006424996741806e-05
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 3740,
+          "min_holding_finger_normal_force_n": 46.335116251459034,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.002819017097104055,
+          "max_joint_tracking_error_rad": 0.10962921197413134
+        },
+        {
+          "id": "red",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "red",
+              "mask_iou": 0.9831503701812612,
+              "translation_error_mm": 3.8503758359871836,
+              "rotation_error_deg": 0.33996618886128604,
+              "raw_rotation_error_deg": 0.33996618886128604,
+              "orientation_observable": true
+            },
+            {
+              "id": "orange",
+              "mask_iou": 0.9908998988877654,
+              "translation_error_mm": 3.526735832620648,
+              "rotation_error_deg": 1.155732501247391,
+              "raw_rotation_error_deg": 1.155732501247391,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "red",
+            "level": 1,
+            "support": "orange",
+            "success": true,
+            "position_m": [
+              0.5403956197464355,
+              0.17806574055389646,
+              0.4483303690504453
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 1.9743035705307308,
+            "relative_support_xy_error_mm": 2.6552928201110215,
+            "support_normal_force_n": 0.9809992221440087,
+            "support_surface_gap_mm": -0.41597406454374486,
+            "max_support_contact_penetration_mm": 0.35900253729625276,
+            "support_polygon_margin_mm": 23.03674757359142,
+            "inside_pallet": true,
+            "tilt_deg": 0.07215398640362834,
+            "yaw_error_deg": 0.06874664936030524,
+            "linear_speed_m_s": 2.0923889555900203e-05,
+            "angular_speed_rad_s": 9.641337510089182e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4023,
+          "min_holding_finger_normal_force_n": 46.15771045752369,
+          "max_unexpected_robot_penetration_m": 0.0001086276892174801,
+          "max_target_support_penetration_m": 0.002228324078539293,
+          "max_joint_tracking_error_rad": 0.10362692586167965
+        }
+      ],
+      "foundationpose_provenance": [
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        }
+      ]
+    },
+    {
+      "success": true,
+      "application": "two-column two-layer palletizing",
+      "layout": 1,
+      "object_count": 4,
+      "columns": 2,
+      "layers": 2,
+      "control_source": "FoundationPose + estimated calibration",
+      "final_evaluation_only": [
+        {
+          "id": "green",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.3994383153358044,
+            0.17880654450583203,
+            0.4086666765060449
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 1.3190245177980147,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619991309973375,
+          "support_surface_gap_mm": -0.3696557776847187,
+          "max_support_contact_penetration_mm": 0.3696551680760722,
+          "support_polygon_margin_mm": 79.43831533580436,
+          "inside_pallet": true,
+          "tilt_deg": 0.05393044898895845,
+          "yaw_error_deg": 0.0074622128032298994,
+          "linear_speed_m_s": 1.0522948291734192e-05,
+          "angular_speed_rad_s": 6.769175801232998e-06,
+          "five_second_max_drift_mm": 0.05102313242857226,
+          "displacement_since_placement_mm": 0.38677889208225863
+        },
+        {
+          "id": "orange",
+          "level": 0,
+          "support": "pallet",
+          "success": true,
+          "position_m": [
+            0.5377344893193622,
+            0.18020337680162007,
+            0.40866642293677574
+          ],
+          "nominal_layer_centre_z_m": 0.40900000000000003,
+          "slot_xy_error_mm": 2.2746210162401534,
+          "relative_support_xy_error_mm": 0.0,
+          "support_normal_force_n": 1.9619996544056195,
+          "support_surface_gap_mm": -0.3574914108755989,
+          "max_support_contact_penetration_mm": 0.35749090182792603,
+          "support_polygon_margin_mm": 82.26551068063782,
+          "inside_pallet": true,
+          "tilt_deg": 0.034003371369355086,
+          "yaw_error_deg": 0.08854852475937307,
+          "linear_speed_m_s": 6.627280341920323e-06,
+          "angular_speed_rad_s": 3.3240323982713354e-06,
+          "five_second_max_drift_mm": 0.03218841366858264,
+          "displacement_since_placement_mm": 0.1810812353458888
+        },
+        {
+          "id": "purple",
+          "level": 1,
+          "support": "green",
+          "success": true,
+          "position_m": [
+            0.4016435989032166,
+            0.17488366903569896,
+            0.4483268045530124
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 5.373849634193374,
+          "relative_support_xy_error_mm": 4.500247500623729,
+          "support_normal_force_n": 0.9809980163985867,
+          "support_surface_gap_mm": -0.45741327225501394,
+          "max_support_contact_penetration_mm": 0.3715905535571427,
+          "support_polygon_margin_mm": 21.272748323428626,
+          "inside_pallet": true,
+          "tilt_deg": 0.11521688769782486,
+          "yaw_error_deg": 0.029678717177942432,
+          "linear_speed_m_s": 3.309722177280122e-05,
+          "angular_speed_rad_s": 2.077536746229813e-05,
+          "five_second_max_drift_mm": 0.1603604201652262,
+          "displacement_since_placement_mm": 0.8436231720669451
+        },
+        {
+          "id": "red",
+          "level": 1,
+          "support": "orange",
+          "success": true,
+          "position_m": [
+            0.5388956237175738,
+            0.1779837299190727,
+            0.44833068098197637
+          ],
+          "nominal_layer_centre_z_m": 0.449,
+          "slot_xy_error_mm": 2.2989110492640092,
+          "relative_support_xy_error_mm": 2.5050080586522356,
+          "support_normal_force_n": 0.9809992674233088,
+          "support_surface_gap_mm": -0.4121617770290187,
+          "max_support_contact_penetration_mm": 0.35807837387702274,
+          "support_polygon_margin_mm": 22.96717650878058,
+          "inside_pallet": true,
+          "tilt_deg": 0.07002330824548444,
+          "yaw_error_deg": 0.06735784175238044,
+          "linear_speed_m_s": 2.03195056922919e-05,
+          "angular_speed_rad_s": 9.2094737216904e-06,
+          "five_second_max_drift_mm": 0.09865388423731107,
+          "displacement_since_placement_mm": 0.1006448062628853
+        }
+      ],
+      "simulation_time_s": 110.30799999992432,
+      "artifact_directory": "artifacts/pallet_vision_layout1",
+      "picks": [
+        {
+          "id": "green",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "green",
+              "mask_iou": 0.9933409873708381,
+              "translation_error_mm": 4.366951363045369,
+              "rotation_error_deg": 0.506396050411356,
+              "raw_rotation_error_deg": 0.506396050411356,
+              "orientation_observable": true
+            },
+            {
+              "id": "orange",
+              "mask_iou": 0.9928795811518325,
+              "translation_error_mm": 4.094132257298729,
+              "rotation_error_deg": 0.41614358595846473,
+              "raw_rotation_error_deg": 0.41614358595846473,
+              "orientation_observable": true
+            },
+            {
+              "id": "purple",
+              "mask_iou": 0.996330793113181,
+              "translation_error_mm": 4.205883971453564,
+              "rotation_error_deg": 0.6155906075007799,
+              "raw_rotation_error_deg": 0.6155906075007799,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.9754601226993865,
+              "translation_error_mm": 3.8697852738868437,
+              "rotation_error_deg": 0.33827330684966095,
+              "raw_rotation_error_deg": 0.33827330684966095,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "green",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.39918446833405324,
+              0.17905755351742283,
+              0.408815518997164
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 1.2463134720783473,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999804603831,
+            "support_surface_gap_mm": -0.19321963247609375,
+            "max_support_contact_penetration_mm": 0.19321918104602898,
+            "support_polygon_margin_mm": 79.18446833405324,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516372215338,
+            "yaw_error_deg": 0.014910091602988852,
+            "linear_speed_m_s": 1.219076956881498e-06,
+            "angular_speed_rad_s": 5.6449677422472425e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 4749,
+          "min_holding_finger_normal_force_n": 46.54447877550343,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.0032718345282033304,
+          "max_joint_tracking_error_rad": 0.1252445660779695
+        },
+        {
+          "id": "orange",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "orange",
+              "mask_iou": 0.9928810720268006,
+              "translation_error_mm": 4.069427890960323,
+              "rotation_error_deg": 0.3881418359768396,
+              "raw_rotation_error_deg": 0.3881418359768396,
+              "orientation_observable": true
+            },
+            {
+              "id": "purple",
+              "mask_iou": 0.9952058657642414,
+              "translation_error_mm": 4.196997568655002,
+              "rotation_error_deg": 0.6192093422713056,
+              "raw_rotation_error_deg": 0.6192093422713056,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.9754663940710452,
+              "translation_error_mm": 3.8654813288671503,
+              "rotation_error_deg": 0.38267552223603235,
+              "raw_rotation_error_deg": 0.38267552223603235,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "orange",
+            "level": 0,
+            "support": "pallet",
+            "success": true,
+            "position_m": [
+              0.5376429196621095,
+              0.18025002202044144,
+              0.4088155189971735
+            ],
+            "nominal_layer_centre_z_m": 0.40900000000000003,
+            "slot_xy_error_mm": 2.370303510096468,
+            "relative_support_xy_error_mm": 0.0,
+            "support_normal_force_n": 0.9809999802500238,
+            "support_surface_gap_mm": -0.1932196332633529,
+            "max_support_contact_penetration_mm": 0.1932191818332878,
+            "support_polygon_margin_mm": 82.35708033789047,
+            "inside_pallet": true,
+            "tilt_deg": 0.011490516879715194,
+            "yaw_error_deg": 0.0937868486660816,
+            "linear_speed_m_s": 1.2190961394653573e-06,
+            "angular_speed_rad_s": 5.6134124366454555e-08
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 7186,
+          "min_holding_finger_normal_force_n": 45.22869102151341,
+          "max_unexpected_robot_penetration_m": 7.769375806917513e-05,
+          "max_target_support_penetration_m": 0.0032694508249468852,
+          "max_joint_tracking_error_rad": 0.09092911714266738
+        },
+        {
+          "id": "purple",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "purple",
+              "mask_iou": 0.9946403385049365,
+              "translation_error_mm": 4.1930770307687055,
+              "rotation_error_deg": 0.5047451871826746,
+              "raw_rotation_error_deg": 0.5047451871826746,
+              "orientation_observable": true
+            },
+            {
+              "id": "red",
+              "mask_iou": 0.974961676034747,
+              "translation_error_mm": 3.8877957378638563,
+              "rotation_error_deg": 0.34269150672609516,
+              "raw_rotation_error_deg": 0.34269150672609516,
+              "orientation_observable": true
+            },
+            {
+              "id": "green",
+              "mask_iou": 0.9927745664739884,
+              "translation_error_mm": 3.6698500660872915,
+              "rotation_error_deg": 0.443739742917833,
+              "raw_rotation_error_deg": 0.443739742917833,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "purple",
+            "level": 1,
+            "support": "green",
+            "success": true,
+            "position_m": [
+              0.40117391797689733,
+              0.17558445299764866,
+              0.4483281170217745
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 4.5689319043356855,
+            "relative_support_xy_error_mm": 3.9274110085298033,
+            "support_normal_force_n": 0.9809984551677888,
+            "support_surface_gap_mm": -0.44400993166693326,
+            "max_support_contact_penetration_mm": 0.3676615660581126,
+            "support_polygon_margin_mm": 21.750198699403338,
+            "inside_pallet": true,
+            "tilt_deg": 0.10168068839302383,
+            "yaw_error_deg": 0.004143538667761746,
+            "linear_speed_m_s": 2.9297568612077878e-05,
+            "angular_speed_rad_s": 1.7010021879047698e-05
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 3912,
+          "min_holding_finger_normal_force_n": 46.485306919885616,
+          "max_unexpected_robot_penetration_m": 0.0,
+          "max_target_support_penetration_m": 0.0026027649179892133,
+          "max_joint_tracking_error_rad": 0.11126862622366057
+        },
+        {
+          "id": "red",
+          "success": true,
+          "perception_evaluation_only": [
+            {
+              "id": "red",
+              "mask_iou": 0.9747061829330608,
+              "translation_error_mm": 3.7507552154856603,
+              "rotation_error_deg": 0.4556604923219241,
+              "raw_rotation_error_deg": 0.4556604923219241,
+              "orientation_observable": true
+            },
+            {
+              "id": "orange",
+              "mask_iou": 0.9929101958136395,
+              "translation_error_mm": 3.540865458124535,
+              "rotation_error_deg": 1.1739066874851039,
+              "raw_rotation_error_deg": 1.1739066874851039,
+              "orientation_observable": true
+            }
+          ],
+          "placement_evaluation_only": {
+            "id": "red",
+            "level": 1,
+            "support": "orange",
+            "success": true,
+            "position_m": [
+              0.5388251280068727,
+              0.17805556112427615,
+              0.4483307797719017
+            ],
+            "nominal_layer_centre_z_m": 0.449,
+            "slot_xy_error_mm": 2.2718201384927728,
+            "relative_support_xy_error_mm": 2.4400824561978176,
+            "support_normal_force_n": 0.9809992950413364,
+            "support_surface_gap_mm": -0.41073179319772724,
+            "max_support_contact_penetration_mm": 0.3576428678373906,
+            "support_polygon_margin_mm": 23.01566554010548,
+            "inside_pallet": true,
+            "tilt_deg": 0.06869685305949101,
+            "yaw_error_deg": 0.06952874347523749,
+            "linear_speed_m_s": 1.994030208942934e-05,
+            "angular_speed_rad_s": 8.908403956540014e-06
+          },
+          "bilateral_loaded_contact_fraction": 1.0,
+          "holding_physics_steps": 3982,
+          "min_holding_finger_normal_force_n": 46.130286602928344,
+          "max_unexpected_robot_penetration_m": 9.573567532522581e-05,
+          "max_target_support_penetration_m": 0.0017504294136286018,
+          "max_joint_tracking_error_rad": 0.10195186553154673
+        }
+      ],
+      "foundationpose_provenance": [
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        },
+        {
+          "status": "inference_completed",
+          "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+          "completed_frames": 1,
+          "ground_truth_used_for_inference": false,
+          "registration_candidate_count": 24
+        }
+      ]
+    }
+  ],
+  "regressions": {
+    "pallet_regression_workpieces": true,
+    "pallet_regression_diverse": true,
+    "pallet_regression_single": true
+  },
+  "cached_visual_pose_replay_current_payload_monitor": true,
+  "floating_block_negative_test": true
+}

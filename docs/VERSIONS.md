@@ -1,13 +1,14 @@
-# 两个阶段版本与组员复现
+# 阶段版本与组员复现
 
-同一个公开仓库保存两个阶段，不需要创建第二个仓库。`main` 为最新整合代码；分支用于调试，版本标签用于固定复现，GitHub Release 提供版本说明和打印文件下载。
+同一个公开仓库保存抓放与码垛的各个阶段。`main` 为最新整合代码；分支用于调试，版本标签用于固定复现，GitHub Release 提供版本说明和打印文件下载。
 
 | 阶段 | 固定标签 | 对应开发分支 | 内容 |
 |---|---|---|---|
 | 三工件 | [v0.2.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | `feat/multi-object-pick-place` | 绿色双斜角、橙色斜肩、紫色渐缩工件；一次连续视觉场景 3/3 |
 | 多种类物品 | [v0.3.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | `feat/diverse-object-library` | 锤子、球、带孔螺母；一次连续视觉场景 3/3；螺丝刀仅预览/打印 |
+| 视觉码垛 | [v0.4.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.4.0) | `feat/palletizing` | 四料块、两列两层；两组视觉试验各 4/4，包含层间支撑与稳定性验收 |
 
-`v0.2.0` 固定在原提交 `8c165f8`。`v0.3.0` 保留 `ef04a4a` 的仿真功能，并补充版本交接说明。标签不随以后码垛开发移动。原 `v0.1.0` 也保留。
+`v0.2.0` 固定在原提交 `8c165f8`。`v0.3.0` 保留 `ef04a4a` 的仿真功能，并补充版本交接说明。`v0.4.0` 加入视觉码垛，保留旧入口。这些标签不随后续开发移动；原 `v0.1.0` 也保留。
 
 ## 1. 为什么自动抓放中没有绿色螺丝刀
 
@@ -60,7 +61,23 @@ python -u scripts/run_multi_pick_place.py --collection diverse \
 
 `--viewer` 打开实时窗口；无窗口环境去掉这个参数，每轮使用新输出目录。最新版也可用 `--collection workpieces` 运行旧类型场景，但若需要严格复现旧阶段，请选固定标签 v0.2.0。
 
-## 4. 已经克隆仓库的组员
+## 4. 新组员复现码垛版本
+
+```bash
+cd ~/projects
+git clone --branch v0.4.0 --depth 1 \
+  https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place.git \
+  ma6216-palletizing-v0.4.0
+cd ma6216-palletizing-v0.4.0
+conda activate foundationpose
+python scripts/check_setup.py --vision
+python -u scripts/run_palletizing.py \
+  --output "artifacts/pallet_$(date +%Y%m%d_%H%M%S)" --record --viewer
+```
+
+`--layout 1` 使用位置和角度扰动，`--ground-truth` 为跳过视觉的明确物理对照。码垛模型、标定重跑、验收和实测范围见 [PALLETIZING.md](PALLETIZING.md)。
+
+## 5. 已经克隆仓库的组员
 
 先保存自己的修改，再获取分支和标签：
 
@@ -78,11 +95,12 @@ git switch -c feat/yourname-workpiece-testing v0.2.0
 
 公开仓库允许所有人拉取；直接推送仍需协作者权限，也可以 Fork 后提交 Pull Request。不要重打同名标签或强制推送覆盖其他组员的提交。
 
-## 5. 打印与真机交接
+## 6. 打印与真机交接
 
 - v0.2.0：`assets/printable` 中的 STL/OBJ；Release 附带三工件打印压缩包。
 - v0.3.0：另外提供 `assets/printable_library`；Release 附带球、螺母、锤子和螺丝刀的打印压缩包。
+- v0.4.0：另外提供 `assets/palletizing`；打印四份 80×50×40 mm 平顶料块，Release 附带模型压缩包。
 - `*_print_mm.stl` 用于毫米制切片；`*_model_m.obj` 用于米制感知。两个扫描工具为原尺寸的 50%，STL 不带颜色，需核对清单尺寸。
-- 两版都是仿真项目和物体交接资源，尚不包含可直接运行的 UR5e 真机驱动。真机相机标定、TCP、坐标和控制接口由硬件组适配验证。螺丝刀抓取和堆叠均未验证。
+- 各版本都是仿真项目和物体交接资源，尚不包含可直接运行的 UR5e 真机驱动。真机相机标定、TCP、坐标和控制接口由硬件组适配验证。螺丝刀抓取尚未验证；两列两层码垛的仿真结果见 v0.4.0。
 
-已有视觉结果只覆盖记录中的固定布局，原始误差和失败范围见 [MULTI_OBJECT.md](MULTI_OBJECT.md) 与 v0.3.0 的 [OBJECT_LIBRARY.md](OBJECT_LIBRARY.md)。后续码垛在新分支开发，验证通过后发布新标签；这两个版本继续保留。
+已有视觉结果只覆盖记录中的指定布局，原始误差和范围见 [MULTI_OBJECT.md](MULTI_OBJECT.md)、[OBJECT_LIBRARY.md](OBJECT_LIBRARY.md) 和 [PALLETIZING.md](PALLETIZING.md)。后续功能在新分支开发，通过验证后发布新标签，已发布版本继续保留。

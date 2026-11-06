@@ -13,6 +13,8 @@
 
 本项目的绿色斜角工件由项目中的参数化几何生成，物理模型与导出 OBJ 使用同一组三角面。若以后加入其他 CAD、网格、纹理、数据或第三方代码，应同时记录其来源与适用许可。原课程材料、个人交接记录和下载权重不属于仓库源码分发清单。
 
+码垛使用的 80×50×40 mm 平顶单角切边料块同样由本项目参数化生成，定义在 `src/ma6216/palletizing.py`。感知、碰撞和打印导出使用同一几何，未为码垛新增外部 CAD 或训练网络。
+
 ## 新增扫描工具（2026-11-06）
 
 本仓库现在包含 [Google Scanned Objects 的 MuJoCo 转换库](https://github.com/kevinzakka/mujoco_scanned_objects/tree/6ff8d275cebfd5b47e49685e3cfbe64b20e49a3c) 中的 `Cole_Hardware_Hammer_Black` 和 `Craftsman_Grip_Screwdriver_Phillips_Cushion`。原始数据归属 Google Scanned Objects / Laura Downs 等，MuJoCo 转换归属 Kevin Zakka。该转换库声明：OBJ/PNG 为 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，XML 为 MIT；MIT 原文保存在 [assets/library/gso/LICENSE](assets/library/gso/LICENSE)。这不是本项目自行建模的工具，也不是 Google 官方维护的 MuJoCo 转换库。

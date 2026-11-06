@@ -1,5 +1,7 @@
 # 工件导出、3D 打印和真机交接
 
+视觉码垛另使用 `assets/palletizing/stack_block_print_mm.stl`，80×50×40 mm，打印四份；模型原点、颜色和仿真验证见 [PALLETIZING.md](PALLETIZING.md)。
+
 新增球体、带通孔六角螺母和两件真实扫描工具的导出文件位于 `assets/printable_library`，来源、半尺寸缩放、抓取验证范围和打印检查见 [OBJECT_LIBRARY.md](OBJECT_LIBRARY.md)。本页下面的三个旧工件及其文件继续保留。
 
 ## 已导出的文件
