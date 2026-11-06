@@ -6,9 +6,9 @@
 |---|---|---|---|
 | 三工件 | [v0.2.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | `feat/multi-object-pick-place` | 绿色双斜角、橙色斜肩、紫色渐缩工件；一次连续视觉场景 3/3 |
 | 多种类物品 | [v0.3.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | `feat/diverse-object-library` | 锤子、球、带孔螺母；一次连续视觉场景 3/3；螺丝刀仅预览/打印 |
-| 视觉码垛 | [v0.4.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.4.0) | `feat/palletizing` | 四料块、两列两层；两组视觉试验各 4/4，包含层间支撑与稳定性验收 |
+| 视觉码垛 | [v1.0.0](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v1.0.0) | `feat/palletizing` | 四料块、两列两层；两组视觉试验各 4/4，包含层间支撑与稳定性验收 |
 
-`v0.2.0` 固定在原提交 `8c165f8`。`v0.3.0` 保留 `ef04a4a` 的仿真功能，并补充版本交接说明。`v0.4.0` 加入视觉码垛，保留旧入口。这些标签不随后续开发移动；原 `v0.1.0` 也保留。
+`v0.2.0` 固定在原提交 `8c165f8`。`v0.3.0` 保留 `ef04a4a` 的仿真功能，并补充版本交接说明。视觉码垛现发布为 `v1.0.0`，沿用已验证的 `v0.4.0` 仿真代码、模型和实验结果，仅更新版本说明与交接入口。旧 `v0.4.0` 和原 `v0.1.0` 作为历史记录保留；这些标签不随后续开发移动。
 
 ## 1. 为什么自动抓放中没有绿色螺丝刀
 
@@ -65,10 +65,10 @@ python -u scripts/run_multi_pick_place.py --collection diverse \
 
 ```bash
 cd ~/projects
-git clone --branch v0.4.0 --depth 1 \
+git clone --branch v1.0.0 --depth 1 \
   https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place.git \
-  ma6216-palletizing-v0.4.0
-cd ma6216-palletizing-v0.4.0
+  ma6216-palletizing-v1.0.0
+cd ma6216-palletizing-v1.0.0
 conda activate foundationpose
 python scripts/check_setup.py --vision
 python -u scripts/run_palletizing.py \
@@ -99,8 +99,8 @@ git switch -c feat/yourname-workpiece-testing v0.2.0
 
 - v0.2.0：`assets/printable` 中的 STL/OBJ；Release 附带三工件打印压缩包。
 - v0.3.0：另外提供 `assets/printable_library`；Release 附带球、螺母、锤子和螺丝刀的打印压缩包。
-- v0.4.0：另外提供 `assets/palletizing`；打印四份 80×50×40 mm 平顶料块，Release 附带模型压缩包。
+- v1.0.0：另外提供 `assets/palletizing`；打印四份 80×50×40 mm 平顶料块，Release 附带模型压缩包。
 - `*_print_mm.stl` 用于毫米制切片；`*_model_m.obj` 用于米制感知。两个扫描工具为原尺寸的 50%，STL 不带颜色，需核对清单尺寸。
-- 各版本都是仿真项目和物体交接资源，尚不包含可直接运行的 UR5e 真机驱动。真机相机标定、TCP、坐标和控制接口由硬件组适配验证。螺丝刀抓取尚未验证；两列两层码垛的仿真结果见 v0.4.0。
+- 各版本都是仿真项目和物体交接资源，尚不包含可直接运行的 UR5e 真机驱动。真机相机标定、TCP、坐标和控制接口由硬件组适配验证。螺丝刀抓取尚未验证；两列两层码垛的仿真结果见 v1.0.0。
 
 已有视觉结果只覆盖记录中的指定布局，原始误差和范围见 [MULTI_OBJECT.md](MULTI_OBJECT.md)、[OBJECT_LIBRARY.md](OBJECT_LIBRARY.md) 和 [PALLETIZING.md](PALLETIZING.md)。后续功能在新分支开发，通过验证后发布新标签，已发布版本继续保留。

@@ -22,7 +22,7 @@
 |---|---|---|
 | [v0.2.0：三工件](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | 绿色、橙色、紫色异形工件 | `scripts/run_multi_pick_place.py` |
 | [v0.3.0：多种类物品](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | 锤子、红球、带孔螺母 | 同一入口加 `--collection diverse` |
-| [v0.4.0：视觉码垛](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.4.0) | 四料块、两列两层，包含指定下层支撑与整垛稳定性验收 | `scripts/run_palletizing.py` |
+| [v1.0.0：视觉码垛](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v1.0.0) | 四料块、两列两层，包含指定下层支撑与整垛稳定性验收 | `scripts/run_palletizing.py` |
 
 `main` 保持最新整合代码；各固定版本提供源码和打印文件下载，原 Pick-and-Place 入口继续保留。绿色螺丝刀仅出现在四物件预览中，尚未验证抓取。组员按阶段拉取、运行和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
 

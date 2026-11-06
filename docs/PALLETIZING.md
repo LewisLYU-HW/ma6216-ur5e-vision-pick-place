@@ -1,6 +1,6 @@
 # 四料块、两列两层视觉码垛
 
-本功能在同一 MuJoCo 场景中依次抓取四件独立自由刚体，形成两列、每列两层的堆垛。感知使用官方 FoundationPose Model-based、RGB-D 及估计标定参数，机械臂为 UR5e，夹爪为 Robotiq 2F-85。项目沿用原仓库，开发分支为 `feat/palletizing`，固定版本为 `v0.4.0`。
+本功能在同一 MuJoCo 场景中依次抓取四件独立自由刚体，形成两列、每列两层的堆垛。感知使用官方 FoundationPose Model-based、RGB-D 及估计标定参数，机械臂为 UR5e，夹爪为 Robotiq 2F-85。项目沿用原仓库，开发分支为 `feat/palletizing`，固定版本为 `v1.0.0`。
 
 ![视觉码垛完成后的实际仿真场景](media/palletizing-final.png)
 
