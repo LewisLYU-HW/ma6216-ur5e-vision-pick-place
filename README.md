@@ -80,4 +80,4 @@ CPU 机器可按安装说明运行 `--ground-truth` 物理对照，它会明确�
 
 组员为各自任务创建分支，通过 Pull Request 互相检查。提交源码、说明和小型结果摘要。每轮原始 RGB-D、录屏、权重、外部仓库和本地环境写入 Git 忽略目录。仓库中已选取一个短视频和一张对照图，便于在安装环境前了解结果。
 
-第三方来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。本仓库未包含 FoundationPose 权重或 Menagerie 模型。自有代码的对外开源许可由小组确认，初始以私有仓库协作为主。
+第三方来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。本仓库未包含 FoundationPose 权重或 Menagerie 模型。自有代码的对外开源许可由小组确认。

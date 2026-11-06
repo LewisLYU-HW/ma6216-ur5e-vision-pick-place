@@ -1,6 +1,6 @@
 # 小组 Git 协作
 
-仓库建议命名为 `ma6216-ur5e-vision-pick-place`，描述 UR5e、视觉估计与物理抓放这一用途。初次共享可采用私有仓库，由仓库所有者在 GitHub 的 Settings → Collaborators 中邀请组员，各人接受邀请后即可拉取。账号拥有者、仓库可见性和最终地址以创建结果为准。
+仓库 `LewisLYU-HW/ma6216-ur5e-vision-pick-place` 为公开仓库，所有人均可浏览和直接克隆。需要直接向仓库推送分支的组员，由所有者在 GitHub 的 Settings → Collaborators 中邀请并授予相应权限。
 
 ## 首次拉取
 
@@ -12,7 +12,7 @@ git clone https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place.git
 cd ma6216-ur5e-vision-pick-place
 ```
 
-随后按 [SETUP.md](SETUP.md) 安装外部模型及本地环境。GitHub 身份验证使用个人账号的 GitHub CLI 登录或个人 SSH 配置，组员各自保管凭据。
+随后按 [SETUP.md](SETUP.md) 安装外部模型及本地环境。克隆公开仓库无需登录。推送分支时使用各自 GitHub 账号登录，并需要仓库写入权限；也可以 Fork 后从个人仓库提交 Pull Request。
 
 ## 每次修改
 
