@@ -49,7 +49,8 @@ def set_front_ready(model, data):
     mujoco.mj_forward(model, data)
 
 
-def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source, *, destination_xy=None):
+def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source, *, destination_xy=None,
+                payload_destination_xy=None):
     """Plan a vertical pick, horizontal loaded transfer, and vertical place.
 
     Every IK sample is seeded from the previous configuration. Collision
@@ -80,7 +81,8 @@ def plan_direct(robot, xyz, yaw, grasp_z, place_z, carry_offset_z, source, *, de
         for stage, destination in positions:
             if stage == "RETREAT":
                 # Check withdrawal against the object after release at the tray.
-                robot.initial_qpos[object_adr:object_adr + 2] = tray
+                robot.initial_qpos[object_adr:object_adr + 2] = (tray if payload_destination_xy is None
+                                                               else payload_destination_xy)
                 robot.initial_qpos[object_adr + 2] += .014  # tray floor above tabletop
             length = float(np.linalg.norm(destination - start_position))
             segments = max(16 if stage == "HOVER_TRAY" else 1, math.ceil(length / SAMPLE_SPACING_M))

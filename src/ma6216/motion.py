@@ -23,7 +23,7 @@ class MotionFailure(RuntimeError):
 
 class Robot:
     def __init__(self, model, data, *, target_vertices=None, target_body="target_cube",
-                 target_geom="target_cube_geom", target_joint="target_cube_freejoint"):
+                 target_geom="target_cube_geom", target_joint="target_cube_freejoint", target_geoms=None):
         self.model, self.data = model, data
         self.target_vertices = None if target_vertices is None else np.asarray(target_vertices, dtype=float)
         self.joints=np.array([model.joint(n).id for n in JOINT_NAMES])
@@ -34,6 +34,7 @@ class Robot:
         self.sid=model.site('gripper_pinch').id
         self.cbid=model.body(target_body).id
         self.cgid=model.geom(target_geom).id
+        self.cgids = {model.geom(name).id for name in target_geoms} if target_geoms else {self.cgid}
         self.target_joint = model.joint(target_joint).id
         self.cube_qposadr=int(model.jnt_qposadr[self.target_joint])
         self.low=np.maximum(model.jnt_range[self.joints,0],model.actuator_ctrlrange[self.aids,0])+.001
@@ -69,7 +70,7 @@ class Robot:
             b1,b2=int(self.model.geom_bodyid[g1]),int(self.model.geom_bodyid[g2])
             if c.dist>=-penetration:continue
             if b1 not in self.robot_bodies and b2 not in self.robot_bodies:continue
-            if allow_cube and self.cgid in (g1,g2) and any(g in self.pad_sides for g in (g1,g2)):continue
+            if allow_cube and self.cgids.intersection((g1,g2)) and any(g in self.pad_sides for g in (g1,g2)):continue
             bad.append({'geom1':self.model.geom(g1).name or f'geom_{g1}', 'geom2':self.model.geom(g2).name or f'geom_{g2}', 'body1':self.model.body(b1).name,'body2':self.model.body(b2).name,'penetration_m':float(-c.dist)})
         return bad
 
@@ -115,15 +116,18 @@ class Robot:
             self.fk(q0+(q1-q0)*u)
             if carry_offset_z is not None:
                 adr=self.cube_qposadr
-                self.scratch.qpos[adr:adr+3]=self.scratch.site_xpos[self.sid]+np.array([0.,0.,carry_offset_z])
+                offset=np.asarray(carry_offset_z,dtype=float)
+                if offset.ndim==0:offset=np.array([0.,0.,float(offset)])
+                self.scratch.qpos[adr:adr+3]=self.scratch.site_xpos[self.sid]+offset
                 # Top-down yaw grasp preserves the object's initial orientation.
                 mujoco.mj_forward(self.model,self.scratch)
             bad=self.collision_contacts(allow_cube=allow_cube)
             if bad:return False,{'fraction':float(u),'contacts':bad}
             if carry_offset_z is not None:
                 for c in self.scratch.contact:
-                    if self.cgid not in (int(c.geom1),int(c.geom2)) or c.dist>=-.0005:continue
-                    other=int(c.geom2) if c.geom1==self.cgid else int(c.geom1)
+                    if not self.cgids.intersection((int(c.geom1),int(c.geom2))) or c.dist>=-.0005:continue
+                    other=int(c.geom2) if int(c.geom1) in self.cgids else int(c.geom1)
+                    if other in self.cgids:continue
                     if other in self.pad_sides:continue
                     return False,{'fraction':float(u),'carried_object_collision':self.model.geom(other).name,'penetration_m':float(-c.dist)}
         return True,{'samples':n}
@@ -177,14 +181,15 @@ class Robot:
         sides={'left':0.,'right':0.};normals={}
         for i,c in enumerate(self.data.contact):
             g1,g2=int(c.geom1),int(c.geom2)
-            if self.cgid not in (g1,g2):continue
-            pad=g2 if g1==self.cgid else g1
+            if not self.cgids.intersection((g1,g2)):continue
+            pad=g2 if g1 in self.cgids else g1
             if pad not in self.pad_sides:continue
             f=np.zeros(6);mujoco.mj_contactForce(self.model,self.data,i,f)
             side=self.pad_sides[pad];sides[side]+=max(0.,float(f[0]))
-            n=np.array(c.frame[:3]);n=n if g1==self.cgid else -n
-            normals[side]=n
-        opposition=float(np.dot(normals['left'],normals['right'])) if len(normals)==2 else None
+            n=np.array(c.frame[:3]);n=n if g1 in self.cgids else -n
+            normals[side]=normals.get(side,np.zeros(3))+max(0.,float(f[0]))*n
+        unit={side:n/np.linalg.norm(n) for side,n in normals.items() if np.linalg.norm(n)>1e-10}
+        opposition=float(np.dot(unit['left'],unit['right'])) if len(unit)==2 else None
         return sides,opposition
 
     def execute(self,plan,frame_callback=None,realtime=False):
@@ -203,8 +208,8 @@ class Robot:
             bad=[c for c in observed if c['penetration_m']>.0005]
             if bad:raise MotionFailure(f'Unexpected physical contact {stage}: {bad}')
             for c in self.data.contact:
-                if self.cgid not in (int(c.geom1),int(c.geom2)):continue
-                other=int(c.geom2) if c.geom1==self.cgid else int(c.geom1)
+                if not self.cgids.intersection((int(c.geom1),int(c.geom2))):continue
+                other=int(c.geom2) if int(c.geom1) in self.cgids else int(c.geom1)
                 if self.model.geom(other).name in ('worktable','tray_bottom'):
                     self.max_cube_support_penetration=max(self.max_cube_support_penetration,float(-c.dist))
             if not np.isfinite(self.data.qpos).all():raise MotionFailure('Nonfinite simulation state')
@@ -292,7 +297,8 @@ class Robot:
         tray_bottom=self.model.geom('tray_bottom').id
         support_force=0.
         for i,contact in enumerate(self.data.contact):
-            if {int(contact.geom1),int(contact.geom2)}=={self.cgid,tray_bottom}:
+            pair={int(contact.geom1),int(contact.geom2)}
+            if tray_bottom in pair and self.cgids.intersection(pair):
                 contact_force=np.zeros(6)
                 mujoco.mj_contactForce(self.model,self.data,i,contact_force)
                 support_force+=max(0.,float(contact_force[0]))

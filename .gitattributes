@@ -9,3 +9,7 @@
 # Preserve exported CAD bytes for manifest checksums; trimesh ends OBJ with a blank line.
 /assets/printable/*.obj -text whitespace=-blank-at-eof
 /assets/printable/*.stl binary
+/assets/printable_library/*.obj -text whitespace=-blank-at-eof
+/assets/printable_library/*.stl binary
+# Keep third-party mesh/XML/texture source hashes stable across operating systems.
+/assets/library/gso/** -text whitespace=-blank-at-eof,-blank-at-eol

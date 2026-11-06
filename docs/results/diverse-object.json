@@ -1,0 +1,160 @@
+{
+  "success": true,
+  "mode": "multi-object planar pick-and-place",
+  "control_source": "FoundationPose + estimated calibration",
+  "object_count": 3,
+  "collection": "diverse",
+  "final_outcomes_evaluation_only": [
+    {
+      "id": "hammer",
+      "position_m": [
+        0.46228129035571136,
+        0.2289762742796353,
+        0.4118618776199995
+      ],
+      "tray_support_force_n": 0.9808924499225978,
+      "inside_tray": true,
+      "linear_speed_m_s": 5.165910097552696e-05,
+      "angular_speed_rad_s": 0.00039578604152312676,
+      "success": true,
+      "slot_error_mm": 2.5004599652059682
+    },
+    {
+      "id": "sphere",
+      "position_m": [
+        0.37096998482572097,
+        0.10799762365189187,
+        0.41372142963572167
+      ],
+      "tray_support_force_n": 0.9809999998481543,
+      "inside_tray": true,
+      "linear_speed_m_s": 2.6465570918253256e-08,
+      "angular_speed_rad_s": 1.0637026257764126e-06,
+      "success": true,
+      "slot_error_mm": 2.2249453030561845
+    },
+    {
+      "id": "hex_nut",
+      "position_m": [
+        0.539310337796118,
+        0.11018269948276134,
+        0.4089959991495458
+      ],
+      "tray_support_force_n": 0.9809999999998158,
+      "inside_tray": true,
+      "linear_speed_m_s": 4.72550655826261e-11,
+      "angular_speed_rad_s": 1.3863255706365509e-09,
+      "success": true,
+      "slot_error_mm": 0.7134515095398153
+    }
+  ],
+  "simulation_time_s": 75.10600000000636,
+  "scope": "One continuous scene, three selected objects and fixed poses; screwdriver is not in the grasp validation set.",
+  "picks": [
+    {
+      "id": "hammer",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "hammer",
+          "mask_iou": 0.9879759519038076,
+          "translation_error_mm": 3.933318920444069,
+          "rotation_error_deg": 1.1901552012910304,
+          "raw_rotation_error_deg": 1.1901552012910304,
+          "orientation_observable": true
+        },
+        {
+          "id": "sphere",
+          "mask_iou": 0.9682539682539683,
+          "translation_error_mm": 4.143710724332736,
+          "rotation_error_deg": null,
+          "raw_rotation_error_deg": 78.18199694991426,
+          "orientation_observable": false
+        },
+        {
+          "id": "hex_nut",
+          "mask_iou": 0.9923142613151152,
+          "translation_error_mm": 3.9075947082794413,
+          "rotation_error_deg": 0.21830854539363231,
+          "raw_rotation_error_deg": 59.797829406663304,
+          "orientation_observable": true
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 5393,
+      "min_holding_finger_normal_force_n": 44.19471339923227,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "max_cube_support_contact_penetration_m": 0.0037899970250566684,
+      "max_joint_tracking_error_rad": 0.09551221107177571,
+      "final_cube_position_m": [
+        0.46470198297926074,
+        0.2286771778360826,
+        0.4118618776205442
+      ],
+      "tray_bottom_normal_force_n": 0.9808924476628609
+    },
+    {
+      "id": "sphere",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "sphere",
+          "mask_iou": 0.9682539682539683,
+          "translation_error_mm": 4.143710724204381,
+          "rotation_error_deg": null,
+          "raw_rotation_error_deg": 78.18199694991426,
+          "orientation_observable": false
+        },
+        {
+          "id": "hex_nut",
+          "mask_iou": 0.9923142613151152,
+          "translation_error_mm": 3.907594353146154,
+          "rotation_error_deg": 0.2183085444506235,
+          "raw_rotation_error_deg": 59.79782940665969,
+          "orientation_observable": true
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 3521,
+      "min_holding_finger_normal_force_n": 47.37431010650449,
+      "max_unexpected_robot_penetration_m": 0.0,
+      "max_cube_support_contact_penetration_m": 0.0026387955061225737,
+      "max_joint_tracking_error_rad": 0.1143198376622408,
+      "final_cube_position_m": [
+        0.37054866030945993,
+        0.10817465074118945,
+        0.41372142963485625
+      ],
+      "tray_bottom_normal_force_n": 0.9810000000000001
+    },
+    {
+      "id": "hex_nut",
+      "success": true,
+      "perception_evaluation_only": [
+        {
+          "id": "hex_nut",
+          "mask_iou": 0.9923142613151152,
+          "translation_error_mm": 3.9075940627257113,
+          "rotation_error_deg": 0.21830854456633234,
+          "raw_rotation_error_deg": 59.797829406659986,
+          "orientation_observable": true
+        }
+      ],
+      "control_source": "vision_pose_file",
+      "bilateral_loaded_contact_fraction": 1.0,
+      "holding_physics_steps": 4216,
+      "min_holding_finger_normal_force_n": 46.453960191724754,
+      "max_unexpected_robot_penetration_m": 0.00016121620672130088,
+      "max_cube_support_contact_penetration_m": 0.00417466598588275,
+      "max_joint_tracking_error_rad": 0.09689759248916463,
+      "final_cube_position_m": [
+        0.5393103377937761,
+        0.1101826994145947,
+        0.40899599914954554
+      ],
+      "tray_bottom_normal_force_n": 0.9809999999999846
+    }
+  ]
+}

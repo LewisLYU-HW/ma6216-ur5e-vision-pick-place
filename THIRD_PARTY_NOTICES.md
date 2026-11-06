@@ -13,6 +13,15 @@
 
 本项目的绿色斜角工件由项目中的参数化几何生成，物理模型与导出 OBJ 使用同一组三角面。若以后加入其他 CAD、网格、纹理、数据或第三方代码，应同时记录其来源与适用许可。原课程材料、个人交接记录和下载权重不属于仓库源码分发清单。
 
+## 新增扫描工具（2026-11-06）
+
+本仓库现在包含 [Google Scanned Objects 的 MuJoCo 转换库](https://github.com/kevinzakka/mujoco_scanned_objects/tree/6ff8d275cebfd5b47e49685e3cfbe64b20e49a3c) 中的 `Cole_Hardware_Hammer_Black` 和 `Craftsman_Grip_Screwdriver_Phillips_Cushion`。原始数据归属 Google Scanned Objects / Laura Downs 等，MuJoCo 转换归属 Kevin Zakka。该转换库声明：OBJ/PNG 为 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，XML 为 MIT；MIT 原文保存在 [assets/library/gso/LICENSE](assets/library/gso/LICENSE)。这不是本项目自行建模的工具，也不是 Google 官方维护的 MuJoCo 转换库。
+
+原始 71 个文件及来源哈希清单在 `assets/library/gso`。本项目派生模型缩小至 50%、以包围盒中心重设原点，并为颜色分割使用哑光颜色；打印副本合并纹理接缝的重合顶点、转为毫米并把底面平移至 Z=0。这些修改不改变原件文件。打印 OBJ/STL 的许可沿用源扫描资产的 CC BY 4.0，请交接时保留本归属说明及来源链接。球体与六角螺母为本项目参数化几何。
+
+- Laura Downs et al. *Google Scanned Objects: A High-Quality Dataset of 3D Scanned Household Items*. 2022. [论文](https://arxiv.org/abs/2204.11918)
+- Kevin Zakka. *Scanned Objects MuJoCo Models*. 2022. [仓库](https://github.com/kevinzakka/mujoco_scanned_objects)
+
 论文引用可在项目技术展示中使用。
 
 - Bowen Wen, Wei Yang, Jan Kautz, Stan Birchfield. *FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects*. CVPR 2024. [论文](https://openaccess.thecvf.com/content/CVPR2024/html/Wen_FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects_CVPR_2024_paper.html)

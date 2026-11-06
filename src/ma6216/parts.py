@@ -84,9 +84,12 @@ PARTS = (
 )
 
 
-def configure_parts(spec):
+def configure_parts(spec, parts=PARTS):
     from .scene import mujoco
-    for part in PARTS:
+    for part in parts:
+        if hasattr(part, "configure"):
+            part.configure(spec)
+            continue
         mesh = part.mesh()
         mesh_name = part.key + "_part_mesh"
         spec.add_mesh(name=mesh_name, uservert=mesh.vertices.ravel().tolist(), userface=mesh.faces.ravel().tolist())

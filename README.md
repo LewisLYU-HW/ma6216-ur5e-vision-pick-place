@@ -20,6 +20,12 @@ UR5e + Robotiq 2F-85 在 MuJoCo 中完成视觉引导的物理抓放。固定 RG
 
 三个模型的毫米制 STL、米制 OBJ 和尺寸清单已放在 `assets/printable`。[3D 打印及真机交接说明](docs/PRINTING.md) 说明单位、原点和实物测量；[码垛评估](docs/PALLETIZING_ASSESSMENT.md) 区分现有基础与待实现工作。
 
+## 球体、带孔件与扫描工具
+
+新增独立的 `--collection diverse` 场景：真实扫描锤子、红球和中空六角螺母在同一次视觉场景中连续抓放 3/3；十字螺丝刀另外提供模型预览和打印副本，尚未验证抓取。[来源、运行和实测范围](docs/OBJECT_LIBRARY.md) · [四物件预览](docs/media/object-library-preview.png) · [抓放录像](docs/media/diverse-object-pick-place.mp4)。
+
+新增打印文件位于 `assets/printable_library`。扫描工具来自 Google Scanned Objects 的 MuJoCo 转换库，以原尺寸 50% 导入；来源、许可和文件哈希随资产保存。旧三工件场景和原打印导出目录继续保留。
+
 ## 开始运行
 
 先在 WSL 或 Linux 中克隆。

@@ -1,5 +1,7 @@
 # 工件导出、3D 打印和真机交接
 
+新增球体、带通孔六角螺母和两件真实扫描工具的导出文件位于 `assets/printable_library`，来源、半尺寸缩放、抓取验证范围和打印检查见 [OBJECT_LIBRARY.md](OBJECT_LIBRARY.md)。本页下面的三个旧工件及其文件继续保留。
+
 ## 已导出的文件
 
 WSL 原件目录为 `/home/loutasaiya/projects/MA6216-VISION/assets/printable`。Windows 文件管理器可打开：

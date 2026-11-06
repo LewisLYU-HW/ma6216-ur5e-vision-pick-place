@@ -14,7 +14,7 @@ sys.path.insert(0, str(SCRIPTS.parent/"src"))
 from ma6216.config import project_root
 from ma6216.parts import PARTS
 from ma6216.multi_object import MultiRobot, build_multi_scene, physical_outcomes
-from ma6216.scene import CAMERA_NAME, camera_ground_truth, mujoco
+from ma6216.scene import CAMERA_NAME, mujoco
 from ma6216.vision import capture_observation, compose_world_pose, make_renderer, prepare_observation_dir
 from ma6216.runner import run_trial
 
@@ -33,7 +33,8 @@ def perceive_remaining(model, data, remaining, output, calibration):
                 seg = renderer.render()
             finally:
                 renderer.disable_segmentation_rendering()
-            gt_mask = ((seg[..., 0] == model.geom(part.geom).id) &
+            body_geoms=np.flatnonzero(model.geom_bodyid==model.body(part.body).id)
+            gt_mask = (np.isin(seg[..., 0],body_geoms) &
                        (seg[..., 1] == int(mujoco.mjtObj.mjOBJ_GEOM)))
             iou = float(np.count_nonzero((mask>0)&gt_mask)/max(1, np.count_nonzero((mask>0)|gt_mask)))
             datasets.append((part, dataset, mesh, iou))
@@ -53,10 +54,14 @@ def perceive_remaining(model, data, remaining, output, calibration):
         np.savetxt(output/part.key/"world_T_object_estimated.txt", pose)
         poses[part.key] = pose
         body = model.body(part.body).id
+        raw_rotation=float(np.rad2deg(Rotation.from_matrix(
+            pose[:3,:3]@data.xmat[body].reshape(3,3).T).magnitude()))
+        from ma6216.object_library import rotation_error
         metrics.append({"id": part.key, "mask_iou": iou,
                         "translation_error_mm": float(1000*np.linalg.norm(pose[:3, 3]-data.xpos[body])),
-                        "rotation_error_deg": float(np.rad2deg(Rotation.from_matrix(
-                            pose[:3, :3]@data.xmat[body].reshape(3, 3).T).magnitude()))})
+                        "rotation_error_deg": rotation_error(part,pose[:3,:3],data.xmat[body].reshape(3,3)),
+                        "raw_rotation_error_deg": raw_rotation,
+                        "orientation_observable": not getattr(part,"sphere",False)})
         print(f"PERCEIVED {part.key}: {metrics[-1]}", flush=True)
     return poses, metrics
 
@@ -88,7 +93,13 @@ def main():
     parser.add_argument("--ground-truth", action="store_true", help="Diagnostic physics baseline only")
     parser.add_argument("--record", action="store_true")
     parser.add_argument("--viewer", action="store_true")
+    parser.add_argument("--collection", choices=("workpieces","diverse"), default="workpieces")
     args = parser.parse_args()
+    if args.collection == "diverse":
+        from ma6216.object_library import DIVERSE_PARTS
+        parts=DIVERSE_PARTS
+    else:
+        parts=PARTS
     if not args.ground_truth:
         for name in ("cam_K.txt", "world_T_camera.txt"):
             if not (args.calibration/name).is_file():
@@ -97,11 +108,11 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     summary = {"success": False, "mode": "multi-object planar pick-and-place",
                "control_source": "ground_truth_control_baseline" if args.ground_truth else "FoundationPose + estimated calibration",
-               "object_count": len(PARTS), "picks": []}
+               "object_count": len(parts), "collection": args.collection, "picks": []}
     viewer = None
     videos = []
     try:
-        model, data = build_multi_scene()
+        model, data = build_multi_scene(parts)
         for _ in range(775):
             mujoco.mj_step(model, data)
         renderer = make_renderer(model)
@@ -113,11 +124,11 @@ def main():
         finally:
             renderer.close()
         known = {}
-        for index, selected in enumerate(PARTS):
+        for index, selected in enumerate(parts):
             step = output/f"pick_{index+1:02d}_{selected.key}"
             step.mkdir()
             if args.ground_truth:
-                for part in PARTS:
+                for part in parts:
                     body = model.body(part.body).id
                     pose = np.eye(4)
                     pose[:3, :3] = data.xmat[body].reshape(3, 3)
@@ -125,7 +136,7 @@ def main():
                     known[part.key] = pose
                 evaluations = []
             else:
-                new_poses, evaluations = perceive_remaining(model, data, PARTS[index:], step, args.calibration)
+                new_poses, evaluations = perceive_remaining(model, data, parts[index:], step, args.calibration)
                 known.update(new_poses)
             if args.viewer and viewer is None:
                 from mujoco import viewer as mj_viewer
@@ -135,7 +146,7 @@ def main():
                     viewer.cam.distance = 1.65
                     viewer.cam.azimuth = 130
                     viewer.cam.elevation = -35
-            robot = MultiRobot(model, data, selected, known, ground_truth=args.ground_truth)
+            robot = MultiRobot(model, data, selected, known, ground_truth=args.ground_truth, parts=parts)
             pose_arg = None if args.ground_truth else known[selected.key]
             result = run_trial(model, data, step/"motion", pose=pose_arg, robot=robot,
                                shared_viewer=viewer, record=args.record)
@@ -153,7 +164,7 @@ def main():
             known[selected.key] = placed
         for _ in range(1000):
             mujoco.mj_step(model, data)
-        summary["final_outcomes_evaluation_only"] = physical_outcomes(model, data)
+        summary["final_outcomes_evaluation_only"] = physical_outcomes(model, data, parts)
         summary["success"] = all(row["success"] for row in summary["final_outcomes_evaluation_only"])
         summary["simulation_time_s"] = float(data.time)
         renderer = make_renderer(model)
