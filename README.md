@@ -6,6 +6,16 @@
 
 [多物品抓放视频](docs/media/diverse-object-pick-place.mp4) · [三工件抓放视频](docs/media/multi-object-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md) · [依赖与验证版本](docs/DEPENDENCIES.md)
 
+## FoundationPose 接入与来源
+
+本项目通过适配层直接调用 [NVIDIA FoundationPose 官方实现](https://github.com/NVlabs/FoundationPose/tree/a1b694b83e633c2cb6115b9063d940a687759392)和预训练网络，采用 Model-based 方法。MuJoCo 渲染的 RGB、米制深度、图像 mask、估计内参和物体 CAD 输入官方模型，得到相机坐标下的物体位姿，再经估计外参变换为机器人抓取目标。
+
+- [FoundationPoseAdapter](src/ma6216/foundationpose.py#L203) 导入官方 `estimater.py`，创建 `FoundationPose`、`ScorePredictor` 和 `PoseRefinePredictor`，调用 `register()`；序列推理也支持 `track_one()`。
+- [推理入口](scripts/run_foundationpose.py)与[多物体流程](scripts/run_multi_pick_place.py)连接仿真观测和官方推理；[坐标转换](src/ma6216/vision.py#L67)把估计物体位姿交给机器人规划。
+- 本仓库提供标定、分割、数据适配、坐标变换、抓取配置、运动规划和物理验证。官方源码与预训练权重作为外部依赖加载，未随本仓库打包分发；机器人模型同样从 Menagerie 加载。
+
+调用链、权重位置、运行记录和安装方式见 [FoundationPose 集成说明](docs/FOUNDATIONPOSE_INTEGRATION.md)。使用 `--ground-truth` 的物理对照会跳过 FoundationPose。
+
 ## 按阶段选择版本
 
 | 固定版本 | 自动抓放内容 | 入口 |
@@ -109,4 +119,4 @@ CPU 机器可按安装说明运行 `--ground-truth` 物理对照，它会明确�
 
 组员为各自任务创建分支，通过 Pull Request 互相检查。提交源码、说明和小型结果摘要。每轮原始 RGB-D、录屏、权重、外部仓库和本地环境写入 Git 忽略目录。仓库选取了抓放场景截图、演示视频和实测摘要，便于在安装环境前了解项目结果。
 
-第三方来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。本仓库未包含 FoundationPose 权重或 Menagerie 模型。自有代码的对外开源许可由小组确认。
+第三方来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。FoundationPose 官方源码、预训练权重与 Menagerie 机器人模型按 [SETUP.md](docs/SETUP.md) 单独获取，本仓库的适配代码在运行时调用这些依赖。自有代码的对外开源许可由小组确认。
