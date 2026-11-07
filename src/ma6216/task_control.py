@@ -581,7 +581,7 @@ class TaskRobot:
             self.known[self.target.object_id] = self.tcp_pose() @ self.tool_T_object
         return True
 
-    def grasp(self, pose, object_T_tcp=None):
+    def grasp(self, pose, object_T_tcp=None, *, lift_distance=None):
         self.known[self.target.object_id] = pose.copy()
         if object_T_tcp is None:
             if hasattr(self.target, "acquisition_grasp"):
@@ -603,7 +603,8 @@ class TaskRobot:
         self.carrying = True
         self.event("physical_grasp", object_id=self.target.object_id, forces_n=force)
         lift = grasp.copy()
-        lift_distance = min(.135, max(.08, (.585 - grasp[2, 3]) / max(.5, -grasp[2, 2])))
+        if lift_distance is None:
+            lift_distance = min(.135, max(.08, (.585 - grasp[2, 3]) / max(.5, -grasp[2, 2])))
         lift[:3, 3] -= grasp[:3, 2] * lift_distance
         self.move(lift, "LIFT", allow_support=True)
 

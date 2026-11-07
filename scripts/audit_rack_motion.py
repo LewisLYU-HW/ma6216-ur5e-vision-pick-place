@@ -16,7 +16,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from ma6216.motion import JOINT_NAMES
 from ma6216.scene import mujoco
-from ma6216.workshop_assets import RACK_TOOLS
 from ma6216.workshop_scene import build_workshop_scene
 from run_workshop import frame_seating_evaluation, physical_evaluation
 
@@ -41,15 +40,16 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     report = json.loads((args.trial / "summary.json").read_text())
-    if report["task"] != "rack":
-        parser.error("This diagnostic requires a rack trial")
+    if report["task"] not in ("rack", "complete"):
+        parser.error("This diagnostic requires a rack or complete-workshop trial")
     path = args.trial / "motion/trajectory_evaluation_only.npz"
     trace = np.load(path, allow_pickle=False)
-    scene = build_workshop_scene(report["seed"], rack_assembly=True)
+    complete = report["task"] == "complete"
+    scene = build_workshop_scene(report["seed"], rack_assembly=True, complete_task=complete)
     model, data = scene.model, scene.data
     robot = subtree(model, "base")
     gripper = subtree(model, "gripper_base")
-    tools = {model.geom(n).id for tool in RACK_TOOLS.values() for n in tool.collision_names}
+    tools = {model.geom(n).id for tool in scene.parts for n in tool.collision_names}
     pads = {model.geom(f"gripper_{side}_pad{i}").id for side in ("left", "right") for i in (1, 2)}
     contacts, loaded_after_release = {}, []
     for index, timestamp in enumerate(trace["time"]):
@@ -93,10 +93,13 @@ def main():
     mujoco.mj_forward(model, data)
 
     def outcome():
-        return dict(
+        result = dict(
             rack_frame=frame_seating_evaluation(scene),
             spanner=physical_evaluation(scene, "spanner", assembled_frame=True),
         )
+        if complete:
+            result.update({name: physical_evaluation(scene, name) for name in ("hammer", "screwdriver")})
+        return result
 
     recorded_final = outcome()
     extension = []
@@ -131,7 +134,7 @@ def main():
                 "robot_contacts": contacts,
                 "loaded_gripper_contacts": len(loaded_after_release),
                 "extension_success": all(
-                    x["rack_frame"]["success"] and x["spanner"]["success"] for x in extension
+                    all(x[name]["success"] for name in recorded_final) for x in extension
                 ),
             }
         )

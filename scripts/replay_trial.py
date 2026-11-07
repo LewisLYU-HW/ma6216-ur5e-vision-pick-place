@@ -29,9 +29,13 @@ def main():
     path = args.trial / "motion/trajectory_evaluation_only.npz"
     trace = np.load(path, allow_pickle=False)
     task, seed = report["task"], report["seed"]
-    workshop = task in ("all", "insert", "hang", "rack")
+    workshop = task in ("all", "insert", "hang", "rack", "complete")
     scene = (
-        build_workshop_scene(seed, rack_assembly=task == "rack") if workshop else build_task_scene(task, seed)
+        build_workshop_scene(
+            seed, rack_assembly=task in ("rack", "complete"), complete_task=task == "complete"
+        )
+        if workshop
+        else build_task_scene(task, seed)
     )
     m, d = scene.model, scene.data
     status = "SUCCESS" if report["success"] else "FAILURE"
@@ -61,6 +65,19 @@ def main():
         recorder.pose_provider = lambda: current
     start, end = float(trace["time"][0]), float(trace["time"][-1])
     times = start + np.arange(max(1, round((end - start) * 25) + 1)) / 25
+    phase_events = []
+    phase_labels = {
+        "park_hammer": "1 OF 4 - HAMMER PARKING",
+        "moving_driver_insertion": "2 OF 4 - MOVING DRIVER + TILTED INSERTION",
+        "install_frame": "3 OF 4 - RACK ASSEMBLY",
+        "regrasp_and_hang_spanner": "4 OF 4 - SPANNER REGRASP + HANG",
+    }
+    if task == "complete":
+        phase_events = [
+            event
+            for event in json.loads((args.trial / "motion/events.json").read_text())
+            if event["event"] == "task_phase"
+        ]
     try:
         for number, timestamp in enumerate(times):
             index = min(
@@ -75,7 +92,11 @@ def main():
             mujoco.mj_forward(m, d)
             estimate = trace["estimated_pose"][index]
             current = (str(trace["object_id"][index]), estimate) if np.isfinite(estimate).all() else None
-            recorder.capture(d, str(trace["stage"][index]), detail)
+            stage = str(trace["stage"][index])
+            phases = [event for event in phase_events if event["simulation_time_s"] <= timestamp]
+            if phases:
+                stage = phase_labels[phases[-1]["phase"]] + "  |  " + stage.replace("_", " ")
+            recorder.capture(d, stage, detail)
     finally:
         recorder.close()
     metadata = {

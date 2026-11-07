@@ -49,10 +49,10 @@ def evaluation_pose(model, data, body):
 
 def physical_evaluation(scene, name, *, assembled_frame=False):
     # Import simulator geometry only inside the explicitly isolated evaluator.
-    from ma6216.workshop_assets import TOOLS, RACK_FRAME, FRAME_HOOK
+    from ma6216.workshop_assets import RACK_FRAME, FRAME_HOOK
 
     m, d = scene.model, scene.data
-    tool = TOOLS[name]
+    tool = next(part for part in scene.parts if part.object_id == name)
     actual = evaluation_pose(m, d, tool.body)
     rack = evaluation_pose(m, d, "target_tray")
     relative = np.linalg.inv(rack) @ actual
@@ -77,8 +77,10 @@ def physical_evaluation(scene, name, *, assembled_frame=False):
         hook_contact = (
             geom in RACK_FRAME.collision_names[3:] if assembled_frame else geom.startswith("rack_hook")
         )
-        if (name == "spanner" and hook_contact) or (
-            name == "screwdriver" and geom.startswith("driver_socket_")
+        if (
+            (name == "spanner" and hook_contact)
+            or (name == "screwdriver" and geom.startswith("driver_socket_"))
+            or (name == "hammer" and geom == "tool_park")
         ):
             wrench = np.zeros(6)
             mujoco.mj_contactForce(m, d, i, wrench)
@@ -95,7 +97,20 @@ def physical_evaluation(scene, name, *, assembled_frame=False):
         "angular_speed_rad_s": angular,
         "world_T_object": actual.tolist(),
     }
-    if name == "spanner":
+    if name == "hammer":
+        expected_rotation = Rotation.from_euler("z", 145.0, degrees=True).as_matrix()
+        bottom = float((tool.vertices @ expected_rotation.T)[:, 2].min())
+        expected = transform(PARK + [0.0, 0.0, -bottom], expected_rotation)
+        result.update(pose_errors(actual, expected))
+        result["bottom_gap_mm"] = float(
+            ((tool.vertices @ actual[:3, :3].T + actual[:3, 3])[:, 2].min() - PARK[2]) * 1000
+        )
+        geometric = (
+            result["translation_error_mm"] < 5.0
+            and result["rotation_error_deg"] < 8.0
+            and abs(result["bottom_gap_mm"]) < 3.0
+        )
+    elif name == "spanner":
         eye = (relative @ np.array([-0.060, 0.0, 0.0, 1.0]))[:3]
         offset = eye - hook_centre
         plane_angle = float(np.rad2deg(np.arccos(np.clip(abs(relative[1, 2]), 0.0, 1.0))))
@@ -181,7 +196,7 @@ def frame_seating_evaluation(scene):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--task", choices=("all", "insert", "hang", "rack"), default="all")
+    p.add_argument("--task", choices=("all", "insert", "hang", "rack", "complete"), default="all")
     p.add_argument("--method", choices=METHODS, default="full")
     p.add_argument("--disturbance", choices=("none", "grasp_impulse"), default="none")
     p.add_argument("--models", type=Path, default=ROOT / "assets/reconstructed/workshop")
@@ -204,7 +219,7 @@ def main():
     if args.sensor_delay is not None and args.sensor_delay < 0:
         p.error("sensor-delay must be nonnegative")
     if args.method == "no_recovery" or (
-        args.method == "no_prediction" and args.task not in ("insert", "all")
+        args.method == "no_prediction" and args.task not in ("insert", "all", "complete")
     ):
         p.error("This ablation is not applicable to the selected workshop task")
     out = args.output.resolve()
@@ -233,14 +248,32 @@ def main():
         "command": " ".join(sys.argv),
     }
     try:
-        assembling = args.task == "rack"
+        complete = args.task == "complete"
+        assembling = args.task in ("rack", "complete")
+        object_names = (
+            ("hammer", "screwdriver", "rack_frame", "spanner")
+            if complete
+            else (("rack_frame", "spanner") if assembling else ("hammer", "screwdriver", "spanner"))
+        )
         objects = {
-            name: ReconstructedTool(args.models / name)
-            for name in (("rack_frame", "spanner") if assembling else ("hammer", "screwdriver", "spanner"))
+            name: ReconstructedTool(
+                args.models / name, body="target_hammer" if complete and name == "hammer" else None
+            )
+            for name in object_names
         }
+        if complete:
+            report["phase_order"] = [
+                "park_hammer",
+                "moving_driver_insertion",
+                "install_frame",
+                "regrasp_and_hang_spanner",
+            ]
+            report["continuous_physics_scene"] = True
         report["reconstructed_features"] = {k: v.features for k, v in objects.items()}
-        scene = build_workshop_scene(args.seed, rack_assembly=assembling)
-        planning = build_workshop_scene(args.seed, planning_parts=objects.values(), rack_assembly=assembling)
+        scene = build_workshop_scene(args.seed, rack_assembly=assembling, complete_task=complete)
+        planning = build_workshop_scene(
+            args.seed, planning_parts=objects.values(), rack_assembly=assembling, complete_task=complete
+        )
         m, d = scene.model, scene.data
         for _ in range(1000):
             mujoco.mj_step(m, d)
@@ -253,7 +286,7 @@ def main():
         )
         # Commissioning observation of the empty station. Its actual depth
         # image (not segmentation IDs or CAD silhouettes) is the background.
-        empty = build_workshop_scene(args.seed, empty=True, rack_assembly=assembling)
+        empty = build_workshop_scene(args.seed, empty=True, rack_assembly=assembling, complete_task=complete)
         with mujoco.Renderer(empty.model, height=960, width=1280) as renderer:
             renderer.update_scene(empty.data, camera=CAMERA_NAME)
             renderer.enable_depth_rendering()
@@ -273,7 +306,7 @@ def main():
             recorder,
             out / "motion",
             planning_scene=planning,
-            initial_target="rack_frame" if assembling else "hammer",
+            initial_target="rack_frame" if assembling and not complete else "hammer",
             supports=(
                 (
                     lambda stage: rack_assembly_supports(
@@ -312,6 +345,8 @@ def main():
         ):
             if assembling and name == "spanner" and region is None and prior is None:
                 region = "rack_spanner"
+            if complete and name in ("hammer", "screwdriver") and region is None and prior is None:
+                region = "complete_" + name
             cap = observer.capture(
                 d, camera=camera, object_id=name, region=region, prior=prior, vertices=objects[name].vertices
             )
@@ -345,8 +380,10 @@ def main():
             raw_pose = pose.copy()
             if (
                 not args.ground_truth
-                and name == "rack_frame"
-                and (camera == WRIST_CAMERA or prior is not None)
+                and (
+                    (name == "rack_frame" and (camera == WRIST_CAMERA or prior is not None))
+                    or (complete and name == "screwdriver" and camera == WRIST_CAMERA)
+                )
             ):
                 pose, info["depth_refinement"] = refine_depth_pose(cap, objects[name].mesh, pose)
             if not args.ground_truth and name == "rack_frame" and camera == CAMERA_NAME and prior is not None:
@@ -442,8 +479,14 @@ def main():
             robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ pose
             locate_rack(WRIST_CAMERA)
 
-        if assembling:
+        def install_frame():
             robot.select("rack_frame")
+            if complete:
+                robot.event("task_phase", phase="install_frame")
+                pose, _ = observe("rack_frame")
+                approach = pose @ objects["rack_frame"].acquisition_grasp(pose)
+                approach[:3, 3] -= approach[:3, 2] * 0.10
+                robot.move(approach, "ROUTE_TO_FRAME", joint_space=True)
             robot.grasp(robot.known["rack_frame"])
             held_refinement()
             tool = objects["rack_frame"]
@@ -488,9 +531,21 @@ def main():
             observe("rack_frame", prior=goal)
             robot.obstacle_clearances["rack_frame"] = 0.004
 
-        if args.task in ("all", "insert"):
+        if assembling and not complete:
+            install_frame()
+
+        if args.task in ("all", "insert", "complete"):
             robot.select("hammer")
-            robot.grasp(robot.known["hammer"])
+            if complete:
+                robot.event("task_phase", phase="park_hammer")
+                pose = robot.known["hammer"]
+                approach = pose @ objects["hammer"].acquisition_grasp(pose)
+                approach[:3, 3] -= approach[:3, 2] * 0.10
+                robot.move(approach, "ROUTE_TO_HAMMER", joint_space=True)
+            # The complete bench puts the hammer near the far working edge.
+            # Eight centimetres clears its station without approaching the
+            # straight-arm singularity; the transfer remains collision checked.
+            robot.grasp(robot.known["hammer"], lift_distance=0.08 if complete else None)
             pose = robot.known["hammer"].copy()
             pose[:3, :3] = Rotation.from_euler("z", 145.0, degrees=True).as_matrix()
             zmin = (objects["hammer"].vertices @ pose[:3, :3].T)[:, 2].min()
@@ -498,13 +553,21 @@ def main():
             target = pose @ np.linalg.inv(robot.tool_T_object)
             hover = target.copy()
             hover[2, 3] = 0.535
-            robot.move(hover, "CLEAR_TOOL_ACCESS")
+            robot.move(hover, "CLEAR_TOOL_ACCESS", joint_space=complete)
             robot.move(target, "PARK_HAMMER", allow_support=True)
             robot.release(retreat_distance=0.07)
             robot.known["hammer"] = pose
             report["hammer_cleared"] = True
+            if complete:
+                robot.hold(1.0, "CHECK_HAMMER_STABILITY")
+                result = physical_evaluation(scene, "hammer")
+                report["outcomes"]["hammer"] = result
+                if not result["success"]:
+                    raise MotionFailure(f"Hammer parking failed: {result}")
 
             robot.select("screwdriver")
+            if complete:
+                robot.event("task_phase", phase="moving_driver_insertion")
             if args.stationary_feed:
                 pose, _ = observe("screwdriver")
             else:
@@ -594,8 +657,13 @@ def main():
             if not result["success"]:
                 raise MotionFailure(f"Driver seating failed: {result}")
 
-        if args.task in ("all", "hang", "rack"):
+        if complete:
+            install_frame()
+
+        if args.task in ("all", "hang", "rack", "complete"):
             robot.select("spanner")
+            if complete:
+                robot.event("task_phase", phase="regrasp_and_hang_spanner")
             pose, _ = observe("spanner")
             acquisition = objects["spanner"].acquisition_grasp(pose)
             if assembling:
@@ -659,6 +727,13 @@ def main():
                 if not report["outcomes"]["rack_frame_loaded"]["success"]:
                     raise MotionFailure("Assembled frame did not remain stable under the hanging tool load")
 
+        if complete:
+            # Earlier placements must still be supported after later motions.
+            for name in ("hammer", "screwdriver"):
+                result = physical_evaluation(scene, name)
+                report["outcomes"][name + "_final"] = result
+                if not result["success"]:
+                    raise MotionFailure(f"Earlier tool placement no longer stable: {name}: {result}")
         robot.hold(1.0, "TOOLS_READY")
         report["success"] = all(v["success"] for v in report["outcomes"].values())
         report["simulation_seconds"] = float(d.time)
@@ -675,11 +750,15 @@ def main():
                     pass
     finally:
         if robot is not None:
-            if args.task == "rack":
+            if args.task in ("rack", "complete"):
                 report["terminal_outcomes_evaluation_only"] = {
                     "rack_frame": frame_seating_evaluation(scene),
                     "spanner": physical_evaluation(scene, "spanner", assembled_frame=True),
                 }
+                if args.task == "complete":
+                    report["terminal_outcomes_evaluation_only"].update(
+                        {name: physical_evaluation(scene, name) for name in ("hammer", "screwdriver")}
+                    )
             else:
                 names = (
                     ("screwdriver", "spanner")

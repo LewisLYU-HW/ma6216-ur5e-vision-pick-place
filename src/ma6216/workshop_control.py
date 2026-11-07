@@ -93,16 +93,19 @@ def eye_from_reconstruction(mesh):
 
 
 class ReconstructedTool:
-    def __init__(self, bundle):
+    def __init__(self, bundle, *, body=None):
         self.bundle = Path(bundle).resolve()
         manifest, path = validate_bundle(self.bundle)
         self.object_id = manifest["object_id"]
-        self.body = {
-            "hammer": "target_cube",
-            "screwdriver": "target_screwdriver",
-            "spanner": "target_spanner",
-            "rack_frame": "target_cube",
-        }[self.object_id]
+        self.body = (
+            body
+            or {
+                "hammer": "target_cube",
+                "screwdriver": "target_screwdriver",
+                "spanner": "target_spanner",
+                "rack_frame": "target_cube",
+            }[self.object_id]
+        )
         self.geom = self.body + "_geom"
         self.joint = self.body + "_freejoint"
         self.mesh = trimesh.load(path, force="mesh", process=False)

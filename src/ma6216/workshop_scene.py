@@ -15,7 +15,15 @@ from .config import project_root
 from .direct_route import configure_direct_table, set_front_ready
 from .pose_insertion import transform
 from .scene import build_scene, look_at_quat, matrix_to_quat, mujoco
-from .workshop_assets import TOOLS, RACK_TOOLS, RACK_FRAME, FRAME_PROFILE, FRAME_DEPTH, ring_mesh
+from .workshop_assets import (
+    TOOLS,
+    RACK_TOOLS,
+    COMPLETE_TOOLS,
+    RACK_FRAME,
+    FRAME_PROFILE,
+    FRAME_DEPTH,
+    ring_mesh,
+)
 
 TABLE_Z = 0.375
 BELT_TOP = 0.414
@@ -37,6 +45,8 @@ FRAME_CLEARANCE = 0.0015
 # Surveyed pickup regions are deliberately broad. They associate a task name
 # with a station, not with a simulator segmentation ID or true object pose.
 PICK_REGIONS = {
+    "complete_hammer": ([0.575, -0.25, TABLE_Z + 0.002], [0.65, -0.04, 0.46]),
+    "complete_screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.15, 0.48]),
     "rack_spanner": ([0.44, -0.075, TABLE_Z + 0.002], [0.65, 0.05, 0.44]),
     "rack_frame": ([0.33, -0.22, 0.395], [0.59, -0.05, 0.49]),
     "screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.12, 0.48]),
@@ -285,8 +295,11 @@ def add_bench(spec):
     )
 
 
-def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed=0.003, rack_assembly=False):
-    physical_tools = RACK_TOOLS if rack_assembly else TOOLS
+def build_workshop_scene(
+    seed=0, *, planning_parts=None, empty=False, belt_speed=0.003, rack_assembly=False, complete_task=False
+):
+    rack_assembly = rack_assembly or complete_task
+    physical_tools = COMPLETE_TOOLS if complete_task else RACK_TOOLS if rack_assembly else TOOLS
     parts = tuple(physical_tools.values()) if planning_parts is None else tuple(planning_parts)
     rng = np.random.default_rng(seed)
     poses = {
@@ -305,12 +318,19 @@ def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed
         poses["spanner"][1, 3] -= 0.065
         # Hook points upward on the source rails. This also exposes the front
         # side for the final horizontal-hand approach, clear of the backboard.
-        poses = {
-            "rack_frame": transform(
-                [0.385, -0.120, 0.433], np.column_stack(([0.0, -1.0, 0.0], [0.0, 0.0, -1.0], [1.0, 0.0, 0.0]))
-            ),
-            "spanner": poses["spanner"],
-        }
+        frame_pose = transform(
+            [0.385, -0.120, 0.433], np.column_stack(([0.0, -1.0, 0.0], [0.0, 0.0, -1.0], [1.0, 0.0, 0.0]))
+        )
+        if complete_task:
+            poses["rack_frame"] = frame_pose
+            # Separate the hammer from the removable frame and the feed tray.
+            hammer_offset = poses["hammer"][:2, 3] - [0.50, -0.10]
+            poses["hammer"] = transform(
+                [0.605, -0.145, 0.401], Rotation.from_euler("z", 90, degrees=True).as_matrix()
+            )
+            poses["hammer"][:2, 3] += hammer_offset
+        else:
+            poses = {"rack_frame": frame_pose, "spanner": poses["spanner"]}
         if seed:
             poses["rack_frame"][:2, 3] += rng.uniform(-0.004, 0.004, 2)
 

@@ -4,7 +4,7 @@ GSO source files retain their original UVs and CC-BY attribution. The ring
 spanner is an original parametric workshop prop, with a real collision hole.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import cached_property
 
 import numpy as np
@@ -219,4 +219,9 @@ TOOLS = {
 }
 RACK_FRAME = WorkshopTool("rack_frame", "target_cube", mass_kg=0.15)
 RACK_TOOLS = {"rack_frame": RACK_FRAME, "spanner": TOOLS["spanner"]}
+COMPLETE_TOOLS = {
+    "hammer": replace(TOOLS["hammer"], body="target_hammer"),
+    "screwdriver": TOOLS["screwdriver"],
+    **RACK_TOOLS,
+}
 SCAN_TOOLS = {**TOOLS, "rack_frame": RACK_FRAME}

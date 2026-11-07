@@ -17,7 +17,7 @@ from ma6216.reconstructed import validate_bundle
 from ma6216.scene import mujoco
 from ma6216.task_control import TaskRobot
 from ma6216.motion import MotionFailure
-from ma6216.workshop_assets import TOOLS
+from ma6216.workshop_assets import TOOLS, COMPLETE_TOOLS
 from ma6216.workshop_control import FeedPoseHistory, ReconstructedTool
 from ma6216.workshop_scene import (
     build_workshop_scene,
@@ -100,6 +100,35 @@ class RackAcceptance(unittest.TestCase):
             mujoco.mj_step(self.scene.model, self.scene.data)
         result = physical_evaluation(self.scene, "spanner")
         self.assertTrue(result["success"], result)
+
+
+class CompleteWorkshop(unittest.TestCase):
+    def test_four_tools_have_independent_free_joints_and_do_not_start_interpenetrating(self):
+        scene = build_workshop_scene(complete_task=True)
+        m, d = scene.model, scene.data
+        self.assertEqual({part.object_id for part in scene.parts}, set(COMPLETE_TOOLS))
+        ids = {m.body(part.body).id for part in scene.parts}
+        joints = {m.joint(part.joint).id for part in scene.parts}
+        self.assertEqual(len(ids), 4)
+        self.assertEqual(len(joints), 4)
+        self.assertTrue(all(m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE for j in joints))
+        for _ in range(1000):
+            mujoco.mj_step(m, d)
+        bad = [
+            (m.geom(c.geom1).name, m.geom(c.geom2).name, c.dist)
+            for c in d.contact
+            if m.geom_bodyid[c.geom1] in ids
+            and m.geom_bodyid[c.geom2] in ids
+            and m.geom_bodyid[c.geom1] != m.geom_bodyid[c.geom2]
+            and c.dist < -0.0005
+        ]
+        self.assertFalse(bad, bad)
+
+    def test_floating_hammer_is_not_a_completed_placement(self):
+        scene = build_workshop_scene(complete_task=True)
+        set_initial_pose(scene.model, scene.data, COMPLETE_TOOLS["hammer"], transform([0.60, -0.28, 0.60]))
+        mujoco.mj_forward(scene.model, scene.data)
+        self.assertFalse(physical_evaluation(scene, "hammer")["success"])
 
 
 if __name__ == "__main__":
