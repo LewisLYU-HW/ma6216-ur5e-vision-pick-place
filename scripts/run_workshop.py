@@ -717,7 +717,11 @@ def main():
             robot.move(final_object @ np.linalg.inv(robot.tool_T_object), "SEAT_EYE", allow_support=True)
             robot.release(retreat_distance=0.10)
             robot.known["spanner"] = final_object
-            robot.hold(4.0, "CHECK_HANG_STABILITY")
+            # The continuous demonstration includes the visible settling of
+            # the freely hanging tool. Keep the legacy benchmark's 4 s limit.
+            hang_settle = 10.0 if complete else 4.0
+            report["hang_settle_duration_s"] = hang_settle
+            robot.hold(hang_settle, "CHECK_HANG_STABILITY")
             result = physical_evaluation(scene, "spanner", assembled_frame=assembling)
             report["outcomes"]["spanner"] = result
             if not result["success"]:
