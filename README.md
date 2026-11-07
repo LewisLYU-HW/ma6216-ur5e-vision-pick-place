@@ -26,6 +26,32 @@
 
 `main` 保持最新整合代码；各固定版本提供源码和打印文件下载，原 Pick-and-Place 入口继续保留。绿色螺丝刀仅出现在四物件预览中，尚未验证抓取。组员按阶段拉取、运行和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
 
+## 分支扩展：6D 位姿引导的定向入槽
+
+`feat/6d-pose-insertion` 接续 `v1.0.0`：沿用缺角料块，从带 roll/pitch 的
+倾斜料架取件，使用官方 FoundationPose 的完整旋转搜索和三维抓取变换，
+校正朝向后放入匹配浅槽。颜色只提供前景 mask，验收包括三维姿态、位置、
+实际槽底支撑和五秒稳定性。提供 `yaw-only` 对照及物理验收正/负例。
+录制时增加 `--record-view both` 可同步保存全景和腕部视角。
+这是独立分支任务，尚未发布新版本标签。
+
+```bash
+python scripts/run_pose_insertion.py --layout 1 \
+  --output artifacts/pose_insertion_01 --record --viewer
+```
+
+运行条件、倾斜范围、接触设置、完整/简化姿态对照及实测范围见
+[POSE_INSERTION.md](docs/POSE_INSERTION.md)。
+
+演示视频已随仓库提供（H.264 MP4，点击查看或下载）：
+
+- [全景＋腕部同步演示](docs/videos/pose-insertion-overview-wrist.mp4)
+- [独立腕部视角](docs/videos/pose-insertion-wrist.mp4)
+- [完整 6D 位姿全景演示](docs/videos/pose-insertion-full.mp4)
+- [yaw-only 落座失败对照](docs/videos/pose-insertion-yaw-only-failure.mp4)
+
+场景、时长与文件校验信息见 [视频说明](docs/videos/README.md)。
+
 ## 运行视觉码垛
 
 在已有环境的 WSL 项目目录运行：
