@@ -1,0 +1,651 @@
+{
+  "schema_version": 1,
+  "tested_date": "2026-11-07",
+  "base_commit": "2d784021fff6e3f62fefffbcf868578b5183b5f3",
+  "branch": "feat/6d-pose-insertion",
+  "scope": "Final deterministic validation matrix; one run per listed configuration, not a randomized robustness benchmark. Earlier development iterations and repeat checks remain in ignored local artifacts.",
+  "task": "Full-SE(3) tilted picking and shallow keyed-nest seating",
+  "controls": {
+    "nest_depth_mm": 8,
+    "clearance_mm_per_side": 2.5,
+    "target_yaw_deg": 0,
+    "planned_release_gap_mm": 12,
+    "robot_self_gravity_compensation": true,
+    "workpiece_gravity_compensation": false,
+    "friction_cone": "elliptic",
+    "impratio": 10,
+    "full_vs_yaw_only_estimated_pose_files_identical": true,
+    "estimated_camera_extrinsic_sha256": "3a97ec9b05546c68e97e88f4439f4507fd1df8ec862558ffc704612feb617735"
+  },
+  "environment": {
+    "os": "Ubuntu 22.04",
+    "simulation_python": "3.11.14",
+    "mujoco": "3.17.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "opencv-python": "5.0.0.93",
+    "trimesh": "5.2.0",
+    "inference_python": "3.9.23",
+    "torch": "2.4.1+cu121",
+    "cuda_runtime": "12.1",
+    "gpu": "NVIDIA RTX 2000 Ada Generation",
+    "menagerie_commit": "fb36886b3023db08c198264e1e9956ab202c3e3b",
+    "foundationpose_commit": "a1b694b83e633c2cb6115b9063d940a687759392"
+  },
+  "controller_sha256": "60d74d56e0254a2d2ed7d17423f6e4fbc9542b8d6cd843cc54025a2a6ff25334",
+  "validation": {
+    "check_setup_simulation_only": "passed",
+    "check_pose_insertion": "passed",
+    "check_palletizing": "passed",
+    "new_python_syntax": "passed",
+    "git_diff_check": "passed"
+  },
+  "notes": [
+    "Ground-truth runs validate physics and do not count as vision results.",
+    "Vision-only full pose passed the three tested tilted layouts; yaw-only passed layout 1 and failed layouts 2 and 3.",
+    "Yaw-only can succeed through passive contact alignment: it also passed the separate ground-truth layout 3 baseline.",
+    "Seated rotation accuracy reflects passive physical alignment as well as planning; it is not FoundationPose estimation accuracy.",
+    "No validation of force-controlled insertion, hardware execution, random clutter, tighter clearances or nonzero target yaw is claimed.",
+    "The last runner update only adds structured failure metrics and failure snapshots; the controller is identical across this matrix."
+  ],
+  "runs": [
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 0,
+      "pose_mode": "full",
+      "control_source": "ground_truth_control_baseline",
+      "artifact_directory": "artifacts/pose_insert_gt_l0_verified",
+      "raw_summary_sha256": "bd43fdadf918c45a956c8b574bfeb49ed6a7e442560bb92b4286f821eef792c2",
+      "perception_evaluation_only": {
+        "translation_error_mm": 0.0,
+        "rotation_error_deg": 0.0,
+        "actual_roll_pitch_yaw_deg": [
+          -0.0011720243711545275,
+          0.006991741031681847,
+          17.99999942940069
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          -0.0011720243711545275,
+          0.006991741031681847,
+          17.99999942940069
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 0.11812249054943816,
+        "rotation_error_deg": 0.007147406592384435,
+        "bottom_gap_mm": -0.11338374849620414,
+        "minimum_wall_clearance_mm": 2.4510454713728977,
+        "bottom_support_force_n": 0.9809999924908189,
+        "linear_speed_m_s": 3.162082730676467e-08,
+        "angular_speed_rad_s": 4.950122659587299e-09,
+        "max_workpiece_penetration_mm": 0.11338330027904363,
+        "five_second_max_drift_mm": 0.00015658557647690047
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 28.84599999999489,
+      "wall_clock_seconds_including_inference": 9.002406599000096,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 1,
+      "pose_mode": "full",
+      "control_source": "ground_truth_control_baseline",
+      "artifact_directory": "artifacts/pose_insert_gt_l1_verified",
+      "raw_summary_sha256": "a81123db7eb17b249dcfe0607f207548cf0cdeba51549ca33545db263da4f161",
+      "perception_evaluation_only": {
+        "translation_error_mm": 0.0,
+        "rotation_error_deg": 0.0,
+        "actual_roll_pitch_yaw_deg": [
+          10.031602100738779,
+          -8.003031812940742,
+          21.99659947447128
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          10.031602100738779,
+          -8.003031812940742,
+          21.99659947447128
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 0.260241934192648,
+        "rotation_error_deg": 0.007149471349756676,
+        "bottom_gap_mm": -0.11338374843277224,
+        "minimum_wall_clearance_mm": 2.262098819619543,
+        "bottom_support_force_n": 0.9809999924907864,
+        "linear_speed_m_s": 3.1620845900441355e-08,
+        "angular_speed_rad_s": 4.285293713511137e-09,
+        "max_workpiece_penetration_mm": 0.1133833002155944,
+        "five_second_max_drift_mm": 0.00015658560371447475
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 31.075999999993655,
+      "wall_clock_seconds_including_inference": 10.040517378000004,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 2,
+      "pose_mode": "full",
+      "control_source": "ground_truth_control_baseline",
+      "artifact_directory": "artifacts/pose_insert_gt_l2_v2",
+      "raw_summary_sha256": "f7e86c54809bd2da9e0feb131164ea3b879417d510602d366926633751cddeb8",
+      "perception_evaluation_only": {
+        "translation_error_mm": 0.0,
+        "rotation_error_deg": 0.0,
+        "actual_roll_pitch_yaw_deg": [
+          -18.057865964279134,
+          16.027431799781837,
+          -18.00407866373646
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          -18.057865964279134,
+          16.027431799781837,
+          -18.00407866373646
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 0.38760347668904116,
+        "rotation_error_deg": 0.007140438657266505,
+        "bottom_gap_mm": -0.11338374869348036,
+        "minimum_wall_clearance_mm": 2.125897513426241,
+        "bottom_support_force_n": 0.9809999924908347,
+        "linear_speed_m_s": 3.162113635703724e-08,
+        "angular_speed_rad_s": 1.1164289282798658e-08,
+        "max_workpiece_penetration_mm": 0.11338330047633025,
+        "five_second_max_drift_mm": 0.00015658557511484764
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 27.99799999999536,
+      "wall_clock_seconds_including_inference": 8.920856844999435,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 3,
+      "pose_mode": "full",
+      "control_source": "ground_truth_control_baseline",
+      "artifact_directory": "artifacts/pose_insert_gt_l3_v2",
+      "raw_summary_sha256": "649d41df3fea5edff2bdd3c29d608b045bfdff0eba494b00dce9f26ad9a21bf9",
+      "perception_evaluation_only": {
+        "translation_error_mm": 0.0,
+        "rotation_error_deg": 0.0,
+        "actual_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 0.3852660079634682,
+        "rotation_error_deg": 0.007161208418755129,
+        "bottom_gap_mm": -0.11338374861660089,
+        "minimum_wall_clearance_mm": 2.128306480830039,
+        "bottom_support_force_n": 0.9809999924907971,
+        "linear_speed_m_s": 3.162093506218885e-08,
+        "angular_speed_rad_s": 8.492472604128296e-09,
+        "max_workpiece_penetration_mm": 0.11338330039939194,
+        "five_second_max_drift_mm": 0.00015658559979899838
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 33.81399999999536,
+      "wall_clock_seconds_including_inference": 11.42488671799947,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 3,
+      "pose_mode": "yaw-only",
+      "control_source": "ground_truth_control_baseline",
+      "artifact_directory": "artifacts/pose_insert_yaw_only_l3",
+      "raw_summary_sha256": "2b7af2b9202c96d932dcc0d4c6d5b52364192c317b64f9cbad030b741ff7019b",
+      "perception_evaluation_only": {
+        "translation_error_mm": 0.0,
+        "rotation_error_deg": 0.0,
+        "actual_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 2.799321227677668,
+        "rotation_error_deg": 0.768595739999139,
+        "bottom_gap_mm": -0.11338374872315454,
+        "minimum_wall_clearance_mm": 0.01900155943157511,
+        "bottom_support_force_n": 0.9809999924906849,
+        "linear_speed_m_s": 3.162021293655547e-08,
+        "angular_speed_rad_s": 1.4211778115222076e-09,
+        "max_workpiece_penetration_mm": 0.11338330050597324,
+        "five_second_max_drift_mm": 0.0001565855603527193
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 28.081999999995315,
+      "wall_clock_seconds_including_inference": 8.318621451999206,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.00021037282399859102,
+      "bilateral_loaded_contact_fraction": 1.0
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 1,
+      "pose_mode": "full",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l1_final",
+      "raw_summary_sha256": "ace92d431e1db83438783a7a0463943faa259b06a351b57bad596623cd8fd0f8",
+      "perception_evaluation_only": {
+        "translation_error_mm": 3.830211330709178,
+        "rotation_error_deg": 0.7215831189487539,
+        "actual_roll_pitch_yaw_deg": [
+          10.031602100738779,
+          -8.003031812940742,
+          21.99659947447128
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          10.14314942224156,
+          -8.257453461277233,
+          21.314671774527493
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 1.9207551144855897,
+        "rotation_error_deg": 0.007171891959565,
+        "bottom_gap_mm": -0.11338374846235622,
+        "minimum_wall_clearance_mm": 0.5795779075352738,
+        "bottom_support_force_n": 0.9809999924907258,
+        "linear_speed_m_s": 3.1620705114434394e-08,
+        "angular_speed_rad_s": 8.970118699962678e-10,
+        "max_workpiece_penetration_mm": 0.11338330024512655,
+        "five_second_max_drift_mm": 0.00015658553625199948
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 31.10599999999364,
+      "wall_clock_seconds_including_inference": 24.18930727500083,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "2eb5a5630fc2619fc338bad23f523162fc82fedb34de333989ddca7fbd04d69b"
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 2,
+      "pose_mode": "full",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l2_full_verified",
+      "raw_summary_sha256": "bd75642ca0a575ba6e1e127a9ff9e6de5ee97009a0e3dec00eac681c670eb73f",
+      "perception_evaluation_only": {
+        "translation_error_mm": 4.265737598684228,
+        "rotation_error_deg": 0.4192680797763551,
+        "actual_roll_pitch_yaw_deg": [
+          -18.057865964279134,
+          16.027431799781837,
+          -18.00407866373646
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          -17.809246277692882,
+          15.96213712278585,
+          -18.2738080348763
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 2.4230772856086067,
+        "rotation_error_deg": 0.007160338863014774,
+        "bottom_gap_mm": -0.11338374838872067,
+        "minimum_wall_clearance_mm": 0.07660160586021869,
+        "bottom_support_force_n": 0.9809999924907842,
+        "linear_speed_m_s": 3.1620879829019846e-08,
+        "angular_speed_rad_s": 2.2542585943061064e-09,
+        "max_workpiece_penetration_mm": 0.11338330017157419,
+        "five_second_max_drift_mm": 0.00015658559220385802
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 28.205999999995246,
+      "wall_clock_seconds_including_inference": 19.67255534600008,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "de297eba4e75e7e164dc19de1067e23706b1e3cfe53114becade8e01f7ef8fe6"
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 3,
+      "pose_mode": "full",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l3_full_verified",
+      "raw_summary_sha256": "4fea30eb0b82c704b779b096043228a29970d86b8e9b2d7ae6f6065e1164e004",
+      "perception_evaluation_only": {
+        "translation_error_mm": 4.481335005703827,
+        "rotation_error_deg": 1.9565689010277807,
+        "actual_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          18.331359481464133,
+          13.404910138150923,
+          -24.63317430177094
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 2.354164032632209,
+        "rotation_error_deg": 0.012880240848156489,
+        "bottom_gap_mm": -0.11338374870924206,
+        "minimum_wall_clearance_mm": 0.14118392900575039,
+        "bottom_support_force_n": 0.9809999924906969,
+        "linear_speed_m_s": 3.1620225781286604e-08,
+        "angular_speed_rad_s": 1.3494223716327702e-09,
+        "max_workpiece_penetration_mm": 0.1133833004920401,
+        "five_second_max_drift_mm": 0.00015658558709588362
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 34.595999999996316,
+      "wall_clock_seconds_including_inference": 25.989104133999717,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "e09972f504467a56f6304fecdb19c7615ff3b76cb6415161fe3771c045c811cb"
+    },
+    {
+      "success": true,
+      "status": "completed",
+      "layout": 1,
+      "pose_mode": "yaw-only",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l1_yaw-only_verified",
+      "raw_summary_sha256": "96f5e93bafa0f9ba68f460e7e3754647902722493dd946e798497bcdbd0b9bbc",
+      "perception_evaluation_only": {
+        "translation_error_mm": 3.830211330709178,
+        "rotation_error_deg": 0.7215831189487539,
+        "actual_roll_pitch_yaw_deg": [
+          10.031602100738779,
+          -8.003031812940742,
+          21.99659947447128
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          10.14314942224156,
+          -8.257453461277233,
+          21.314671774527493
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": true,
+        "position_error_mm": 1.4425465802801667,
+        "rotation_error_deg": 0.00986859593788669,
+        "bottom_gap_mm": -0.11338375037654724,
+        "minimum_wall_clearance_mm": 1.0572624643411175,
+        "bottom_support_force_n": 0.9809999924905951,
+        "linear_speed_m_s": 3.1615331361418184e-08,
+        "angular_speed_rad_s": 7.185516841086772e-09,
+        "max_workpiece_penetration_mm": 0.11338330215931709,
+        "five_second_max_drift_mm": 0.00015655954032935243
+      },
+      "evaluation_time": "after_five_second_stability_check",
+      "simulation_time_s": 29.683999999994427,
+      "wall_clock_seconds_including_inference": 20.082485654000266,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "bilateral_loaded_contact_fraction": 1.0,
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "2eb5a5630fc2619fc338bad23f523162fc82fedb34de333989ddca7fbd04d69b"
+    },
+    {
+      "success": false,
+      "status": "failed",
+      "layout": 2,
+      "pose_mode": "yaw-only",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l2_yaw_only_reported",
+      "raw_summary_sha256": "b402840294bc545230ee9ab0aea2c5001d29e793bea803f955fe98e4f4158e3c",
+      "perception_evaluation_only": {
+        "translation_error_mm": 4.265737598684228,
+        "rotation_error_deg": 0.4192680797763551,
+        "actual_roll_pitch_yaw_deg": [
+          -18.057865964279134,
+          16.027431799781837,
+          -18.00407866373646
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          -17.809246277692882,
+          15.96213712278585,
+          -18.2738080348763
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": false,
+        "position_error_mm": 7.178304320775412,
+        "rotation_error_deg": 6.143176876649286,
+        "bottom_gap_mm": -0.10667115825286136,
+        "minimum_wall_clearance_mm": -5.2817636102989525,
+        "bottom_support_force_n": 0.48362857874275256,
+        "linear_speed_m_s": 1.3553098177066705e-05,
+        "angular_speed_rad_s": 4.421426552757618e-05,
+        "max_workpiece_penetration_mm": 0.12428933469278765
+      },
+      "evaluation_time": "at_execution_failure_before_stability_check",
+      "simulation_time_s": null,
+      "wall_clock_seconds_including_inference": 18.94854723000026,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "failure_reason": "keyed_nest_seating_acceptance_failed",
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "de297eba4e75e7e164dc19de1067e23706b1e3cfe53114becade8e01f7ef8fe6"
+    },
+    {
+      "success": false,
+      "status": "failed",
+      "layout": 3,
+      "pose_mode": "yaw-only",
+      "control_source": "FoundationPose + estimated calibration",
+      "artifact_directory": "artifacts/pose_insert_visual_l3_yaw_only_reported",
+      "raw_summary_sha256": "0b5b7becb143ca63d172cc571e6bd0cb398d245ffddf3695db207c6f422d12b3",
+      "perception_evaluation_only": {
+        "translation_error_mm": 4.481335005703827,
+        "rotation_error_deg": 1.9565689010277807,
+        "actual_roll_pitch_yaw_deg": [
+          20.065803456401095,
+          14.029228620004066,
+          -24.9960257194242
+        ],
+        "estimated_roll_pitch_yaw_deg": [
+          18.331359481464133,
+          13.404910138150923,
+          -24.63317430177094
+        ]
+      },
+      "seating_evaluation_only": {
+        "success": false,
+        "position_error_mm": 6.14864343472548,
+        "rotation_error_deg": 6.092831120884932,
+        "bottom_gap_mm": -0.16063312046041278,
+        "minimum_wall_clearance_mm": -3.95276441358066,
+        "bottom_support_force_n": 0.5123010725028403,
+        "linear_speed_m_s": 4.9389676775048e-05,
+        "angular_speed_rad_s": 0.0019059682572615958,
+        "max_workpiece_penetration_mm": 0.16063240701646997
+      },
+      "evaluation_time": "at_execution_failure_before_stability_check",
+      "simulation_time_s": null,
+      "wall_clock_seconds_including_inference": 21.44831483999951,
+      "completed_stages": [
+        "APPROACH",
+        "GRASP",
+        "LIFT",
+        "HOVER_TRAY",
+        "PLACE",
+        "RETREAT"
+      ],
+      "max_unexpected_robot_penetration_m": 0.0,
+      "failure_reason": "keyed_nest_seating_acceptance_failed",
+      "foundationpose_provenance": {
+        "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+        "status": "inference_completed",
+        "mesh_sha256": "53bae17804b87007d69fc4d9bac4894dd873e69dbbf17362ddbdda05de410b83",
+        "intrinsics_sha256": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+        "registration_candidate_count": 252,
+        "ground_truth_used_for_inference": false,
+        "gpu": "NVIDIA RTX 2000 Ada Generation",
+        "torch_version": "2.4.1+cu121",
+        "cuda_runtime": "12.1"
+      },
+      "estimated_pose_sha256": "e09972f504467a56f6304fecdb19c7615ff3b76cb6415161fe3771c045c811cb"
+    }
+  ]
+}
