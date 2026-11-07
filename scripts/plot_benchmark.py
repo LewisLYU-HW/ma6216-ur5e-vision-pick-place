@@ -46,9 +46,9 @@ def main():
             "figure.dpi": 160,
         }
     )
-    tasks = list(LABELS)
+    tasks = [task for task in LABELS if any(g["task"] == task for g in result["groups"])]
     colours = ("#157f83", "#d37b42")
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4.5), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(max(7, 2 * len(tasks) + 1), 4.5), sharey=True)
     for ax, disturbed in zip(axes, (False, True)):
         for offset, full, colour in zip((-0.19, 0.19), (True, False), colours):
             groups = [

@@ -292,6 +292,7 @@ def main():
             target = "rack_frame" if assembling else "spanner" if args.task == "hang" else "screwdriver"
             robot.environment_hook = GraspImpulse(robot, target)
         robot.trace_enabled = args.trace
+        robot.joint_velocity_feedforward = assembling
 
         def displayed_estimate():
             name = robot.target.object_id
@@ -472,13 +473,16 @@ def main():
                     retreat[:3, 3] += axis * 0.05
                     robot.move(retreat, "RETRACT_FRAME", allow_support=True)
                     raise MotionFailure("Rack frame insertion contact guard triggered")
-            robot.release(retreat_distance=0.035)
+            robot.release(retreat_distance=0.085)
             robot.known["rack_frame"] = goal
-            clear = transform([0.43, -0.04, 0.64], np.diag([1.0, -1.0, -1.0]))
+            robot.obstacle_clearances["rack_frame"] = 0.004
+            clear = transform([0.43, -0.04, 0.64], np.diag([-1.0, 1.0, -1.0]))
             robot.move(clear, "CLEAR_ASSEMBLED_FRAME", joint_space=True)
             robot.hold(2.0, "CHECK_FRAME_SEATING")
             result = frame_seating_evaluation(scene)
             report["outcomes"]["rack_frame"] = result
+            if not result["success"]:
+                raise MotionFailure(f"Rack frame seating failed: {result}")
             # Locate the free assembled support after release, rather than
             # assuming its actual position equals the commanded seat pose.
             observe("rack_frame", prior=goal)
@@ -593,11 +597,15 @@ def main():
         if args.task in ("all", "hang", "rack"):
             robot.select("spanner")
             pose, _ = observe("spanner")
+            acquisition = objects["spanner"].acquisition_grasp(pose)
             if assembling:
-                approach = pose @ objects["spanner"].acquisition_grasp(pose)
+                # Use the other antipodal grasp through both pickups so that
+                # the wrist orientation stays compatible with the seated frame.
+                acquisition[:3, :3] = acquisition[:3, :3] @ np.diag([-1.0, -1.0, 1.0])
+                approach = pose @ acquisition
                 approach[:3, 3] -= approach[:3, 2] * 0.10
                 robot.move(approach, "ROUTE_TO_SPANNER", joint_space=True)
-            robot.grasp(pose)
+            robot.grasp(pose, acquisition)
             # Put the tool on two physical rails, open, withdraw, reobserve,
             # and grasp a different part of the handle. No attachment weld.
             flat = transform(CRADLE + [0.0, 0.0, -objects["spanner"].bounds[0, 2] + 0.0015])
@@ -609,7 +617,10 @@ def main():
             robot.release()
             robot.known["spanner"] = flat
             pose, _ = observe("spanner", region="cradle")
-            robot.grasp(pose, objects["spanner"].top_grasp(regrasp=True))
+            regrasp = objects["spanner"].top_grasp(regrasp=True)
+            if assembling:
+                regrasp[:3, :3] = regrasp[:3, :3] @ np.diag([-1.0, -1.0, 1.0])
+            robot.grasp(pose, regrasp)
             report["physical_regrasp_executed"] = True
             held_refinement()
             tool = objects["spanner"]

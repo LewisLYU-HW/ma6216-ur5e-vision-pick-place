@@ -277,7 +277,7 @@ class WorkshopRecorder(TaskRecorder):
             cv2.rectangle(frame, (0, 0), (7, 58), (65, 179, 231), -1)
             cv2.putText(
                 frame,
-                "MA6216  /  TOOL SERVICE",
+                self.source if self.source.startswith("RECORDED RUN") else "MA6216  /  TOOL SERVICE",
                 (22, 25),
                 cv2.FONT_HERSHEY_DUPLEX,
                 0.60,

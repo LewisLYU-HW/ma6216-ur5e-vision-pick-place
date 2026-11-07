@@ -434,7 +434,13 @@ def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed
     # Presentation camera changes do not alter the calibrated RGB-D sensor.
     cid = m.camera("overview").id
     eye, target = [0.99, -1.15, 0.99], [0.42, 0.015, 0.425]
-    m.cam_pos[cid], m.cam_quat[cid], m.cam_fovy[cid] = eye, look_at_quat(eye, target), 45.0
+    # Include the lifted wrist in the rack demonstration's overview. This
+    # camera is for presentation only; RGB-D perception cameras are unchanged.
+    m.cam_pos[cid], m.cam_quat[cid], m.cam_fovy[cid] = (
+        eye,
+        look_at_quat(eye, target),
+        52.0 if rack_assembly else 45.0,
+    )
     mujoco.mj_forward(m, d)
     return TaskScene(m, d, "workshop", seed, RACK_POSE.copy(), parts, belt_speed)
 

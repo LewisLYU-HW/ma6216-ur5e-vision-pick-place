@@ -53,6 +53,9 @@ def main():
     if not result["complete"]:
         raise RuntimeError("A final report requires all scheduled trials")
     groups = result["groups"]
+    config = protocol["config"]
+    task_count = len(config["tasks"])
+    seeds = config["seeds"]
     reports = [json.loads(p.read_text()) for p in sorted((args.results / "trials").glob("*.json"))]
     lines = []
 
@@ -68,11 +71,15 @@ def main():
     def label(g):
         return [LABELS[g["task"]], g["method"], "无" if g["disturbance"] == "none" else g["disturbance"]]
 
-    add("# 六类任务配对评测结果")
     add(
-        f"已完成 **{result['n_trials']} 次**：六类任务 × 两种方法 × 两种环境 × 每配置 10 次。"
-        "固定种子 100–109；每个任务/种子的四组初始物理状态 SHA-256 一致性检查已通过。"
-        "开发种子 0 不计入统计；任务失败全部保留。"
+        "# 工具架动作修订后配对评测"
+        if task_count == 1 and "rack" in config["tasks"]
+        else "# 任务配对评测结果"
+    )
+    add(
+        f"已完成 **{result['n_trials']} 次**：{task_count} 类任务 × 两种方法 × 两种环境 × 每配置 {len(seeds)} 次。"
+        f"固定种子 {seeds}；每个任务/种子的四组初始物理状态 SHA-256 一致性检查已通过。"
+        "开发运行不计入统计；任务失败全部保留。"
     )
     add(
         f"控制版本：`{protocol['git_parent']}`；协议创建时间：`{protocol['created_utc']}`。"
@@ -80,7 +87,7 @@ def main():
         "版本、权重与源文件校验值见 [protocol.json](protocol.json)，本机设备信息见 [hardware.json](hardware.json)。"
     )
     add(
-        "[评测方法与复现](../../EVALUATION.md) · [全部 240 条试验 CSV](trials.csv) · "
+        f"[评测方法与复现](../../EVALUATION.md) · [全部 {result['n_trials']} 条试验 CSV](trials.csv) · "
         "[逐观测位姿 CSV](pose_observations.csv) · [完整统计 JSON](summary.json) · "
         f"[原始试验摘要](trials/) · [录像清单]({video_root}/README.md)"
     )
@@ -113,9 +120,9 @@ def main():
                 [
                     LABELS[task],
                     "无" if condition == "none" else condition,
-                    rate(matched[0]["successes"], 10, matched[0]["success_ci95"]),
+                    rate(matched[0]["successes"], matched[0]["n_trials"], matched[0]["success_ci95"]),
                     spec["baseline"],
-                    rate(matched[1]["successes"], 10, matched[1]["success_ci95"]),
+                    rate(matched[1]["successes"], matched[1]["n_trials"], matched[1]["success_ci95"]),
                 ]
             )
     table(["任务", "扰动", "完整系统", "模块消融", "消融结果"], rows)
@@ -235,7 +242,7 @@ def main():
     add("## 标定误差")
     c = result["calibration"]
     add(
-        f"所有试验共用一次已冻结的固定相机标定，不将重复使用记成 240 次独立标定。"
+        "所有试验共用一次已冻结的固定相机标定，不将重复使用记成多次独立标定。"
         f"外参平移误差 **{c['fixed_extrinsic']['translation_error_mm']:.3f} mm**，"
         f"旋转误差 **{c['fixed_extrinsic']['rotation_error_deg']:.3f}°**；"
         f"焦距相对误差 fx/fy 为 {c['focal_relative_error'][0] * 100:.3f}% / {c['focal_relative_error'][1] * 100:.3f}%，"
@@ -251,7 +258,8 @@ def main():
     add("腕部手眼使用理想仿真安装，独立标定误差 **N/A**。当前结果不含深度传感器真实噪声和真机手眼误差。")
     add("## 执行精度")
     add(
-        "TCP 跟踪误差比较实际关节 FK 与执行器指令 FK；每个试验先求轨迹 RMSE，再在 10 个试验间求均值和区间。"
+        "TCP 跟踪误差比较实际关节 FK 与计划关节参考 FK；加入速度前馈时，执行器输入与计划参考分别记录。"
+        "每个试验先求轨迹 RMSE，再在试验间求均值和区间。"
         "移动终点误差按完成的移动求均值。失败也保留；提前失败、没有完成移动时明确报告缺失样本数。"
         "这些是执行跟踪误差，不能替代感知精度或任务成功率。"
     )
@@ -288,7 +296,7 @@ def main():
     add("## 执行频率与耗时")
     add(
         "仿真控制设定 **500 Hz**，执行误差采样 **50 Hz**，录像 **25 fps**。"
-        "下表为 8 路并行、GPU 串行共享时的实测值；推理时间不含排队，墙钟时间含等待和资源竞争。"
+        f"下表为 {protocol['runtime']['parallel_trials']} 路并行、GPU 串行共享时的实测值；推理时间不含排队，墙钟时间含等待和资源竞争。"
         "视觉更新是间歇性的。静态推理和离线规划期间物理暂停；运动感知使用固定 1.0 s 虚拟延迟。"
         "因此这些值不能解释为 500 Hz 视觉闭环或真机实时性能。"
     )
@@ -367,7 +375,7 @@ def main():
     )
     add("## 失败案例与可追溯性")
     add(
-        "预先规定选取规则：按任务顺序，先保存两个完整系统失败任务，再保存四个消融失败任务；"
+        "预先规定选取规则：按任务顺序，最多保存两个完整系统失败任务及四个消融失败任务；"
         "每个任务/方法优先无扰动，再按最低失败种子选择。录像直接回放该次保存的物理轨迹，"
         "不重新运行、不替换失败。其余失败全部保留摘要、日志与轨迹校验值。"
     )
@@ -394,7 +402,7 @@ def main():
     )
     add("## 适用范围")
     add(
-        "这是固定仿真场景的首轮模块消融，不能宣称优于所有外部算法。每配置只有 10 次；随机化覆盖有限的拾取位置、"
+        "这是固定仿真场景的模块消融，不能宣称优于所有外部算法。每配置只有 10 次；随机化覆盖有限的拾取位置、"
         "夹具位置及部分装配初始角度，没有验证任意工具、任意遮挡、光照、背景或真实传感器噪声。"
         "Model-free 指 24 张标定参考 RGB-D 经官方 Neural Object Field 重建，不是无需参考图的零样本方法。"
         "夹具几何和标记安装关系已知。仿真几何、接触和速度真值用于阶段验收与安全停机，"

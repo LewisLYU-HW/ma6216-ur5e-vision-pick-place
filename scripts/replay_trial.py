@@ -37,16 +37,18 @@ def main():
     status = "SUCCESS" if report["success"] else "FAILURE"
     error = report.get("error") or ""
     if report["success"]:
-        detail = "SUCCESS; original physics state replay"
+        detail = "Trial outcome: SUCCESS; original state replay"
     elif "offline IK" in error:
-        detail = "FAILURE; no collision-free IK"
+        detail = "Trial outcome: FAILURE; no collision-free IK"
     elif "contact guard" in error.lower():
-        detail = "FAILURE; insertion force guard"
+        detail = "Trial outcome: FAILURE; insertion force guard"
     elif "Unexpected robot contact" in error:
-        detail = "FAILURE; unexpected robot contact"
+        detail = "Trial outcome: FAILURE; unexpected robot contact"
     else:
-        detail = "FAILURE; see original trial log"
-    source = f"RECORDED RUN | {report.get('method', 'full')} | seed {seed} | {report.get('disturbance', 'none')} | {status}"
+        detail = "Trial outcome: FAILURE; see original trial log"
+    source = (
+        f"RECORDED RUN | {report.get('method', 'full')} | seed {seed} | {report.get('disturbance', 'none')}"
+    )
     if report.get("control_source") == "ground_truth_diagnostic":
         source = "GROUND TRUTH DIAGNOSTIC | " + status
     recorder = (

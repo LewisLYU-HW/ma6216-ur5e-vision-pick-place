@@ -166,11 +166,13 @@ class TaskRobot:
         self.moves = 0
         self.environment_hook = None
         self.obstacle_clearances = {}
+        self.joint_velocity_feedforward = False
         self.stage = "INITIALIZE"
         self.peak_force = 0.
         self.loaded_steps = 0
         self.holding_steps = 0
         self.select(initial_target)
+        self.reference_joints = self.data.ctrl[self.robot.aids].copy()
 
     def select(self, object_id):
         if self.carrying:
@@ -199,10 +201,11 @@ class TaskRobot:
         print(json.dumps(entry), flush=True)
         (self.output / "events.json").write_text(json.dumps(self.events, indent=2) + "\n")
 
-    def tick(self, q=None, stage=None, *, realtime=False, allow_target=True):
+    def tick(self, q=None, stage=None, *, realtime=False, allow_target=True, reference_q=None):
         started = time.perf_counter()
         if q is not None:
             self.data.ctrl[self.robot.aids] = q
+            self.reference_joints = np.asarray(q if reference_q is None else reference_q).copy()
         if stage is not None:
             self.stage = stage
         if self.environment_hook is not None:
@@ -244,15 +247,17 @@ class TaskRobot:
             mujoco.mj_kinematics(self.model, self.tracking_data)
             measured = transform(self.tracking_data.site_xpos[self.robot.sid].copy(),
                                  self.tracking_data.site_xmat[self.robot.sid].reshape(3, 3).copy())
-            self.tracking_data.qpos[self.robot.qids] = self.data.ctrl[self.robot.aids]
+            self.tracking_data.qpos[self.robot.qids] = self.reference_joints
             mujoco.mj_kinematics(self.model, self.tracking_data)
             command = transform(self.tracking_data.site_xpos[self.robot.sid].copy(),
                                 self.tracking_data.site_xmat[self.robot.sid].reshape(3, 3).copy())
             metrics = pose_errors(measured, command)
-            joint_errors = self.data.qpos[self.robot.qids] - self.data.ctrl[self.robot.aids]
+            joint_errors = self.data.qpos[self.robot.qids] - self.reference_joints
             self.samples.append({"time_s": float(self.data.time), "stage": self.stage,
                                  "wall_time_s": time.perf_counter()-self.wall_started,
                                  "tcp_pose": measured.tolist(), "wrist_wrench": wrench.tolist(),
+                                 "joint_reference": self.reference_joints.tolist(),
+                                 "actuator_command": self.data.ctrl[self.robot.aids].tolist(),
                                  "tracking_translation_mm": metrics["translation_error_mm"],
                                  "tracking_rotation_deg": metrics["rotation_error_deg"],
                                  "joint_tracking_rmse_rad": float(np.sqrt(np.mean(joint_errors**2))),
@@ -529,12 +534,21 @@ class TaskRobot:
         )
         steps = max(1, round(duration / self.model.opt.timestep))
         retimed_steps = 0
+        feedforward = joint_space and self.joint_velocity_feedforward
+        if feedforward:
+            from .joint_servo import position_velocity_command
         for step in range(steps + 1):
             u = step / steps
             progress = (10 * u**3 - 15 * u**4 + 6 * u**5) * (len(path) - 1)
             index = min(int(progress), len(path) - 2)
             q = path[index] + (progress - index) * (path[index + 1] - path[index])
-            self.tick(q, stage)
+            if feedforward:
+                speed = (30*u**2 - 60*u**3 + 30*u**4) / (steps*self.model.opt.timestep)
+                velocity = (path[index+1]-path[index]) * (len(path)-1) * speed
+                command = position_velocity_command(self.model, self.robot.aids, q, velocity)
+                self.tick(command, stage, reference_q=q)
+            else:
+                self.tick(q, stage)
             if joint_space and self.obstacle_clearances:
                 # Slow progress along the already checked path when actuator
                 # tracking lags. Only joint encoders and the current command
@@ -542,7 +556,7 @@ class TaskRobot:
                 for _ in range(1000):
                     if np.max(np.abs(self.data.qpos[self.robot.qids]-q)) <= .010:
                         break
-                    self.tick(stage=stage)
+                    self.tick(q if feedforward else None, stage=stage)
                     retimed_steps += 1
                 else:
                     raise MotionFailure(f"Joint tracking failed to settle at {stage}")
@@ -558,6 +572,9 @@ class TaskRobot:
         self.hold(0.25, stage + "_SETTLE")
         if retimed_steps:
             self.event("joint_path_retimed", stage=stage, extra_steps=retimed_steps, joint_error_limit_rad=.010)
+        if feedforward:
+            self.event("joint_velocity_feedforward", stage=stage, nominal_steps=steps,
+                       recovery_steps=retimed_steps, reference="collision-checked joint path")
         self.endpoints.append({"stage": stage, "time_s": float(self.data.time),
                                **pose_errors(self.tcp_pose(), destination)})
         if self.carrying:
@@ -621,7 +638,8 @@ class TaskRobot:
                 "joint_tracking_max_rad": distribution([s["joint_tracking_max_rad"] for s in self.samples]),
                 "move_endpoint_translation_mm": distribution([s["translation_error_mm"] for s in self.endpoints]),
                 "move_endpoint_rotation_deg": distribution([s["rotation_error_deg"] for s in self.endpoints]),
-                "tracking_reference": "commanded-joint FK versus measured TCP; task outcome evaluated separately",
+                "tracking_reference": "planned-joint FK versus measured TCP; actuator command logged separately",
+                "joint_velocity_feedforward": self.joint_velocity_feedforward,
                 "peak_wrist_force_n": self.peak_force, "events": self.events,
                 "controller_uses_live_object_qpos_writes": False,
                 "planning_object_geometry": "convex hulls of RGB-D neural reconstructions"}
