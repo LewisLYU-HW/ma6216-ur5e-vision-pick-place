@@ -44,7 +44,10 @@ git push -u origin feat/yourname-camera-evaluation
 - 少量明确用于复现的标定样例及小型指标摘要。
 - 引用、方法说明与经小组确认可分享的图。
 
-每轮录屏、原始 RGB-D 序列、下载的模型与权重、虚拟环境、缓存和本地凭据应保存在 Git 忽略目录。需要给组员看大视频时，可放小组共享存储或 GitHub Release，并在 Issue/PR 中附链接。实际是否提交某个文件，以 `git status` 和 `git diff --cached` 检查结果为准。
+原始逐轮录屏、RGB-D 序列、下载的模型与权重、虚拟环境、缓存和本地凭据保存在 Git 忽略目录。
+供课程展示的已验收视频直接提交到 `docs/videos`，采用 H.264 压缩并附时长、来源和哈希，方便组员克隆后观看。
+自行生成、用于复现的少量重建表面可连同来源清单放入 `assets/reconstructed`。
+其他大文件可放小组共享存储或 GitHub Release。实际提交范围以 `git status` 和 `git diff --cached` 检查结果为准。
 
 ## 问题反馈与版本标记
 

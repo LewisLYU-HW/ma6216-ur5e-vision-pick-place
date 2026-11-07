@@ -15,3 +15,6 @@
 /assets/palletizing/*.stl binary
 # Keep third-party mesh/XML/texture source hashes stable across operating systems.
 /assets/library/gso/** -text whitespace=-blank-at-eof,-blank-at-eol
+# Preserve image-reconstruction provenance hashes, including exported OBJ EOFs.
+/assets/reconstructed/** -text whitespace=-blank-at-eof
+/assets/reconstructed/*/model.obj linguist-generated=true

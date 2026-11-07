@@ -2,6 +2,10 @@
 
 面向 MA6216 Project 1 的视觉引导机器人抓放与码垛仿真。UR5e + Robotiq 2F-85 在 MuJoCo 中完成接近、夹取、抬升、横向搬运、放置和撤离，并支持四料块、两列两层的物理码垛。固定 RGB-D 相机提供观测，OpenCV 估计相机参数并分割目标，FoundationPose Model-based 估计物体位姿；坐标变换与 Python 运动规划将视觉结果转换为经过碰撞检查的关节轨迹。
 
+本分支 `feat/model-free-manipulation` 新增 **参考 RGB-D 重建驱动的装配恢复、遮挡重抓和运动目标抓取**。
+工件感知与规划使用官方 Neural Object Field 的重建表面，无需输入工件 CAD。
+[三任务运行说明与适用范围](docs/MODEL_FREE_TASKS.md) · [演示视频](docs/videos/README.md)
+
 ![FoundationPose 视觉引导四料块两列两层物理码垛](docs/media/palletizing-final.png)
 
 [码垛录像](docs/media/palletizing.mp4) · [码垛复现](docs/PALLETIZING.md) · [Project 1 任务与选型](docs/PROJECT1_PALLETIZING.md) · [多物品抓放视频](docs/media/diverse-object-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md)
@@ -25,6 +29,22 @@
 | [v1.0.0：视觉码垛](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v1.0.0) | 四料块、两列两层，包含指定下层支撑与整垛稳定性验收 | `scripts/run_palletizing.py` |
 
 `main` 保持最新整合代码；各固定版本提供源码和打印文件下载，原 Pick-and-Place 入口继续保留。绿色螺丝刀仅出现在四物件预览中，尚未验证抓取。组员按阶段拉取、运行和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
+
+## 分支扩展：Model-free 三任务
+
+| 任务 | 演示重点 | 全景＋腕部视频 |
+|---|---|---|
+| 视觉装配与恢复 | 腕部重定位、夹具移位、接触保护后自动重试 | [装配恢复](docs/videos/model-free-assembly-overview-wrist.mp4) |
+| 遮挡清理与换抓姿 | 搬走障碍物、侧抓翻转、支架松爪、重新抓取并插装 | [遮挡重抓](docs/videos/model-free-clutter-overview-wrist.mp4) |
+| 运动目标抓取 | 图像位姿跟踪、预测接触位置、移动中夹取并插装 | [运动目标](docs/videos/model-free-conveyor-overview-wrist.mp4) |
+| 自动恢复关闭对照 | 同样的夹具扰动，接触保护触发后停止 | [失败对照](docs/videos/model-free-no-recovery-overview-wrist.mp4) |
+
+视频直接保存在仓库中，含同步腕部视角。代码入口为
+`scripts/run_model_free_task.py --task assembly|clutter|conveyor`；
+可直接使用 [RGB-D 重建模型包](assets/reconstructed/README.md)。
+模型来源、环境、完整命令、夹具定位、力保护和有限场景的实测证据见
+[MODEL_FREE_TASKS.md](docs/MODEL_FREE_TASKS.md)。
+这里的 model-free 仍需要标定参考图；夹具几何与标记安装关系已知。
 
 ## 分支扩展：6D 位姿引导的定向入槽
 
