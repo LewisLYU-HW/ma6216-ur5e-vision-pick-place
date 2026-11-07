@@ -1,184 +1,151 @@
-# MA6216 UR5e Vision-Guided Manipulation
+# MA6216 · Model-free 6D 视觉操作
 
-面向 MA6216 Project 1 的视觉引导机器人抓放与码垛仿真。UR5e + Robotiq 2F-85 在 MuJoCo 中完成接近、夹取、抬升、横向搬运、放置和撤离，并支持四料块、两列两层的物理码垛。固定 RGB-D 相机提供观测，OpenCV 估计相机参数并分割目标，FoundationPose Model-based 估计物体位姿；坐标变换与 Python 运动规划将视觉结果转换为经过碰撞检查的关节轨迹。
+**分支：`feat/model-free-manipulation`** · UR5e + Robotiq 2F-85 · MuJoCo · 官方 FoundationPose
 
-本分支 `feat/model-free-manipulation` 新增 **参考 RGB-D 重建驱动的装配恢复、遮挡重抓和运动目标抓取**。
-工件感知与规划使用官方 Neural Object Field 的重建表面，无需输入工件 CAD。
-[三任务运行说明与适用范围](docs/MODEL_FREE_TASKS.md) · [演示视频](docs/videos/README.md)
+本分支接续小组原有抓放与码垛仿真，实现三个任务：**视觉装配与自动恢复、部分遮挡清理与换抓姿、运动目标跟踪与预测抓取**。
+先从标定 RGB-D 参考图重建工件，再用官方 FoundationPose 估计三维位置和朝向，驱动真实接触下的夹持、重定位和插装。
+颜色仅用于前景分割；抓取、翻转和装配使用完整 **6D pose（三维位置＋三维朝向）**。
 
-![FoundationPose 视觉引导四料块两列两层物理码垛](docs/media/palletizing-final.png)
+[演示视频](docs/videos/README.md) · [详细复现与限制](docs/MODEL_FREE_TASKS.md) · [实测数据](docs/results/model-free-tasks.json) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
-[码垛录像](docs/media/palletizing.mp4) · [码垛复现](docs/PALLETIZING.md) · [Project 1 任务与选型](docs/PROJECT1_PALLETIZING.md) · [多物品抓放视频](docs/media/diverse-object-pick-place.mp4) · [安装与复现](docs/SETUP.md) · [小组协作](docs/TEAM_WORKFLOW.md)
+## 三个任务与视频
 
-## FoundationPose 接入与来源
+| 任务 | 机器人做什么 | 6D pose 用在哪里 | 全景＋腕部录像 |
+|---|---|---|---|
+| **装配与恢复** `assembly` | 从倾斜料架取件；夹具移位后触发接触保护，撤退、重定位并重试 | 完整抓取变换、腕部朝向校正、工件与夹具的相对位姿 | [观看视频](docs/videos/model-free-assembly-overview-wrist.mp4) |
+| **遮挡与重抓** `clutter` | 搬走障碍物；侧抓平躺工件，翻转放上支架，松爪后换抓姿并插装 | 识别平躺姿态、构造侧抓关系、翻转与重新抓取 | [观看视频](docs/videos/model-free-clutter-overview-wrist.mp4) |
+| **运动目标抓取** `conveyor` | 连续观察送料台上的工件，预测接触位置，在台面运动时夹取并插装 | 带时间戳的位姿跟踪、速度估计、接触时刻预测和腕部校正 | [观看视频](docs/videos/model-free-conveyor-overview-wrist.mp4) |
 
-本项目通过适配层直接调用 [NVIDIA FoundationPose 官方实现](https://github.com/NVlabs/FoundationPose/tree/a1b694b83e633c2cb6115b9063d940a687759392)和预训练网络，采用 Model-based 方法。MuJoCo 渲染的 RGB、米制深度、图像 mask、估计内参和物体 CAD 输入官方模型，得到相机坐标下的物体位姿，再经估计外参变换为机器人抓取目标。
+另有 [关闭自动恢复的失败对照](docs/videos/model-free-no-recovery-overview-wrist.mp4)：相同初始场景和夹具扰动，第一次接触保护后停止。
+四段 H.264 视频均直接保存在仓库中；点击可查看或下载。每段左侧为全景，右侧为腕部视角。
 
-- [FoundationPoseAdapter](src/ma6216/foundationpose.py#L203) 导入官方 `estimater.py`，创建 `FoundationPose`、`ScorePredictor` 和 `PoseRefinePredictor`，调用 `register()`；序列推理也支持 `track_one()`。
-- [推理入口](scripts/run_foundationpose.py)与[多物体流程](scripts/run_multi_pick_place.py)连接仿真观测和官方推理；[坐标转换](src/ma6216/vision.py#L67)把估计物体位姿交给机器人规划。
-- 本仓库提供标定、分割、数据适配、坐标变换、抓取配置、运动规划和物理验证。官方源码与预训练权重作为外部依赖加载，未随本仓库打包分发；机器人模型同样从 Menagerie 加载。
+![遮挡任务中，机器人将翻转后的工件放上重抓支架；左全景、右腕部](docs/media/model-free-regrasp.png)
 
-调用链、权重位置、运行记录和安装方式见 [FoundationPose 集成说明](docs/FOUNDATIONPOSE_INTEGRATION.md)。使用 `--ground-truth` 的物理对照会跳过 FoundationPose。
+上图取自已验证的遮挡重抓录像，展示放上支架、准备松爪换抓姿的阶段。
 
-## 按阶段选择版本
+## 本分支增加了什么
 
-| 固定版本 | 自动抓放内容 | 入口 |
-|---|---|---|
-| [v0.2.0：三工件](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.2.0) | 绿色、橙色、紫色异形工件 | `scripts/run_multi_pick_place.py` |
-| [v0.3.0：多种类物品](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v0.3.0) | 锤子、红球、带孔螺母 | 同一入口加 `--collection diverse` |
-| [v1.0.0：视觉码垛](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/releases/tag/v1.0.0) | 四料块、两列两层，包含指定下层支撑与整垛稳定性验收 | `scripts/run_palletizing.py` |
-
-`main` 保持最新整合代码；各固定版本提供源码和打印文件下载，原 Pick-and-Place 入口继续保留。绿色螺丝刀仅出现在四物件预览中，尚未验证抓取。组员按阶段拉取、运行和打印交接的完整命令见 [VERSIONS.md](docs/VERSIONS.md)。
-
-## 分支扩展：Model-free 三任务
-
-| 任务 | 演示重点 | 全景＋腕部视频 |
-|---|---|---|
-| 视觉装配与恢复 | 腕部重定位、夹具移位、接触保护后自动重试 | [装配恢复](docs/videos/model-free-assembly-overview-wrist.mp4) |
-| 遮挡清理与换抓姿 | 搬走障碍物、侧抓翻转、支架松爪、重新抓取并插装 | [遮挡重抓](docs/videos/model-free-clutter-overview-wrist.mp4) |
-| 运动目标抓取 | 图像位姿跟踪、预测接触位置、移动中夹取并插装 | [运动目标](docs/videos/model-free-conveyor-overview-wrist.mp4) |
-| 自动恢复关闭对照 | 同样的夹具扰动，接触保护触发后停止 | [失败对照](docs/videos/model-free-no-recovery-overview-wrist.mp4) |
-
-视频直接保存在仓库中，含同步腕部视角。代码入口为
-`scripts/run_model_free_task.py --task assembly|clutter|conveyor`；
-可直接使用 [RGB-D 重建模型包](assets/reconstructed/README.md)。
-模型来源、环境、完整命令、夹具定位、力保护和有限场景的实测证据见
-[MODEL_FREE_TASKS.md](docs/MODEL_FREE_TASKS.md)。
-这里的 model-free 仍需要标定参考图；夹具几何与标记安装关系已知。
-
-## 分支扩展：6D 位姿引导的定向入槽
-
-`feat/6d-pose-insertion` 接续 `v1.0.0`：沿用缺角料块，从带 roll/pitch 的
-倾斜料架取件，使用官方 FoundationPose 的完整旋转搜索和三维抓取变换，
-校正朝向后放入匹配浅槽。颜色只提供前景 mask，验收包括三维姿态、位置、
-实际槽底支撑和五秒稳定性。提供 `yaw-only` 对照及物理验收正/负例。
-录制时增加 `--record-view both` 可同步保存全景和腕部视角。
-这是独立分支任务，尚未发布新版本标签。
-
-```bash
-python scripts/run_pose_insertion.py --layout 1 \
-  --output artifacts/pose_insertion_01 --record --viewer
-```
-
-运行条件、倾斜范围、接触设置、完整/简化姿态对照及实测范围见
-[POSE_INSERTION.md](docs/POSE_INSERTION.md)。
-
-演示视频已随仓库提供（H.264 MP4，点击查看或下载）：
-
-- [全景＋腕部同步演示](docs/videos/pose-insertion-overview-wrist.mp4)
-- [独立腕部视角](docs/videos/pose-insertion-wrist.mp4)
-- [完整 6D 位姿全景演示](docs/videos/pose-insertion-full.mp4)
-- [yaw-only 落座失败对照](docs/videos/pose-insertion-yaw-only-failure.mp4)
-
-场景、时长与文件校验信息见 [视频说明](docs/videos/README.md)。
-
-## 运行视觉码垛
-
-在已有环境的 WSL 项目目录运行：
-
-```bash
-conda activate foundationpose
-python -u scripts/run_palletizing.py \
-  --output "artifacts/pallet_$(date +%Y%m%d_%H%M%S)" --record --viewer
-```
-
-使用默认相机的估计标定样例。`--layout 1` 验证另一组位置和朝向；新机器先按安装说明配置依赖。平顶料块为 80×50×40 mm，打印四份，文件在 `assets/palletizing`。已完成两组完整视觉试验，各 4/4；完整指标、层间支撑判据和复现标定命令见 [PALLETIZING.md](docs/PALLETIZING.md)。
-
-## Project 1 实现情况
-
-| 课程任务 | 当前实现与证据 |
+| 原项目基础 | 本分支扩展 |
 |---|---|
-| Task 1：技术选型 | 采用 MuJoCo、OpenCV 和 FoundationPose Model-based；文献比较、方案选择和实验设计见 [课程对应说明](docs/PROJECT1_PALLETIZING.md)，来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。最终展示由小组整理。 |
-| Task 2：虚拟相机内参标定 | 1280 × 960 固定 RGB-D 相机；从渲染棋盘角点估计内参，以留出图像和重投影误差评价。 |
-| Task 3：相机—机器人标定 | 固定 eye-to-hand 配置；估计相机到机器人安装坐标的变换，并独立验证误差。 |
-| Task 4：物体定位 | 从 RGB 图像生成颜色分割 mask；覆盖异形工件、锤子、球体和螺母，并记录多物体场景的 mask IoU。 |
-| Task 5：位姿估计 | RGB-D、mask 与已知 CAD 输入 FoundationPose；将相机坐标下的物体位姿变换到机器人安装坐标，并评价位置、方向及几何对称性。 |
-| Task 6：机器人操作 | 根据估计位姿和 CAD 抓取关系执行离线 IK、载荷碰撞检查、朝向对齐与物理抓放；码垛增加指定下层接触力、质心支撑余量、层高及五秒稳定性验收。 |
+| RGB-D、颜色 mask、已知工件 CAD 输入 FoundationPose | 标定参考 RGB-D → 官方 Neural Object Field → 重建表面，无需输入工件 CAD |
+| 固定相机定位后抓放、码垛 | 固定相机初定位＋腕部近景重定位，校正夹持关系与朝向歧义 |
+| 预先定义的静态放置目标 | 夹具移位后的接触保护与重试、支架换抓姿、运动目标预测抓取 |
+| 物理抓放及支撑验收 | 分别记录感知误差与最终落座误差，并提供恢复关闭对照 |
 
-## 三工件扩展与打印交接（2026-11-06）
+机械臂、夹爪、标定与基础抓放来自原项目；本分支接入并调用官方 FoundationPose，重建与位姿网络的来源见 [第三方说明](THIRD_PARTY_NOTICES.md)。
+原阶段的功能、课程任务对应关系和实验记录见 [原项目总览](docs/BASELINE_PROJECT.md)。
 
-同一场景中同时存在绿色双斜角工件、橙色斜肩棱柱和紫色渐缩切角块。完整视觉流程在一次固定布局中完成连续 3/3 抓放，三件分别放入托盘内的目标位置。[运行方法与实测范围](docs/MULTI_OBJECT.md) · [视频](docs/media/multi-object-pick-place.mp4)。
+## 系统流程与 Model-free 的含义
 
-三个模型的毫米制 STL、米制 OBJ 和尺寸清单已放在 `assets/printable`。[3D 打印及真机交接说明](docs/PRINTING.md) 说明单位、原点和实物测量。
+```mermaid
+flowchart LR
+  R[标定参考 RGB-D] --> N[官方 Neural Object Field]
+  N --> M[重建表面与纹理]
+  C[固定相机 / 腕部 RGB-D] --> P[官方 FoundationPose]
+  M --> P
+  P --> T[工件完整 6D 位姿]
+  F[RGB-D ArUco 夹具定位] --> A[抓取变换与碰撞规划]
+  T --> A
+  A --> E[关节执行器与物理夹持]
+  E --> W[腕部观察与接触监控]
+  W --> P
+  W --> A
+```
 
-## 球体、带孔件与扫描工具
+这里采用 FoundationPose 的 **few-shot model-free** 路线：每件工件使用 24 张参考 RGB-D、mask 和扫描相机标定，先重建，再调用官方 `register()` / `track_one()`。
+工件感知与碰撞规划使用 [仓库内的重建模型包](assets/reconstructed/README.md)，可以直接复现任务；也可按 [重建说明](docs/MODEL_FREE_TASKS.md)自行生成模型。
 
-新增独立的 `--collection diverse` 场景：真实扫描锤子、红球和中空六角螺母在同一次视觉场景中连续抓放 3/3；十字螺丝刀另外提供模型预览和打印副本，尚未验证抓取。[来源、运行和实测范围](docs/OBJECT_LIBRARY.md) · [四物件预览](docs/media/object-library-preview.png) · [抓放录像](docs/media/diverse-object-pick-place.mp4)。
+夹具几何、标记安装关系和操作坐标系由任务定义。当前参考扫描与腕部手眼安装采用理想合成标定；固定任务相机使用棋盘格估计标定。
+工件由摩擦和双侧指垫接触保持，操作期间不通过写物体位置实现搬运。
 
-新增打印文件位于 `assets/printable_library`。扫描工具来自 Google Scanned Objects 的 MuJoCo 转换库，以原尺寸 50% 导入；来源、许可和文件哈希随资产保存。旧三工件场景和原打印导出目录继续保留。
+## 已验证的结果
 
-## 开始运行
+以下为本工作站 **seed 0 的三个完整视觉演示及一个失败对照**。位置与角度误差指松爪、稳定后的物理落座结果，视觉估计误差单独记录。
 
-先在 WSL 或 Linux 中克隆。
+| 场景 | 验收结果 | 最终位置误差 | 最终角度误差 | 关键观测 |
+|---|---|---|---|---|
+| 装配与恢复 | 第二次插装成功 | 0.19 mm | 0.35° | 首次约 8 N 力增量触发保护，腕部重定位后重试 |
+| 部分遮挡与重抓 | 成功 | 2.88 mm | 0.39° | 清障后前景像素 4478 → 5360；完成三次实际夹持 |
+| 运动目标抓取 | 成功 | 0.54 mm | 0.43° | 视觉速度约 3.99 mm/s，送料设定为 4 mm/s |
+| 关闭自动恢复 | 预期失败 | — | — | 首次保护后停止，无第二次插装 |
+
+三个成功运行均通过槽底支撑和松爪后稳定性验收；7 项回归检查通过。数据与视频对应关系见 [结果摘要](docs/results/model-free-tasks.json) 和 [视频校验清单](docs/videos/manifest.json)。
+这些结果仅覆盖列出的仿真场景；遮挡示例的最小槽壁余量约 0.01 mm。送料采用短行程移动台，IK 仍为同步规划，尚未验证随机场景稳健性、硬实时或真机效果。
+
+## 组员快速开始
+
+首次下载时直接指定本分支：
 
 ```bash
-cd ~/projects
-git clone https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place.git
+git clone --branch feat/model-free-manipulation https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place.git
 cd ma6216-ur5e-vision-pick-place
 ```
 
-新机器先按 [SETUP.md](docs/SETUP.md) 下载机器人模型和安装环境。模型、FoundationPose 源码及网络权重单独获取，路径可由环境变量配置。
-
-已有环境和模型的组员可以先自检。
+已有本地仓库时，在仓库目录切换：
 
 ```bash
-conda activate foundationpose
-python scripts/check_setup.py --vision
+git fetch origin
+git switch feat/model-free-manipulation
+git pull --ff-only
 ```
 
-完整视觉试验包含重新标定和绿色工件抓放。成功标定后才执行下一步。
+先按 [SETUP.md](docs/SETUP.md) 配置仿真环境、Menagerie 机器人模型、官方 FoundationPose 与权重。
+下面的 `python` 使用仿真环境，`FP_PYTHON` **需替换为你已配置的 FoundationPose 环境的 Python 路径**；两个环境可以分开。
+默认官方源码目录为 `third_party/FoundationPose`，其他位置用 `--foundationpose-repository` 指定。使用附带模型包运行任务无需重新训练重建模型。
 
 ```bash
-RUN="artifacts/demo_$(date +%Y%m%d_%H%M%S)"
-python -u scripts/run_camera_calibration.py --output "$RUN/calibration" && python -u scripts/run_front_pick_place.py   --calibration "$RUN/calibration/estimated"   --output "$RUN/pick_place" --record --viewer
+export MUJOCO_GL=egl
+export PYOPENGL_PLATFORM=egl
+FP_PYTHON=/path/to/foundationpose/env/bin/python
+RUN_DIR="artifacts/model_free_$(date +%Y%m%d_%H%M%S)"
+
+python scripts/run_model_free_task.py --task assembly \
+  --plug-model assets/reconstructed/plug \
+  --foundationpose-python "$FP_PYTHON" \
+  --output "$RUN_DIR/assembly" --record
+
+python scripts/run_model_free_task.py --task clutter \
+  --plug-model assets/reconstructed/plug --blocker-model assets/reconstructed/blocker \
+  --foundationpose-python "$FP_PYTHON" \
+  --output "$RUN_DIR/clutter" --record
+
+python scripts/run_model_free_task.py --task conveyor --belt-speed .004 \
+  --plug-model assets/reconstructed/plug \
+  --foundationpose-python "$FP_PYTHON" \
+  --output "$RUN_DIR/conveyor" --record
 ```
 
-在无窗口终端运行时可去掉 `--viewer`。结果写入本轮 `summary.json`、`motion/samples.csv` 和 `motion/physical_pick_place.mp4`。每轮选择新输出目录。增加 `--xy .44 -.19 --yaw-deg 15` 可以改变工件摆放，`--target cube` 使用红方块。
+每个任务输出 `summary.json`、RGB-D 观测、推理记录、运动日志及 `video/overview_wrist.mp4`。
+在 Linux 打开录屏或运行回归检查：
 
-仓库提供 `demo_data/calibration/estimated` 下的估计参数，匹配默认相机，用于快速复现。修改相机后重新执行标定。命令省略 `--calibration` 时默认使用该样例。
+```bash
+xdg-open "$RUN_DIR/assembly/video/overview_wrist.mp4"
+python scripts/check_model_free_tasks.py
+```
 
-CPU 机器可按安装说明运行 `--ground-truth` 物理对照，它会明确记录该控制来源。完整视觉演示需要可工作的 FoundationPose CUDA 环境。
+`--disable-recovery` 用于恢复关闭对照；`--ground-truth` 是明确标记的物理控制诊断，不计作视觉结果。每次运行选择新输出目录。
+详细环境版本、重建命令、传感器与验收判据见 [MODEL_FREE_TASKS.md](docs/MODEL_FREE_TASKS.md)。
 
-## 代码地图
+## 从哪里读代码
 
-| 位置 | 用途 |
+| 文件 | 职责 |
 |---|---|
-| `scripts/run_front_pick_place.py` | 单物体视觉抓放入口，支持绿色工件与红方块 |
-| `scripts/run_multi_pick_place.py` | 三工件与多种类物品的连续视觉抓放 |
-| `scripts/run_palletizing.py`、`src/ma6216/palletizing.py` | 四料块码垛、层位、抓取关系、带载规划与支撑验收 |
-| `scripts/check_palletizing.py`、`export_pallet_blocks.py` | 悬空负例/物理支撑检查、料块打印和感知模型导出 |
-| `scripts/preview_object_library.py` | 包含螺丝刀的四物件待机预览 |
-| `scripts/run_camera_calibration.py` | 棋盘格采图、标定和独立评价 |
-| `scripts/run_foundationpose.py` | 对保存的 RGB-D、mask 和网格执行注册或跟踪 |
-| `src/ma6216/workcell.py`、`scene.py` | 工作站、相机和标定板 |
-| `src/ma6216/workpiece.py` | 绿色工件几何、米制 OBJ 和 mask |
-| `src/ma6216/parts.py`、`object_library.py`、`multi_object.py` | 多物体几何、碰撞模型、抓取配置及场景 |
-| `scripts/export_workpieces.py`、`export_library_objects.py` | 米制感知网格和毫米制打印文件导出 |
-| `src/ma6216/foundationpose.py`、`vision.py` | 官方推理适配、观测和坐标链 |
-| `src/ma6216/direct_route.py`、`motion.py` | 离线 IK、路径检查和物理执行 |
-| `scripts/check_setup.py` | 仿真或视觉环境自检 |
-| `scripts/capture_vision_dataset.py`、`replay_vision_trials.py`、`evaluate_vision.py` | 批量采集、对照和评价 |
-| `docs/results/` | 小型实测摘要及指标定义 |
+| [run_model_free_task.py](scripts/run_model_free_task.py) | 三任务的观测、抓取、重抓、恢复和验收流程 |
+| [capture_model_free_references.py](scripts/capture_model_free_references.py)、[reconstruct_neural_object.py](scripts/reconstruct_neural_object.py) | 参考图采集与官方 Neural Object Field 重建 |
+| [serve_model_free_pose.py](scripts/serve_model_free_pose.py) | 独立 GPU 进程，调用官方位姿注册和跟踪 |
+| [task_perception.py](src/ma6216/task_perception.py)、[online_pose.py](src/ma6216/online_pose.py) | RGB-D、腕部相机、夹具定位、时间戳与运动预测 |
+| [task_control.py](src/ma6216/task_control.py) | 抓取变换、IK、碰撞检查、力保护与物理执行 |
+| [advanced_scene.py](src/ma6216/advanced_scene.py) | 三个工作场景、重抓支架、夹具扰动和移动送料台 |
+| [check_model_free_tasks.py](scripts/check_model_free_tasks.py) | 模型来源、预测时间戳、抓取方向与物理验收的回归检查 |
 
-## 实验记录
+## 其他文档与历史阶段
 
-以下是 2026-11-04 至 2026-11-06 在开发机执行得到的结果，样本和评价范围按行列出。
-
-| 试验 | 实测结果 |
+| 入口 | 内容 |
 |---|---|
-| 相机内参 | 19 张有效训练图，4 张有效留出图，留出每图平均 RMSE 0.050 px |
-| 相机外参 | 5 张训练、5 张独立验证图，固定外参复验 RMSE 0.074 px，参考误差 4.25 mm / 0.122° |
-| 绿色工件单物体抓放 | 两种摆放 2/2，位姿误差 4.12–4.32 mm / 0.56–0.91°，落盘中心误差 0.25–0.82 mm |
-| 绿色、橙色、紫色三工件 | 一次固定布局的连续视觉抓放 3/3；最终槽位 XY 误差分别为 1.288、1.000、1.098 mm |
-| 锤子、球体、带孔螺母 | 一次固定布局的连续视觉抓放 3/3；最终槽位 XY 误差分别为 2.500、2.225、0.713 mm |
-| 四料块视觉码垛 | 两种布局各 4/4，整垛 2/2；名义槽位 XY 误差 1.15–5.37 mm，五秒最大漂移 0.16 mm |
+| [详细复现](docs/MODEL_FREE_TASKS.md) / [实测数据](docs/results/model-free-tasks.json) | 当前分支的完整方法、命令、假设和验证记录 |
+| [视频目录](docs/videos/README.md) | 三项新任务、恢复失败对照及原定向入槽录像 |
+| [原项目总览](docs/BASELINE_PROJECT.md) / [版本选择](docs/VERSIONS.md) | v0.2 三工件、v0.3 多物品、v1.0 视觉码垛及课程任务对应关系 |
+| [6D 定向入槽](docs/POSE_INSERTION.md) | 本分支继承的 Model-based 倾斜抓取与 yaw-only 对照 |
+| [安装](docs/SETUP.md) / [小组协作](docs/TEAM_WORKFLOW.md) / [第三方来源](THIRD_PARTY_NOTICES.md) | 环境、分支与提交流程、官方依赖和资产来源 |
 
-每次抓取前从 RGB-D 图像估计目标位姿，执行过程中监测关节误差和接触；多物体场景在两次抓取之间重新观测剩余目标。当前采用已知 CAD、受控颜色和预先定义的抓取部位，部分模型使用近似直立或平放先验。球体不报告唯一朝向，螺母按 60° 对称性评价。上述结果的适用范围和失败记录见 [MULTI_OBJECT.md](docs/MULTI_OBJECT.md)、[OBJECT_LIBRARY.md](docs/OBJECT_LIBRARY.md) 及 [实测摘要](docs/results/)。
-
-十字螺丝刀目前仅验证模型预览和打印文件导出。真机相机标定、TCP、坐标和控制接口需要由硬件组实测适配；仓库中的质量、摩擦和软接触参数为仿真假设。
-
-## 小组开发
-
-组员为各自任务创建分支，通过 Pull Request 互相检查。提交源码、说明和小型结果摘要。每轮原始 RGB-D、录屏、权重、外部仓库和本地环境写入 Git 忽略目录。仓库选取了抓放场景截图、演示视频和实测摘要，便于在安装环境前了解项目结果。
-
-第三方来源和许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。FoundationPose 官方源码、预训练权重与 Menagerie 机器人模型按 [SETUP.md](docs/SETUP.md) 单独获取，本仓库的适配代码在运行时调用这些依赖。自有代码的对外开源许可由小组确认。
+代码与演示位于小组原仓库的 `feat/model-free-manipulation` 分支，对应 [草稿 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)。
