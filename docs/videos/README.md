@@ -1,9 +1,19 @@
 # 任务演示视频
 
-以下为已实际运行的 MuJoCo 仿真录像，按原帧率、完整时长转码为 H.264 / yuv420p
-MP4，并设置 faststart。没有加速、删帧或把失败片段剪成成功片段。
+以下均基于已实际运行的 MuJoCo 仿真。历史演示为运行时录像，新统一评测视频由原试验保存的 25 Hz 物理状态回放；保留完整过程，没有把失败片段剪成成功片段。视频使用 H.264 / yuv420p MP4，并设置 faststart。
 点击文件链接可在 GitHub 查看或下载；下载到本地后可用 VLC 打开。
 录像按仿真时间采样；静态任务的推理和离线规划等待不等于录像时长。
+
+## 240 次评测：工具架自装配、失败与配对对照
+
+| 入口 | 内容 |
+|---|---|
+| [工具架全景＋腕部](evaluation-v1/rack__full__none__101.mp4) | 先安装独立支架，再换抓并悬挂扳手；正式试验 seed 101 |
+| [同次运行的独立腕部](evaluation-v1/rack__full__none__101__wrist.mp4) | 观察支架插装、近景复测和扳手穿孔过程 |
+| [6 条失败与同种子完整方法对照](evaluation-v1/README.md) | 包含完整系统失败；每个选中消融案例均附同种子的完整方法，不预设对照成功 |
+| [完整统计报告](../results/evaluation-v1/README.md) | 六类任务、每配置 10 次、置信区间和全部指标 |
+
+这组视频只回放原状态，不重新运行推理或物理试验。其来源、帧数、时长与 SHA-256 见独立的 [评测视频清单](evaluation-v1/manifest.json)，对应原始轨迹保存在 [replay_inputs](../results/evaluation-v1/replay_inputs/)。成功视频不代表该配置全部成功。
 
 ## 新维修工具工作站
 
@@ -42,7 +52,7 @@ MP4，并设置 faststart。没有加速、删帧或把失败片段剪成成功�
 以上四段均为原布局 3；使用官方 FoundationPose Model-based、固定 RGB-D 估计及相同
 物理验收。腕部相机在这组原录像中仅用于观察。
 
-各视频的时长、分辨率、SHA-256 以及原始运行路径记录在
+以下历史视频的时长、分辨率、SHA-256 以及原始运行路径记录在
 [manifest.json](manifest.json)。感知误差与物理结果见
 [pose-insertion.json](../results/pose-insertion.json) 和
 [wrist-camera.json](../results/wrist-camera.json)。

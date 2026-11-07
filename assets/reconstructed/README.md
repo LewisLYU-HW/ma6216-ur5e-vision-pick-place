@@ -19,6 +19,6 @@ CAD 文件或顶点。仿真器仍需要几何来生成图像和物理接触。
 
 ## 维修工作站工具
 
-[workshop/](workshop/README.md) 增加带纹理的锤子、螺丝刀和有真实通孔的扳手重建。
+[workshop/](workshop/README.md) 增加带纹理的锤子、螺丝刀、有真实通孔的扳手和独立工具支架重建。
 每件使用 24 组 480×480 的标定 RGB-D 参考观测，前景来自孤立扫描的深度阈值。
-锤子 1200 步、其余各 1500 步，提取分辨率 0.8 mm；复现见 [WORKSHOP.md](../../docs/WORKSHOP.md)。
+锤子 1200 步、其余各 1500 步，提取分辨率 0.8 mm；复现见 [WORKSHOP.md](../../docs/WORKSHOP.md) 和 [工具架自装配](../../docs/RACK_ASSEMBLY.md)。

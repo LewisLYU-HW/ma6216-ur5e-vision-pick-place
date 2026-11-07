@@ -1,0 +1,28 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "fixture_localized", "simulation_time_s": 1.5500000000000012, "camera": "vision_camera", "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"}
+{"event": "visual_pose", "simulation_time_s": 3.0499999999998857, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 2.049999999999996, "foreground_pixels": 6363}
+{"event": "visual_pose", "simulation_time_s": 4.449999999999732, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 3.4499999999998416, "foreground_pixels": 6326}
+{"event": "visual_pose", "simulation_time_s": 5.849999999999578, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 4.849999999999688, "foreground_pixels": 6287}
+{"event": "intercept_planned", "simulation_time_s": 5.849999999999578, "visual_velocity_m_s": [-0.0001033523123454476, 0.004013643175036225, 1.796385583531908e-05], "prediction_horizon_s": 10.413533190887128, "last_visual_capture_time_s": 4.849999999999688, "predicted_contact_time_s": 16.263533190886704, "commanded_belt_speed_m_s": 0.004, "physics_continues_during_inference": false, "fixed_virtual_sensor_delay_s": 1.0}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_model_free_task.py", line 248, in main
+    robot.grasp(predicted)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 581, in grasp
+    self.hold(1.5, "CLOSE_GRIPPER")
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 267, in hold
+    self.tick(stage=stage, realtime=realtime)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 219, in tick
+    raise MotionFailure(f"Unexpected robot contact at {self.stage}: {bad}")
+ma6216.motion.MotionFailure: Unexpected robot contact at CLOSE_GRIPPER: [{'geom1': 'geom_42', 'geom2': 'target_cube_geom', 'body1': 'gripper_right_follower', 'body2': 'target_cube', 'penetration_m': 0.000512754127204448}]
+{"success": false, "task": "conveyor", "error": "MotionFailure: Unexpected robot contact at CLOSE_GRIPPER: [{'geom1': 'geom_42', 'geom2': 'target_cube_geom', 'body1': 'gripper_right_follower', 'body2': 'target_cube', 'penetration_m': 0.000512754127204448}]", "wall_seconds": 50.795059233001666}

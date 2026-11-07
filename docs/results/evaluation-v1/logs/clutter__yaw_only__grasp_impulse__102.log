@@ -1,0 +1,33 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "fixture_localized", "simulation_time_s": 1.5500000000000012, "camera": "vision_camera", "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"}
+{"event": "visual_pose", "simulation_time_s": 1.5500000000000012, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 1.5500000000000012, "foreground_pixels": 4478}
+{"event": "visual_pose", "simulation_time_s": 1.5500000000000012, "object_id": "blocker", "camera": "vision_camera", "capture_time_s": 1.5500000000000012, "foreground_pixels": 4893}
+{"event": "physical_grasp", "simulation_time_s": 6.799999999999473, "object_id": "blocker", "forces_n": {"left": 44.195832073692245, "right": 43.876668594906796}}
+{"event": "released", "simulation_time_s": 16.65200000000165, "object_id": "blocker"}
+{"event": "visual_pose", "simulation_time_s": 20.227999999999668, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 20.227999999999668, "foreground_pixels": 5360}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_model_free_task.py", line 271, in main
+    robot.grasp(plug_pose, objects["plug"].side_grasp())
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 578, in grasp
+    self.move(approach, "PICK_APPROACH")
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 513, in move
+    else self.plan_move(destination, stage, allow_support=allow_support)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 323, in plan_move
+    q_next, _ = planner.solve(tcp[:3, 3], tcp[:3, :3], q)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/motion.py", line 111, in solve
+    raise MotionFailure(f'No collision-free offline IK at {pos.tolist()}; best={min(diagnostics,key=lambda d:d["p_error"])}')
+ma6216.motion.MotionFailure: No collision-free offline IK at [0.4475545249593719, -0.045714633966056586, 0.43015354636829745]; best={'p_error': 1.4765690539555836e-12, 'r_error': 9.246614413591347e-12, 'contacts': [{'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0028338403923741486}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0028176115780943847}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0023867370028484115}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.002402965817128231}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.00260660727843676}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.0025809803254035948}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.002832187000557894}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.002857813913079719}], 'q': [0.6525184769197665, -1.7350670435625422, -1.372873735316909, -2.7736191031679645, 0.8223443265187883, 1.2706973334288245]}
+{"success": false, "task": "clutter", "error": "MotionFailure: No collision-free offline IK at [0.4475545249593719, -0.045714633966056586, 0.43015354636829745]; best={'p_error': 1.4765690539555836e-12, 'r_error': 9.246614413591347e-12, 'contacts': [{'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0028338403923741486}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0028176115780943847}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.0023867370028484115}, {'geom1': 'worktable', 'geom2': 'geom_51', 'body1': 'world', 'body2': 'gripper_left_coupler', 'penetration_m': 0.002402965817128231}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.00260660727843676}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.0025809803254035948}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.002832187000557894}, {'geom1': 'worktable', 'geom2': 'geom_55', 'body1': 'world', 'body2': 'gripper_left_follower', 'penetration_m': 0.002857813913079719}], 'q': [0.6525184769197665, -1.7350670435625422, -1.372873735316909, -2.7736191031679645, 0.8223443265187883, 1.2706973334288245]}", "wall_seconds": 52.191685763998976}

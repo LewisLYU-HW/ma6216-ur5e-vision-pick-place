@@ -1,0 +1,37 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "hammer", "camera": "vision_camera", "pixels": 1657}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1765}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 2660}
+{"event": "physical_grasp", "simulation_time_s": 7.925999999999349, "object_id": "hammer", "forces_n": {"left": 44.679668861033605, "right": 42.42771412328432}}
+{"event": "released", "simulation_time_s": 22.309999999998514, "object_id": "hammer"}
+{"event": "object_localized", "simulation_time_s": 26.759999999996047, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1761}
+{"event": "object_localized", "simulation_time_s": 28.1099999999953, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1750}
+{"event": "object_localized", "simulation_time_s": 29.45999999999455, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1747}
+{"event": "physical_grasp", "simulation_time_s": 40.42600000000344, "object_id": "screwdriver", "forces_n": {"left": 47.92947785475097, "right": 42.55283484092206}}
+{"event": "external_grasp_impulse_started", "simulation_time_s": 42.54200000000603, "object_id": "screwdriver", "world_wrench": [1.5, 0.0, 0.0, 0.0, 0.03, 0.0], "duration_s": 0.12, "controller_receives_object_pose": false}
+{"event": "external_grasp_impulse_finished", "simulation_time_s": 42.662000000006174, "object_id": "screwdriver"}
+{"event": "object_localized", "simulation_time_s": 43.0920000000067, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 35258}
+{"event": "rack_localized", "simulation_time_s": 44.58200000000852, "camera": "wrist_camera"}
+{"event": "object_localized", "simulation_time_s": 51.336000000016774, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 35318}
+{"event": "force_guard_triggered", "simulation_time_s": 58.38400000002539, "stage": "INSERT_DRIVER", "force_delta_n": 7.002025789820851}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 584, in main
+    raise MotionFailure("Driver insertion contact guard stopped the task")
+ma6216.motion.MotionFailure: Driver insertion contact guard stopped the task
+{"success": false, "task": "insert", "error": "MotionFailure: Driver insertion contact guard stopped the task", "wall_seconds": 284.63220301899855}

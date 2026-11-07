@@ -20,6 +20,14 @@ LABELS = {
 }
 
 
+def save_figure(fig, stem):
+    for suffix in ("png", "svg"):
+        output = stem.with_suffix("." + suffix)
+        fig.savefig(output, bbox_inches="tight")
+        if suffix == "svg":
+            output.write_text("\n".join(line.rstrip() for line in output.read_text().splitlines()) + "\n")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--results", type=Path, required=True)
@@ -42,7 +50,7 @@ def main():
     colours = ("#157f83", "#d37b42")
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.5), sharey=True)
     for ax, disturbed in zip(axes, (False, True)):
-        for offset, full, colour in zip((-0.17, 0.17), (True, False), colours):
+        for offset, full, colour in zip((-0.19, 0.19), (True, False), colours):
             groups = [
                 next(
                     g
@@ -71,7 +79,7 @@ def main():
                     min(105.0, value + 3.0),
                     f"{group['successes']}/{group['n_trials']}",
                     ha="center",
-                    fontsize=8,
+                    fontsize=7,
                 )
         ax.set_xticks(range(len(tasks)), [LABELS[t] for t in tasks])
         ax.set_ylim(0, 112)
@@ -80,11 +88,17 @@ def main():
         ax.grid(axis="y", alpha=0.18)
         ax.set_axisbelow(True)
     axes[0].set_ylabel("Physical task success (%)")
-    axes[0].legend(loc="lower left", fontsize=8)
+    fig.legend(
+        *axes[0].get_legend_handles_labels(),
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.07),
+        ncol=2,
+        frameon=False,
+        fontsize=9,
+    )
     fig.suptitle("10 paired seeds per configuration · 95% Wilson intervals", fontsize=12)
     fig.tight_layout()
-    for suffix in ("png", "svg"):
-        fig.savefig(folder / ("success_rates." + suffix), bbox_inches="tight")
+    save_figure(fig, folder / "success_rates")
     plt.close(fig)
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     metrics = [
@@ -121,8 +135,7 @@ def main():
     axes[0].legend(fontsize=8)
     fig.suptitle("Full system · trial-level means and 95% bootstrap intervals", fontsize=12)
     fig.tight_layout()
-    for suffix in ("png", "svg"):
-        fig.savefig(folder / ("measured_metrics." + suffix), bbox_inches="tight")
+    save_figure(fig, folder / "measured_metrics")
     plt.close(fig)
 
 

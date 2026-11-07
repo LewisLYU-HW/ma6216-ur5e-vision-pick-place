@@ -19,3 +19,8 @@
 /assets/reconstructed/** -text whitespace=-blank-at-eof
 /assets/reconstructed/*/model.obj linguist-generated=true
 /assets/reconstructed/workshop/*/model.obj linguist-generated=true
+
+# Raw evaluation evidence must keep its recorded bytes on every platform.
+/docs/results/**/*.log -text
+/docs/results/**/*.npz binary
+/docs/results/evaluation-v1/** linguist-generated=true

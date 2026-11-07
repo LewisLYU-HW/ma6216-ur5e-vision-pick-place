@@ -35,6 +35,17 @@ def main():
     )
     m, d = scene.model, scene.data
     status = "SUCCESS" if report["success"] else "FAILURE"
+    error = report.get("error") or ""
+    if report["success"]:
+        detail = "SUCCESS; original physics state replay"
+    elif "offline IK" in error:
+        detail = "FAILURE; no collision-free IK"
+    elif "contact guard" in error.lower():
+        detail = "FAILURE; insertion force guard"
+    elif "Unexpected robot contact" in error:
+        detail = "FAILURE; unexpected robot contact"
+    else:
+        detail = "FAILURE; see original trial log"
     source = f"RECORDED RUN | {report.get('method', 'full')} | seed {seed} | {report.get('disturbance', 'none')} | {status}"
     if report.get("control_source") == "ground_truth_diagnostic":
         source = "GROUND TRUTH DIAGNOSTIC | " + status
@@ -62,7 +73,7 @@ def main():
             mujoco.mj_forward(m, d)
             estimate = trace["estimated_pose"][index]
             current = (str(trace["object_id"][index]), estimate) if np.isfinite(estimate).all() else None
-            recorder.capture(d, str(trace["stage"][index]), f"{status}; original physics state replay")
+            recorder.capture(d, str(trace["stage"][index]), detail)
     finally:
         recorder.close()
     metadata = {
@@ -73,6 +84,7 @@ def main():
         "disturbance": report.get("disturbance"),
         "success": report["success"],
         "error": report.get("error"),
+        "video_explanation": detail,
         "trajectory_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "summary_sha256": hashlib.sha256((args.trial / "summary.json").read_bytes()).hexdigest(),
         "simulation_start_s": start,

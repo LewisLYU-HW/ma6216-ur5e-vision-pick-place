@@ -1,0 +1,33 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "hammer", "camera": "vision_camera", "pixels": 1645}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1760}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 2683}
+{"event": "object_localized", "simulation_time_s": 2.5999999999999353, "object_id": "spanner", "camera": "vision_camera", "pixels": 2683}
+{"event": "physical_grasp", "simulation_time_s": 8.251999999999425, "object_id": "spanner", "forces_n": {"left": 44.18347058850645, "right": 44.12627348747847}}
+{"event": "released", "simulation_time_s": 16.83200000000155, "object_id": "spanner"}
+{"event": "object_localized", "simulation_time_s": 19.132000000000275, "object_id": "spanner", "camera": "vision_camera", "pixels": 2469}
+{"event": "physical_grasp", "simulation_time_s": 24.33599999999739, "object_id": "spanner", "forces_n": {"left": 44.04325785234593, "right": 43.48306536323048}}
+{"event": "wrist_refinement_disabled", "simulation_time_s": 26.315999999996293, "object_id": "spanner"}
+{"event": "joint_route_planned", "simulation_time_s": 26.315999999996293, "stage": "REORIENT_AND_APPROACH_RACK", "collision_checks": 54, "waypoints": 52, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "released", "simulation_time_s": 43.86400000000764, "object_id": "spanner"}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 645, in main
+    raise MotionFailure(f"Hanging failed: {result}")
+ma6216.motion.MotionFailure: Hanging failed: {'support_force_n': 0.9819286235642457, 'support_contacts': ['rack_hook'], 'gripper_contact_after_release': False, 'linear_speed_m_s': 0.012757277625768993, 'angular_speed_rad_s': 0.1724459238129865, 'world_T_object': [[-0.031080247423557805, 0.9406000568586255, 0.3380910398955303, 0.4426925232355349], [-0.010531136473467761, 0.33792751170825236, -0.9411132195412231, 0.197004562329624], [-0.9994614116536304, -0.03281051459851875, -0.0005972831093899456, 0.5259401150337001], [0.0, 0.0, 0.0, 1.0]], 'eye_offset_from_hook_mm': [0.3824506283280002, 24.043015271061055, -10.092200267082074], 'eye_plane_error_deg': 0.24181756978164137, 'success': False}
+{"success": false, "task": "hang", "error": "MotionFailure: Hanging failed: {'support_force_n': 0.9819286235642457, 'support_contacts': ['rack_hook'], 'gripper_contact_after_release': False, 'linear_speed_m_s': 0.012757277625768993, 'angular_speed_rad_s': 0.1724459238129865, 'world_T_object': [[-0.031080247423557805, 0.9406000568586255, 0.3380910398955303, 0.4426925232355349], [-0.010531136473467761, 0.33792751170825236, -0.9411132195412231, 0.197004562329624], [-0.9994614116536304, -0.03281051459851875, -0.0005972831093899456, 0.5259401150337001], [0.0, 0.0, 0.0, 1.0]], 'eye_offset_from_hook_mm': [0.3824506283280002, 24.043015271061055, -10.092200267082074], 'eye_plane_error_deg': 0.24181756978164137, 'success': False}", "wall_seconds": 148.67928632300027}

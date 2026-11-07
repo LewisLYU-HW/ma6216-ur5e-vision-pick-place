@@ -2,6 +2,10 @@
 
 本评测比较具名模块消融，不预设完整系统一定优于基线，也不将消融称为竞争性外部算法。正式结果使用冻结代码后的新种子，开发调试运行不混入统计。每个配置 10 次，完整矩阵为 **6 类任务 × 2 种方法 × 2 种环境 × 10 = 240 次**。
 
+本轮已完成：[完整报告与图表](results/evaluation-v1/README.md) · [240 次逐试验数据](results/evaluation-v1/trials.csv) · [失败及配对视频](videos/evaluation-v1/README.md)。
+
+[交付检查记录](results/evaluation-v1/validation.json)包含 23 项通过的回归检查日志，以及 11 段视频的完整解码、帧数、时长与校验值。可分别运行 `scripts/check_model_free_tasks.py`、`scripts/check_workshop.py` 和 `scripts/check_evaluation.py` 复查代码。
+
 ## 任务与对照
 
 | 任务 | 基线替换 | 扰动环境 |
@@ -41,26 +45,41 @@
 
 ```bash
 # 终端 1：串行共享 GPU 模型；多个试验只并行执行 CPU 仿真
-MUJOCO_GL=egl PYOPENGL_PLATFORM=egl .venv/bin/python scripts/serve_pose_pool.py \
+FP_PYTHON=/path/to/foundationpose/env/bin/python
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+  .venv/bin/python scripts/serve_pose_pool.py \
   --socket /tmp/ma6216-pose.sock \
-  --python /home/arm-pc/miniconda3/envs/any6d/bin/python \
+  --python "$FP_PYTHON" \
   --output artifacts/pose_pool_new
 
 # 终端 2：目录已存在时，仅续跑尚未完成的配置；控制源码变化会拒绝续跑
+FP_PYTHON=/path/to/foundationpose/env/bin/python
 MA6216_POSE_SOCKET=/tmp/ma6216-pose.sock .venv/bin/python scripts/run_benchmark.py \
-  --jobs 2 --output artifacts/evaluation_new
+  --jobs 8 --foundationpose-python "$FP_PYTHON" --output artifacts/evaluation_new
 
 .venv/bin/python scripts/summarize_benchmark.py \
   --source artifacts/evaluation_new --output docs/results/evaluation_new
+
+.venv/bin/python scripts/package_benchmark_evidence.py \
+  --source artifacts/evaluation_new --results docs/results/evaluation_new
+.venv/bin/python scripts/write_benchmark_report.py --results docs/results/evaluation_new
+# 绘图所用 Python 需要 matplotlib；不要求与仿真环境相同
+"$FP_PYTHON" scripts/plot_benchmark.py --results docs/results/evaluation_new
 ```
 
 也可不启动共享进程，以 `--jobs 1` 使用每次试验独立的 GPU 进程。共享推理保留每个试验独立的跟踪历史和固定随机数初始化；不会在不同种子间传递位姿。
 
 每次试验保留 `summary.json`、RGB-D、推理请求/回复、动作与接触事件、50 Hz 测量和 25 Hz 压缩物理状态。GPU/进程基础设施异常不伪装成算法失败；不完整试验会阻止最终报告。
 
+本轮遇到一次并行纹理缓存读到空 PNG 的初始化异常，发生在控制器和任务执行创建之前。修复仅改为完整编码后原子替换文件，两张纹理的字节 SHA-256 前后一致。此前 70 次有效试验全部保留，仅该未初始化试验补跑；控制策略、几何、阈值、种子均未更改。原协议、异常尝试和修复版本通过 `protocol.json` 的 `source_amendments` 及 `infrastructure_incidents/` 完整记录。该情况不能当作方法失败，也不能静默删除。
+
+证据打包脚本保存全部试验摘要、控制台日志和原始记录校验值；选中录像的原始轨迹同时放入 `replay_inputs/`，无需推理即可离线回放。其余完整 RGB-D 与轨迹保留在本机原始评测目录。成功工具架视频固定取无扰动完整系统的最低成功种子，失败视频使用下述预定规则。
+
 ## 失败录像
 
 预先固定最多 6 条：按配置任务顺序，完整方法取前两个出现失败的任务，消融方法取前四个；各任务先选无扰动，再选有扰动，选择最小失败种子。其余失败仍保留日志与轨迹。录像使用原试验状态回放，不重新运行一遍后替换结果。
+
+每条选中消融失败录像另外附上**相同任务、扰动和种子的完整方法录像**，无论完整方法成功还是失败都保留。它们是已有试验的配对回放，不增加或替换统计样本。
 
 ```bash
 MUJOCO_GL=egl PYOPENGL_PLATFORM=egl .venv/bin/python scripts/replay_trial.py \
@@ -69,3 +88,5 @@ MUJOCO_GL=egl PYOPENGL_PLATFORM=egl .venv/bin/python scripts/replay_trial.py \
 ```
 
 评测范围仍是合成 RGB-D、预先采集的校准参考扫描、已知工位区域与夹具设计、理想腕部手眼安装。这里的 Model-free 是官方参考图像重建流程：不向物体位姿估计和持物碰撞规划提供物体 CAD；不是无需参考扫描的零样本方案。
+
+仿真几何、接触和速度真值用于阶段/终态验收与安全停机；不达标可以结束试验，但不会把真值位姿反馈给网络或生成运动纠偏目标。该评测不验证真机上的验收传感器与安全检测实现。
