@@ -5,19 +5,21 @@ from pathlib import Path
 import traceback
 
 import cv2
+import numpy as np
 
 from .scene import mujoco
 from .motion import Robot
 
 
 def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=False, robot=None,
-              shared_viewer=None):
+              shared_viewer=None, record_cameras=("overview",)):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     robot = Robot(model, data) if robot is None else robot
     viewer_handle = shared_viewer
     renderer = None
     writer = None
+    view_writers = {}
     next_frame = float(data.time)
     last_stage = None
 
@@ -29,16 +31,25 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
             viewer_handle.sync()
         if renderer is None or d.time + 1e-8 < next_frame:
             return
-        renderer.update_scene(d, camera="overview")
-        renderer.scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = False
-        renderer.scene.flags[mujoco.mjtRndFlag.mjRND_REFLECTION] = False
-        image = cv2.cvtColor(renderer.render(), cv2.COLOR_RGB2BGR)
         forces, _ = robot.finger_contacts()
         label = f"{stage}   t={d.time:.1f}s   object z={d.xpos[robot.cbid, 2]:.3f}m"
         source = "FoundationPose + calibrated camera" if pose is not None else "Ground-truth control baseline"
         load = f"{source} | Left {forces['left']:.1f} N / Right {forces['right']:.1f} N"
-        cv2.putText(image, label, (12, 25), cv2.FONT_HERSHEY_SIMPLEX, .52, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.putText(image, load, (12, 48), cv2.FONT_HERSHEY_SIMPLEX, .46, (255, 255, 255), 1, cv2.LINE_AA)
+        frames = []
+        for camera in record_cameras:
+            renderer.update_scene(d, camera=camera)
+            renderer.scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = False
+            renderer.scene.flags[mujoco.mjtRndFlag.mjRND_REFLECTION] = False
+            frame = cv2.cvtColor(renderer.render(), cv2.COLOR_RGB2BGR)
+            cv2.putText(frame, label, (12, 25), cv2.FONT_HERSHEY_SIMPLEX, .52, (255, 255, 255), 1, cv2.LINE_AA)
+            cv2.putText(frame, load, (12, 48), cv2.FONT_HERSHEY_SIMPLEX, .46, (255, 255, 255), 1, cv2.LINE_AA)
+            if len(record_cameras) > 1 or camera != "overview":
+                cv2.putText(frame, f"View: {camera}", (12, 71), cv2.FONT_HERSHEY_SIMPLEX, .52,
+                            (255, 255, 255), 1, cv2.LINE_AA)
+            frames.append(frame)
+            if camera in view_writers:
+                view_writers[camera].write(frame)
+        image = np.concatenate(frames, axis=1)
         writer.write(image)
         if stage != last_stage:
             cv2.imwrite(str(output / f"{stage.lower()}.png"), image)
@@ -46,6 +57,13 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
         next_frame += .04
 
     try:
+        if record:
+            if not record_cameras or len(set(record_cameras)) != len(record_cameras):
+                raise ValueError("Recording requires distinct named cameras")
+            for camera in record_cameras:
+                if not camera or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for c in camera):
+                    raise ValueError("Recording camera names must be filename-safe")
+                model.camera(camera)  # Validate before planning or moving.
         plan = robot.plan(object_pose=pose, yaw=yaw)
         (output / "plan.json").write_text(json.dumps(plan, indent=2))
         if viewer and viewer_handle is None:
@@ -60,9 +78,15 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
         if record:
             renderer = mujoco.Renderer(model, height=480, width=640)
             writer = cv2.VideoWriter(str(output / "physical_pick_place.mp4"),
-                                     cv2.VideoWriter_fourcc(*"mp4v"), 25., (640, 480))
+                                     cv2.VideoWriter_fourcc(*"mp4v"), 25., (640 * len(record_cameras), 480))
             if not writer.isOpened():
                 raise RuntimeError("MP4 encoder unavailable")
+            if len(record_cameras) > 1:
+                for camera in record_cameras:
+                    view_writers[camera] = cv2.VideoWriter(str(output / f"view_{camera}.mp4"),
+                                                          cv2.VideoWriter_fourcc(*"mp4v"), 25., (640, 480))
+                    if not view_writers[camera].isOpened():
+                        raise RuntimeError(f"MP4 encoder unavailable for {camera}")
         result = robot.execute(plan, frame_callback=on_frame if viewer_handle is not None or record else None,
                                realtime=viewer_handle is not None)
     except Exception as exc:
@@ -73,6 +97,8 @@ def run_trial(model, data, output, *, pose=None, yaw=0., viewer=False, record=Fa
     finally:
         if writer is not None:
             writer.release()
+        for view_writer in view_writers.values():
+            view_writer.release()
         if renderer is not None:
             renderer.close()
         if viewer_handle is not None and shared_viewer is None:

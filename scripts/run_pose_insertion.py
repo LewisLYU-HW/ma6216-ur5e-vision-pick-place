@@ -14,7 +14,7 @@ from scipy.spatial.transform import Rotation
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from ma6216.pose_insertion import (BLOCK, LAYOUTS, InsertionRobot, Nest,
+from ma6216.pose_insertion import (BLOCK, LAYOUTS, WRIST_CAMERA, InsertionRobot, Nest,
                                    build_insertion_scene, insertion_outcome, object_pose)
 from ma6216.runner import run_trial
 from ma6216.scene import CAMERA_NAME, mujoco
@@ -59,8 +59,14 @@ def main():
     parser.add_argument("--foundationpose-repository", type=Path,
                         help="Official checkout; otherwise use the existing repository path configuration")
     parser.add_argument("--record", action="store_true")
+    parser.add_argument("--record-view", choices=("overview", "wrist", "both"), default="overview",
+                        help="Recorded camera view; both saves a synchronized pair plus each view separately")
     parser.add_argument("--viewer", action="store_true")
     args = parser.parse_args()
+    if args.record_view != "overview" and not args.record:
+        parser.error("--record-view requires --record")
+    record_cameras = {"overview": ("overview",), "wrist": (WRIST_CAMERA,),
+                      "both": ("overview", WRIST_CAMERA)}[args.record_view]
     if not np.isfinite(args.target_yaw_deg) or abs(args.target_yaw_deg) > 30:
         parser.error("Target yaw must be within [-30, 30] degrees")
     if not np.isfinite(args.clearance_mm) or not .5 <= args.clearance_mm <= 3:
@@ -78,6 +84,8 @@ def main():
                "rotation_initialization": "not run (physics baseline)" if args.ground_truth else "official full SO(3) grid; no upright prior",
                "nest_clearance_mm_per_side": args.clearance_mm,
                "robot_self_gravity_compensation": True,
+               "recording_cameras": list(record_cameras) if args.record else [],
+               "perception_camera": None if args.ground_truth else CAMERA_NAME,
                "scope": "Four deterministic fixture layouts; shallow gravity seating, not force-controlled precision insertion"}
     exit_code = 1
     try:
@@ -121,7 +129,8 @@ def main():
             snapshot(model, data, output / "initial_scene.png")
         robot = InsertionRobot(model, data, estimate, nest, ground_truth=args.ground_truth, pose_mode=args.pose_mode)
         motion = run_trial(model, data, output / "motion", robot=robot,
-                           pose=None if args.ground_truth else estimate, record=args.record, viewer=args.viewer)
+                           pose=None if args.ground_truth else estimate, record=args.record, viewer=args.viewer,
+                           record_cameras=record_cameras)
         summary["motion"] = motion
         if not motion["success"]:
             summary["failure_evaluation_only"] = insertion_outcome(model, data, nest)

@@ -79,6 +79,40 @@ python scripts/run_pose_insertion.py --layout 1 \
 `scripts/run_foundationpose.py` 调用官方实现。`--capture-only` 只保存观测，
 其摘要为 `status: observation_captured, success: null`，不表示完成操作。
 
+### 腕部视角录像
+
+新增虚拟相机 `wrist_camera`，固定安装在夹爪基座侧面，随腕部平移和旋转，
+朝向双指夹持区域。其相对安装位姿固定，不使用物体真值来调整镜头。
+相机采用 MuJoCo 的 [fixed 挂载方式](https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-camera)。
+这是观察用相机；FoundationPose 输入仍来自原来的固定 `vision_camera`，
+尚未实现腕部 RGB-D 感知、手眼标定或腕部视觉伺服。虚拟相机未添加实体外壳或质量。
+
+```bash
+python scripts/run_pose_insertion.py --layout 3 --record --record-view both \
+  --output artifacts/pose_insertion_wrist_01
+```
+
+需要独立推理环境时，追加上一节的 `--foundationpose-python` 和
+`--foundationpose-repository` 参数。同一次物理执行的每一帧分别渲染两个视角，
+输出 25 fps 视频：
+
+- `motion/physical_pick_place.mp4`：左侧全景、右侧腕部，1280×480。
+- `motion/view_wrist_camera.mp4`：独立腕部视角，640×480。
+- `motion/view_overview.mp4`：独立全景视角，640×480。
+
+`--record-view wrist` 只录腕部画面到 `physical_pick_place.mp4`；默认
+`--record-view overview` 保持原全景录像。该参数只选择录像视角，
+`--viewer` 的交互窗口仍按原设置打开。摘要记录 `recording_cameras` 与
+`perception_camera`，便于区分观察相机和估计输入。
+
+布局 3 的完整视觉双视角录制已通过：三份视频均为 702 帧（28.08 秒），
+位姿估计文件和最终物理指标与增加相机前的该布局逐项一致，中心误差
+2.35 mm。默认全景录制也通过了布局 0 的物理对照。另检查了腕部相机
+随关节移动、相对夹爪安装位姿保持固定，以及视频首、中、末帧可解码。
+详见 [腕部录制验证摘要](results/wrist-camera.json)。
+
+![同一时刻的全景与腕部夹持画面](media/pose-insertion-wrist.png)
+
 ## 对照与验收
 
 `--pose-mode yaw-only` 保留输入平移和 yaw，丢弃 roll/pitch；与完整位姿使用

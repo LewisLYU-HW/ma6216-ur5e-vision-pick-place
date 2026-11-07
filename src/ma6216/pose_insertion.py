@@ -17,7 +17,7 @@ from .foundationpose import validate_rigid_transform
 from .motion import MotionFailure, Robot
 from .palletizing import FOOTPRINT, PARTS
 from .parts import configure_parts
-from .scene import build_scene, matrix_to_quat, mujoco
+from .scene import build_scene, look_at_quat, matrix_to_quat, mujoco
 
 
 BLOCK = PARTS[0]
@@ -26,6 +26,7 @@ WALL_HEIGHT = .008
 WALL_THICKNESS = .006
 RELEASE_GAP = .012
 TRANSFER_Z = .56
+WRIST_CAMERA = "wrist_camera"
 # x, y, z, roll, pitch, yaw; angles in degrees. These are scene initial
 # conditions, never supplied to FoundationPose or the visual grasp planner.
 LAYOUTS = (
@@ -101,6 +102,13 @@ def build_insertion_scene(layout=1, nest=None):
                 body.gravcomp = 1.
         spec.option.impratio = 10.
         spec.option.cone = mujoco.mjtCone.mjCONE_ELLIPTIC
+        # Observation-only virtual camera rigidly mounted beside the gripper.
+        # Its local pose stays fixed; it never tracks the workpiece's truth pose.
+        camera_position = [.075, 0., .035]
+        spec.body("gripper_base").add_camera(
+            name=WRIST_CAMERA, pos=camera_position,
+            quat=look_at_quat(camera_position, [0., 0., .145]), fovy=80.,
+            mode=mujoco.mjtCamLight.mjCAMLIGHT_FIXED)
         # Keep the inherited tray and support height; enlarge its footprint.
         spec.body("target_tray").pos = [*nest.xy, .375]
         spec.geom("tray_bottom").size = [.16, .10, .007]

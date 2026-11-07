@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-07",
+  "base_commit": "e9c916eb8cad798dfba507ee544d20856e3bc15a",
+  "layout": 3,
+  "source_sha256": {
+    "src/ma6216/pose_insertion.py": "8a9ad8714bb9f86f50a5ad6f0e2c6ec4e220a3f792b9460cd1bf55be5040676c",
+    "src/ma6216/runner.py": "17373b7cc3ea80d97d694b0a5c624f78ea42892955d93d3b62c772179ecc7bfa",
+    "scripts/run_pose_insertion.py": "b257aaa30f27f39623d890f66d5b2d05622e5f0daf9dc9941136ea778bde7683"
+  },
+  "success": true,
+  "perception_camera": "vision_camera",
+  "recording_cameras": [
+    "overview",
+    "wrist_camera"
+  ],
+  "camera_parent_body": "gripper_base",
+  "camera_mount_mode": "fixed",
+  "camera_local_position_m": [
+    0.075,
+    0.0,
+    0.035
+  ],
+  "camera_fovy_deg": 80.0,
+  "camera_role": "visualization only, not FoundationPose input",
+  "checks": {
+    "camera_moves_with_wrist_and_preserves_local_transform": true,
+    "estimate_identical_to_previous_visual_trial": true,
+    "final_physical_metrics_identical_to_previous_visual_trial": true,
+    "synchronized_video_lengths": true,
+    "first_middle_and_last_frames_decodable": true,
+    "default_overview_recording_and_physics_pass": true,
+    "check_pose_insertion": "passed"
+  },
+  "final_position_error_mm": 2.354164032632209,
+  "final_rotation_error_deg": 0.012880240848156489,
+  "videos": [
+    {
+      "path": "artifacts/pose_insert_visual_l3_wrist_verified/motion/physical_pick_place.mp4",
+      "frames": 702,
+      "fps": 25.0,
+      "width": 1280,
+      "height": 480,
+      "size_bytes": 8050809
+    },
+    {
+      "path": "artifacts/pose_insert_visual_l3_wrist_verified/motion/view_wrist_camera.mp4",
+      "frames": 702,
+      "fps": 25.0,
+      "width": 640,
+      "height": 480,
+      "size_bytes": 4964539
+    },
+    {
+      "path": "artifacts/pose_insert_visual_l3_wrist_verified/motion/view_overview.mp4",
+      "frames": 702,
+      "fps": 25.0,
+      "width": 640,
+      "height": 480,
+      "size_bytes": 3087352
+    }
+  ]
+}
