@@ -1,0 +1,78 @@
+{
+  "note": "Development diagnostics with changing code/layout, not a benchmark or success-rate denominator. Raw runs remain locally under artifacts/. Earlier visual attempts failed; the final continuous visual result is recorded separately.",
+  "runs": [
+    {
+      "local_run": "complete_workshop_gt_dev1",
+      "control_source": "ground_truth_diagnostic",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No collision-free offline IK at [0.6891620618946914, -0.07511209223987676, 0.5029797530985205]; best={'p_error': 0.01133270295904715, 'r_error': 0.045579471408399304, 'contacts': [{'geom1': 'geom_41', 'geom2': 'worktable', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.019039988395536715}, {'geom1': 'geom_41', 'geom2': 'feed_frame_-0.12', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.025216017664110357}, {'geom1': 'geom_41', 'geom2': 'feed_frame_-0.12', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.005447805554991254}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.03091770782599232}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_leg_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.02664051444430407}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_leg_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.006285436563238982}, {'geom1': 'geom_47', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.006132565830576468}, {'geom1': 'geom_47', 'geom2': 'workshop_cradle_leg_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.0015532870746737953}, {'geom1': 'geom_41', 'geom2': 'belt_surface', 'body1': 'upper_arm_link', 'body2': 'conveyor', 'penetration_m': 0.011367418836882151}, {'geom1': 'geom_41', 'geom2': 'belt_surface', 'body1': 'upper_arm_link', 'body2': 'conveyor', 'penetration_m': 0.004615614131474363}, {'geom1': 'geom_46', 'geom2': 'target_cube_geom', 'body1': 'forearm_link', 'body2': 'target_cube', 'penetration_m': 0.0034630099354284677}, {'geom1': 'geom_46', 'geom2': 'target_cube_geom', 'body1': 'forearm_link', 'body2': 'target_cube', 'penetration_m': 0.003433918496880038}], 'q': [0.08771278758983661, -2.3409886964972513, 2.451141117905791e-07, -2.358612911890633, 1.572255319530097, -1.4822340689868307]}",
+      "wall_seconds": 8.581888084998354
+    },
+    {
+      "local_run": "complete_workshop_gt_dev2",
+      "control_source": "ground_truth_diagnostic",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No collision-free offline IK at [0.639573315526189, -0.09017408939784342, 0.5154728322532688]; best={'p_error': 6.022119836187293e-11, 'r_error': 7.430421292171815e-11, 'contacts': [{'geom1': 'geom_41', 'geom2': 'feed_frame_-0.12', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.00724502046578767}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.004470333287922977}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.004334276632637059}], 'q': [0.06603129415546012, -2.2499320639793137, -0.0935678942516717, -2.401396900729121, 1.577916221318021, -1.5041142658631665]}",
+      "wall_seconds": 18.73178776599525
+    },
+    {
+      "local_run": "complete_workshop_gt_dev3",
+      "control_source": "ground_truth_diagnostic",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No bilateral grasp: {'left': 50.95138143236009, 'right': 52.11646758282998}; opposing normal dot=-0.5522254207205854",
+      "wall_seconds": 50.723054501999286
+    },
+    {
+      "local_run": "complete_workshop_static_gt_dev1",
+      "control_source": "ground_truth_diagnostic",
+      "stationary_feed": true,
+      "success": true,
+      "error": null,
+      "wall_seconds": 237.11366003299918
+    },
+    {
+      "local_run": "complete_workshop_visual_dev1",
+      "control_source": "FoundationPose official reference reconstruction",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No collision-free offline IK at [0.6439055108614004, -0.09456531607470339, 0.5055741448457252]; best={'p_error': 0.0008963556656007061, 'r_error': 0.003430401983311014, 'contacts': [{'geom1': 'geom_41', 'geom2': 'worktable', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.006339723027669941}, {'geom1': 'geom_41', 'geom2': 'feed_frame_-0.12', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.026579405949888873}, {'geom1': 'geom_41', 'geom2': 'feed_frame_-0.12', 'body1': 'upper_arm_link', 'body2': 'world', 'penetration_m': 0.0015007930885257773}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.022493692728232657}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_rail_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.022493692728232657}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_leg_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.018243593310165562}, {'geom1': 'geom_46', 'geom2': 'workshop_cradle_leg_-1', 'body1': 'forearm_link', 'body2': 'world', 'penetration_m': 0.018243593310165562}, {'geom1': 'geom_41', 'geom2': 'belt_surface', 'body1': 'upper_arm_link', 'body2': 'conveyor', 'penetration_m': 0.010529387754873859}, {'geom1': 'geom_41', 'geom2': 'belt_surface', 'body1': 'upper_arm_link', 'body2': 'conveyor', 'penetration_m': 0.0035957041557761055}], 'q': [0.051195825332597936, -2.3119918572216305, -3.292959628571997e-08, -2.454562899838703, 1.5971235454361716, -1.5130823291511233]}",
+      "wall_seconds": 34.849984576998395
+    },
+    {
+      "local_run": "complete_workshop_visual_dev2",
+      "control_source": "FoundationPose official reference reconstruction",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: Driver insertion contact guard stopped the task",
+      "wall_seconds": 122.74326654199831
+    },
+    {
+      "local_run": "complete_workshop_visual_dev3",
+      "control_source": "FoundationPose official reference reconstruction",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No collision-free offline IK at [0.5610270380943562, -0.025122244926366378, 0.41542105348676794]; best={'p_error': 7.413243222774025e-13, 'r_error': 2.0291723142248162e-12, 'contacts': [{'geom1': 'geom_51', 'geom2': 'target_cube_geom_45', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.003544828486611494}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_53', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.003532687258343839}], 'q': [0.2084661232540922, -1.7182885819267453, -1.1967692712037306, -1.800303639017626, 1.544647146028848, -2.713632866365052]}",
+      "wall_seconds": 281.1382065430007
+    },
+    {
+      "local_run": "complete_workshop_visual_dev4",
+      "control_source": "FoundationPose official reference reconstruction",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: No collision-free offline IK at [0.5940147448164508, -0.1145319213165263, 0.4910956308680908]; best={'p_error': 7.312387986539544e-11, 'r_error': 1.9883016481931484e-10, 'contacts': [{'geom1': 'gripper_right_pad1', 'geom2': 'target_cube_geom_44', 'body1': 'gripper_right_pad', 'body2': 'target_cube', 'penetration_m': 0.000891422835007415}, {'geom1': 'gripper_right_pad1', 'geom2': 'target_cube_geom_44', 'body1': 'gripper_right_pad', 'body2': 'target_cube', 'penetration_m': 0.0008913737403530868}, {'geom1': 'gripper_right_pad1', 'geom2': 'target_cube_geom_45', 'body1': 'gripper_right_pad', 'body2': 'target_cube', 'penetration_m': 0.005389042714758402}, {'geom1': 'gripper_right_pad1', 'geom2': 'target_cube_geom_45', 'body1': 'gripper_right_pad', 'body2': 'target_cube', 'penetration_m': 0.005432167552215072}, {'geom1': 'gripper_right_pad1', 'geom2': 'target_cube_geom_45', 'body1': 'gripper_right_pad', 'body2': 'target_cube', 'penetration_m': 0.005447462366122864}], 'q': [-0.007098643329716241, -1.865477401274613, -0.8316548526383779, -1.9456854245601722, 1.6635313277425214, 1.3471382953146345]}",
+      "wall_seconds": 29.869311681999534
+    },
+    {
+      "local_run": "complete_workshop_visual_dev5",
+      "control_source": "FoundationPose official reference reconstruction",
+      "stationary_feed": false,
+      "success": false,
+      "error": "MotionFailure: Hanging failed: {'support_force_n': 0.9789450957038749, 'support_contacts': ['target_cube_geom_3'], 'gripper_contact_after_release': False, 'linear_speed_m_s': 0.00708018954511061, 'angular_speed_rad_s': 0.09092713911791615, 'world_T_object': [[-0.026271754609024173, 0.939645512571148, 0.3411394225454839, 0.4579281510040275], [0.07760991210368001, 0.34214441244825144, -0.9364368118424746, 0.16043285385694622], [-0.9966375953439749, 0.0018739624712728054, -0.08191453968395349, 0.5989304827833353], [0.0, 0.0, 0.0, 1.0]], 'eye_offset_from_hook_mm': [0.029691333693357976, 29.682908854612737, -10.091986459861147], 'eye_plane_error_deg': 0.8515703350554114, 'success': False}",
+      "wall_seconds": 297.7844001199992,
+      "note": "All four motions completed and spanner supported by hook. At the original 4 s settling limit its linear/angular speeds remained above threshold; preserved as failure."
+    }
+  ]
+}

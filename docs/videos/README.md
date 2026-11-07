@@ -4,7 +4,15 @@
 点击文件链接可在 GitHub 查看或下载；下载到本地后可用 VLC 打开。
 录像按仿真时间采样；静态任务的推理和离线规划等待不等于录像时长。
 
-## 当前工具架演示：动作修复版
+## 完整连续任务：四个物体、四个阶段
+
+**[全景＋腕部](complete-workshop/overview-wrist.mp4)** · **[独立腕部](complete-workshop/wrist.mp4)** · [视频来源与时间点](complete-workshop/README.md)
+
+扫描锤子归位 → 运动螺丝刀抓取、倾斜插架 → 安装独立工具架、释放后重新定位 → 扳手松爪换抓、穿孔挂放。整段来自同一次视觉运行，四个物体始终保留在同一物理场景中。分屏为 1920×720，独立腕部为 960×720，均为 25 fps。
+
+[复现命令](../COMPLETE_WORKSHOP.md) · [原始轨迹与验收](../results/complete-workshop/README.md)。这是固定布局的完整演示，不能当作多次试验的成功率。
+
+## 工具架单项演示：动作修复版
 
 [全景、独立腕部和失败对照](rack-revision-v2/README.md) · [修订后 40 次评测](../results/rack-revision-v2/README.md) · [动作修复说明](../RACK_MOTION_REVISION.md)
 
@@ -23,11 +31,11 @@
 
 这组视频只回放原状态，不重新运行推理或物理试验。其来源、帧数、时长与 SHA-256 见独立的 [评测视频清单](evaluation-v1/manifest.json)，对应原始轨迹保存在 [replay_inputs](../results/evaluation-v1/replay_inputs/)。成功视频不代表该配置全部成功。
 
-## 新维修工具工作站
+## 原三工具任务：固定挂钩
 
 | 视频 | 内容 |
 |---|---|
-| [完整流程：全景＋腕部](workshop-overview-wrist.mp4) | 扫描锤子归位、运动螺丝刀抓取与倾斜插架、扳手松爪换抓与穿孔挂放 |
+| [三工具流程：全景＋腕部](workshop-overview-wrist.mp4) | 扫描锤子归位、运动螺丝刀抓取与倾斜插架、扳手松爪换抓与穿孔挂放；使用固定挂钩，不包含装架 |
 | [同次运行：独立腕部](workshop-wrist.mp4) | 保留完整时长，近距离观察夹持、姿态调整、插入和释放 |
 
 使用真实扫描纹理与官方 FoundationPose few-shot Model-free 重建；深度背景分割、固定和腕部 RGB-D 估计共同驱动操作。

@@ -6,9 +6,19 @@
 先从标定 RGB-D 参考图重建工具，再用官方 FoundationPose 估计 **6D pose（三维位置＋三维朝向）**，驱动实际接触下的夹持、转向、插入和悬挂。新工作站采用深度背景分割，无需给工具涂分割色。
 原有的视觉装配恢复、遮挡换抓和运动目标抓取任务继续保留。
 
-[演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [工作站复现](docs/WORKSHOP.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
+[完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
-## 新任务：先装工具架，再挂扳手
+## 完整任务：四阶段连续视频
+
+**[完整全景＋腕部视频](docs/videos/complete-workshop/overview-wrist.mp4)** · **[同次运行的独立腕部](docs/videos/complete-workshop/wrist.mp4)** · [运行与验收记录](docs/results/complete-workshop/README.md)
+
+扫描锤子归位 → 运动螺丝刀抓取与倾斜插架 → 安装独立工具架并重新定位 → 扳手松爪换抓、穿孔挂放。四个物体从开始就处于同一个场景，依次操作，前面已归位的工具留在原位。
+
+![完整场景：锤子、运动螺丝刀、独立支架和扳手](docs/media/complete-workshop-overview.png)
+
+使用 `--task complete` 运行，详见 [完整任务复现](docs/COMPLETE_WORKSHOP.md)。录像约 **3 分 14 秒**，来自同一次视觉运行的连续状态，保留四阶段及挂放后的 10 秒稳定等待。四件物体均通过最终验收和额外 30 秒静置复核。它是固定布局演示，不计入下面两轮独立评测的成功率。
+
+## 独立工具架任务与 40 次复测
 
 ![横放的独立支架、带孔扳手与待装底座](docs/media/rack-assembly-overview.png)
 
