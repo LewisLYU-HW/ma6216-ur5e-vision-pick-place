@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import json
+import random
 from pathlib import Path
 import sys
 import time
@@ -46,6 +47,11 @@ def main():
                                                    args.debug_dir / manifest["object_id"])
                 models[key] = (adapter, manifest)
             adapter, manifest = models[key]
+            # Isolate requests from process history and benchmark scheduling.
+            random.seed(0)
+            np.random.seed(0)
+            adapter.torch.manual_seed(0)
+            adapter.torch.cuda.manual_seed_all(0)
             sequence = (key, request.get("sequence", "default"))
             prior = request.get("camera_T_object_prior")
             register = bool(request.get("register", False) or (sequence not in histories and prior is None))

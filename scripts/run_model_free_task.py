@@ -20,6 +20,8 @@ from ma6216.scene import CAMERA_NAME, mujoco
 from ma6216.simulation_objects import PLUG
 from ma6216.task_control import ObservedObject, TaskRecorder, TaskRobot
 from ma6216.task_perception import ImageObserver
+from ma6216.evaluation import pose_errors, camera_metrics, timing_metrics, state_fingerprint
+from ma6216.experiments import METHODS, control_pose, GraspImpulse
 
 
 def evaluation_pose(model, data, body):
@@ -71,10 +73,23 @@ def main():
     parser.add_argument("--foundationpose-repository", type=Path, default=ROOT / "third_party/FoundationPose")
     parser.add_argument("--calibration", type=Path, default=ROOT / "demo_data/calibration/estimated")
     parser.add_argument("--record", action="store_true")
+    parser.add_argument("--trace", action="store_true")
+    parser.add_argument("--sensor-delay", type=float, default=None)
+    parser.add_argument("--method", choices=METHODS, default="full")
+    parser.add_argument("--disturbance", choices=("default", "none", "fixture_shift", "grasp_impulse"), default="default")
     parser.add_argument("--no-disturbance", action="store_true")
     parser.add_argument("--disable-recovery", action="store_true", help="Explicit failure-recovery ablation")
     parser.add_argument("--belt-speed", type=float, default=.004)
     args = parser.parse_args()
+    if args.sensor_delay is not None and args.sensor_delay < 0:
+        parser.error("sensor-delay must be nonnegative")
+    if args.disable_recovery:
+        args.method = "no_recovery"
+    args.disable_recovery = args.method == "no_recovery"
+    if args.disturbance == "default":
+        args.disturbance = "fixture_shift" if args.task == "assembly" and not args.no_disturbance else "none"
+    if args.disturbance == "fixture_shift" and args.task != "assembly":
+        parser.error("fixture_shift is defined only for the assembly task")
     if args.task == "clutter" and not args.blocker_model:
         parser.error("Clutter task requires --blocker-model")
     if not .001 <= args.belt_speed <= .010:
@@ -84,6 +99,8 @@ def main():
     started = time.perf_counter()
     worker = observer = recorder = robot = None
     summary = {"success": False, "task": args.task, "seed": args.seed,
+               "method": args.method, "disturbance": args.disturbance,
+               "fixed_virtual_sensor_delay_s": args.sensor_delay,
                "control_source": "ground_truth_diagnostic" if args.ground_truth else "FoundationPose official reconstructed-model inference",
                "model_free": not args.ground_truth, "reconstruction_input": "reference RGB-D, masks, calibrated scan poses; no CAD",
                "wrist_calibration": "ideal synthetic hand-eye mount and robot kinematics",
@@ -99,10 +116,15 @@ def main():
         model, data = scene.model, scene.data
         for _ in range(775):
             mujoco.mj_step(model, data)
+        summary["initial_scene_state_sha256"] = state_fingerprint(data)
         recorder = TaskRecorder(model, output / "video", args.task, args.record,
                                 source="Ground-truth diagnostic" if args.ground_truth else "RGB-D references -> Neural Object Field -> FoundationPose")
         observer = ImageObserver(model, output / "observations", args.calibration)
+        summary["calibration_evaluation_only"] = camera_metrics(model, data, observer, args.calibration)
         robot = TaskRobot(scene, objects, recorder, output / "motion")
+        robot.trace_enabled = args.trace
+        impulse = GraspImpulse(robot, "plug") if args.disturbance == "grasp_impulse" else None
+        robot.environment_hook = impulse
         if not args.ground_truth:
             worker = PoseWorker(args.foundationpose_python, args.foundationpose_repository, output / "pose_worker")
             for obj in objects.values():
@@ -120,9 +142,19 @@ def main():
                                         frame=capture["frame"], K=capture["K"], world_T_camera=capture["world_T_camera"],
                                         capture_time_s=capture["capture_time_s"], register=not track and prior is None,
                                         world_T_object_prior=prior)
-                on_wait = (lambda: robot.tick(stage="TRACK_MOVING_OBJECT", realtime=True)) if args.task == "conveyor" and not robot.carrying else None
+                moving = args.task == "conveyor" and not robot.carrying
+                on_wait = (lambda: robot.tick(stage="TRACK_MOVING_OBJECT", realtime=True)) if moving and args.sensor_delay is None else None
                 info = worker.wait(request, on_wait=on_wait)
+                if moving and args.sensor_delay is not None:
+                    robot.hold(args.sensor_delay, "TRACK_MOVING_OBJECT")
+                    info["fixed_virtual_sensor_delay_s"] = args.sensor_delay
                 pose = np.asarray(info["world_T_object"])
+            raw_pose = pose.copy()
+            pose = control_pose(pose, args.method)
+            info["control_world_T_object"] = pose.tolist()
+            info["capture_truth_evaluation_only"] = actual_at_capture.tolist()
+            info["raw_estimator_metrics_evaluation_only"] = pose_errors(raw_pose, actual_at_capture, objects[key].mesh.vertices)
+            info["control_pose_metrics_evaluation_only"] = pose_errors(pose, actual_at_capture, objects[key].mesh.vertices)
             info.update(object_id=key, camera=camera, foreground_pixels=capture["metadata"]["foreground_pixels"],
                         translation_error_mm_evaluation_only=float(np.linalg.norm(pose[:3, 3] - actual_at_capture[:3, 3]) * 1000),
                         rotation_error_deg_evaluation_only=float(np.rad2deg(Rotation.from_matrix(pose[:3, :3] @ actual_at_capture[:3, :3].T).magnitude())))
@@ -197,18 +229,21 @@ def main():
                     robot.hold(.4, "TRACK_MOVING_OBJECT", realtime=True)
             horizon = 5.
             for _ in range(3):
-                predicted = history.predict(float(data.time) + horizon)
+                predicted = (history.samples[-1][1].copy() if args.method == "no_prediction"
+                             else history.predict(float(data.time) + horizon))
                 robot.known["plug"] = predicted
                 approach = predicted @ objects["plug"].top_grasp()
                 approach[:3, 3] -= approach[:3, 2] * .10
                 _, duration = robot.plan_move(approach, "PREDICT_INTERCEPT")
                 horizon = duration + .25 + 2. + .25 + .35
-            predicted = history.predict(float(data.time) + horizon)
+            predicted = (history.samples[-1][1].copy() if args.method == "no_prediction"
+                         else history.predict(float(data.time) + horizon))
             summary["conveyor"] = {"visual_velocity_m_s": history.velocity.tolist(), "prediction_horizon_s": horizon,
                                    "last_visual_capture_time_s": history.samples[-1][0],
                                    "predicted_contact_time_s": float(data.time) + horizon,
                                    "commanded_belt_speed_m_s": args.belt_speed,
-                                   "physics_continues_during_inference": not args.ground_truth}
+                                   "physics_continues_during_inference": not args.ground_truth and args.sensor_delay is None,
+                                   "fixed_virtual_sensor_delay_s": args.sensor_delay}
             robot.event("intercept_planned", **summary["conveyor"])
             robot.grasp(predicted)
             # The belt remains in motion through contact, closure, and lift.
@@ -253,17 +288,22 @@ def main():
         target_tcp = target_object @ np.linalg.inv(robot.tool_T_object)
         hover = target_tcp.copy(); hover[2, 3] = .56
         robot.move(hover, "ASSEMBLY_HOVER")
-        robot.hold(.3, "WRIST_OBSERVE")
-        # Full close-range registration can resolve the nearly rectangular
-        # silhouette's 180-degree ambiguity in the distant first view.
-        held_pose, _ = observe_object("plug", WRIST_CAMERA)
-        robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held_pose
-        observe_fixture(WRIST_CAMERA)
+        if args.method != "no_wrist":
+            robot.hold(.3, "WRIST_OBSERVE")
+            # Full close-range registration can resolve the nearly rectangular
+            # silhouette's 180-degree ambiguity in the distant first view.
+            held_pose, _ = observe_object("plug", WRIST_CAMERA)
+            robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held_pose
+            observe_fixture(WRIST_CAMERA)
+        else:
+            robot.event("wrist_refinement_disabled", object_id="plug")
         disturbance_done = False
 
         def environment(stage):
             nonlocal disturbance_done
-            if args.task == "assembly" and not args.no_disturbance and not disturbance_done and stage == "INSERT_1":
+            if impulse is not None:
+                impulse(stage)
+            if args.disturbance == "fixture_shift" and not disturbance_done and stage == "INSERT_1":
                 scene.disturb_fixture()
                 disturbance_done = True
                 robot.event("environment_fixture_displaced", controller_receives_delta=False)
@@ -297,9 +337,10 @@ def main():
                 raise RuntimeError("Insertion contact guard triggered; recovery ablation stops here")
             retreat = robot.tcp_pose(); retreat[:3, 3] += axis * .05
             robot.move(retreat, "RETRACT_AFTER_CONTACT", allow_support=True)
-            observe_fixture(WRIST_CAMERA)
-            held_pose, _ = observe_object("plug", WRIST_CAMERA, prior=robot.tcp_pose() @ robot.tool_T_object)
-            robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held_pose
+            observe_fixture(CAMERA_NAME if args.method == "no_wrist" else WRIST_CAMERA)
+            if args.method != "no_wrist":
+                held_pose, _ = observe_object("plug", WRIST_CAMERA, prior=robot.tcp_pose() @ robot.tool_T_object)
+                robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held_pose
             robot.event("relocalized_for_retry", attempt=attempt + 1)
         if not inserted:
             raise RuntimeError("Assembly did not complete within three contact-limited attempts")
@@ -317,6 +358,12 @@ def main():
     finally:
         if robot is not None:
             summary["execution"] = robot.save()
+            summary["timing"] = timing_metrics(summary, robot, started)
+            summary["last_stage"] = robot.stage
+            summary["simulation_seconds"] = float(data.time)
+            summary.setdefault("final_evaluation_only", seating_evaluation(scene))
+            np.savez(output / "final_state_evaluation_only.npz", qpos=data.qpos, qvel=data.qvel,
+                     ctrl=data.ctrl, mocap_pos=data.mocap_pos, mocap_quat=data.mocap_quat, time=data.time)
             summary["fixture_disturbance_executed"] = any(
                 item["event"] == "environment_fixture_displaced" for item in robot.events)
         if worker is not None:

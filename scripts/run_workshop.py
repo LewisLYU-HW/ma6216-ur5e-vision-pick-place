@@ -18,8 +18,10 @@ from ma6216.online_pose import PoseWorker
 from ma6216.pose_insertion import transform
 from ma6216.scene import CAMERA_NAME, mujoco
 from ma6216.task_control import TaskRobot
+from ma6216.evaluation import pose_errors, camera_metrics, timing_metrics, state_fingerprint
+from ma6216.experiments import METHODS, control_pose, GraspImpulse
 from ma6216.workshop_control import FeedPoseHistory, ReconstructedTool, WorkshopRecorder
-from ma6216.workshop_perception import WorkshopObserver
+from ma6216.workshop_perception import WorkshopObserver, refine_depth_pose
 from ma6216.workshop_scene import (
     build_workshop_scene,
     workshop_supports,
@@ -32,6 +34,10 @@ from ma6216.workshop_scene import (
     SOCKET_INNER,
     SPANNER_HANG_ROTATION,
     WORKSHOP_T_MARKER,
+    ASSEMBLY_T_MARKER,
+    RACK_T_FRAME,
+    FRAME_CLEARANCE,
+    rack_assembly_supports,
 )
 
 
@@ -41,15 +47,19 @@ def evaluation_pose(model, data, body):
     return transform(data.xpos[bid].copy(), data.xmat[bid].reshape(3, 3).copy())
 
 
-def physical_evaluation(scene, name):
+def physical_evaluation(scene, name, *, assembled_frame=False):
     # Import simulator geometry only inside the explicitly isolated evaluator.
-    from ma6216.workshop_assets import TOOLS
+    from ma6216.workshop_assets import TOOLS, RACK_FRAME, FRAME_HOOK
 
     m, d = scene.model, scene.data
     tool = TOOLS[name]
     actual = evaluation_pose(m, d, tool.body)
     rack = evaluation_pose(m, d, "target_tray")
     relative = np.linalg.inv(rack) @ actual
+    hook_centre = HOOK_CENTRE
+    if assembled_frame and name == "spanner":
+        relative = np.linalg.inv(evaluation_pose(m, d, RACK_FRAME.body)) @ actual
+        hook_centre = FRAME_HOOK
     ids = {m.geom(n).id for n in tool.collision_names}
     normal_force = 0.0
     gripper_contact = False
@@ -64,7 +74,10 @@ def physical_evaluation(scene, name):
         geom = m.geom(other).name
         if geom.startswith("gripper_"):
             gripper_contact = True
-        if (name == "spanner" and geom.startswith("rack_hook")) or (
+        hook_contact = (
+            geom in RACK_FRAME.collision_names[3:] if assembled_frame else geom.startswith("rack_hook")
+        )
+        if (name == "spanner" and hook_contact) or (
             name == "screwdriver" and geom.startswith("driver_socket_")
         ):
             wrench = np.zeros(6)
@@ -84,7 +97,7 @@ def physical_evaluation(scene, name):
     }
     if name == "spanner":
         eye = (relative @ np.array([-0.060, 0.0, 0.0, 1.0]))[:3]
-        offset = eye - HOOK_CENTRE
+        offset = eye - hook_centre
         plane_angle = float(np.rad2deg(np.arccos(np.clip(abs(relative[1, 2]), 0.0, 1.0))))
         result.update(eye_offset_from_hook_mm=(offset * 1000).tolist(), eye_plane_error_deg=plane_angle)
         geometric = (
@@ -115,19 +128,85 @@ def physical_evaluation(scene, name):
     return result
 
 
+def frame_seating_evaluation(scene):
+    from ma6216.workshop_assets import RACK_FRAME, FRAME_PROFILE, FRAME_DEPTH
+
+    m, d = scene.model, scene.data
+    actual = evaluation_pose(m, d, RACK_FRAME.body)
+    expected = evaluation_pose(m, d, "target_tray") @ RACK_T_FRAME
+    relative = np.linalg.inv(expected) @ actual
+    stem = RACK_FRAME.geometry[1][0].vertices @ relative[:3, :3].T + relative[:3, 3]
+    margins = []
+    for i, a in enumerate(FRAME_PROFILE):
+        edge = FRAME_PROFILE[(i + 1) % len(FRAME_PROFILE)] - a
+        normal = np.array([edge[1], -edge[0]]) / np.linalg.norm(edge)
+        margins.extend(normal @ a + FRAME_CLEARANCE - stem[:, :2] @ normal)
+    force, gripper = 0.0, False
+    ids = {m.geom(n).id for n in RACK_FRAME.collision_names}
+    for i, c in enumerate(d.contact):
+        pair = {int(c.geom1), int(c.geom2)}
+        if not ids.intersection(pair):
+            continue
+        for other in pair - ids:
+            name = m.geom(other).name
+            gripper |= name.startswith("gripper_")
+            if name.startswith("frame_socket_"):
+                wrench = np.zeros(6)
+                mujoco.mj_contactForce(m, d, i, wrench)
+                force += max(0.0, float(wrench[0]))
+    adr = m.jnt_dofadr[m.joint(RACK_FRAME.joint).id]
+    linear = float(np.linalg.norm(d.qvel[adr : adr + 3]))
+    angular = float(np.linalg.norm(d.qvel[adr + 3 : adr + 6]))
+    result = pose_errors(actual, expected)
+    result.update(
+        bottom_gap_mm=float((stem[:, 2].min() + FRAME_DEPTH) * 1000),
+        minimum_wall_clearance_mm=float(min(margins) * 1000),
+        support_force_n=force,
+        gripper_contact_after_release=gripper,
+        linear_speed_m_s=linear,
+        angular_speed_rad_s=angular,
+    )
+    result["success"] = bool(
+        result["translation_error_mm"] < 4.0
+        and result["rotation_error_deg"] < 8.0
+        and abs(result["bottom_gap_mm"]) < 2.0
+        and min(margins) > -0.0007
+        and force > 0.2
+        and not gripper
+        and linear < 0.005
+        and angular < 0.08
+    )
+    return result
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--task", choices=("all", "insert", "hang"), default="all")
+    p.add_argument("--task", choices=("all", "insert", "hang", "rack"), default="all")
+    p.add_argument("--method", choices=METHODS, default="full")
+    p.add_argument("--disturbance", choices=("none", "grasp_impulse"), default="none")
     p.add_argument("--models", type=Path, default=ROOT / "assets/reconstructed/workshop")
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--ground-truth", action="store_true", help="Physics diagnostic; never a vision result")
     p.add_argument("--record", action="store_true")
+    p.add_argument("--trace", action="store_true", help="Save original 25 Hz states for exact failure replay")
+    p.add_argument(
+        "--sensor-delay",
+        type=float,
+        default=None,
+        help="Fixed simulated moving-camera latency for paired benchmarks; default uses wall-clock waits",
+    )
     p.add_argument("--stationary-feed", action="store_true")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--foundationpose-python", type=Path, default=Path(sys.executable))
     p.add_argument("--foundationpose-repository", type=Path, default=ROOT / "third_party/FoundationPose")
     p.add_argument("--calibration", type=Path, default=ROOT / "demo_data/calibration/estimated")
     args = p.parse_args()
+    if args.sensor_delay is not None and args.sensor_delay < 0:
+        p.error("sensor-delay must be nonnegative")
+    if args.method == "no_recovery" or (
+        args.method == "no_prediction" and args.task not in ("insert", "all")
+    ):
+        p.error("This ablation is not applicable to the selected workshop task")
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
@@ -136,6 +215,9 @@ def main():
         "success": False,
         "task": args.task,
         "seed": args.seed,
+        "method": args.method,
+        "disturbance": args.disturbance,
+        "fixed_virtual_sensor_delay_s": args.sensor_delay,
         "perception": [],
         "rack_observations": [],
         "outcomes": {},
@@ -151,15 +233,18 @@ def main():
         "command": " ".join(sys.argv),
     }
     try:
+        assembling = args.task == "rack"
         objects = {
-            name: ReconstructedTool(args.models / name) for name in ("hammer", "screwdriver", "spanner")
+            name: ReconstructedTool(args.models / name)
+            for name in (("rack_frame", "spanner") if assembling else ("hammer", "screwdriver", "spanner"))
         }
         report["reconstructed_features"] = {k: v.features for k, v in objects.items()}
-        scene = build_workshop_scene(args.seed)
-        planning = build_workshop_scene(args.seed, planning_parts=objects.values())
+        scene = build_workshop_scene(args.seed, rack_assembly=assembling)
+        planning = build_workshop_scene(args.seed, planning_parts=objects.values(), rack_assembly=assembling)
         m, d = scene.model, scene.data
         for _ in range(1000):
             mujoco.mj_step(m, d)
+        report["initial_scene_state_sha256"] = state_fingerprint(d)
         recorder = WorkshopRecorder(
             m,
             out / "video",
@@ -168,22 +253,45 @@ def main():
         )
         # Commissioning observation of the empty station. Its actual depth
         # image (not segmentation IDs or CAD silhouettes) is the background.
-        empty = build_workshop_scene(args.seed, empty=True)
+        empty = build_workshop_scene(args.seed, empty=True, rack_assembly=assembling)
         with mujoco.Renderer(empty.model, height=960, width=1280) as renderer:
             renderer.update_scene(empty.data, camera=CAMERA_NAME)
             renderer.enable_depth_rendering()
             background = renderer.render().copy()
         np.save(out / "empty_station_depth.npy", background)
-        observer = WorkshopObserver(m, out / "observations", args.calibration, background_depth=background)
+        observer = WorkshopObserver(
+            m,
+            out / "observations",
+            args.calibration,
+            background_depth=background,
+            fixture_T_marker=ASSEMBLY_T_MARKER if assembling else WORKSHOP_T_MARKER,
+        )
+        report["calibration_evaluation_only"] = camera_metrics(m, d, observer, args.calibration)
         robot = TaskRobot(
             scene,
             objects,
             recorder,
             out / "motion",
             planning_scene=planning,
-            initial_target="hammer",
-            supports=workshop_supports,
+            initial_target="rack_frame" if assembling else "hammer",
+            supports=(
+                (
+                    lambda stage: rack_assembly_supports(
+                        stage,
+                        [
+                            objects["rack_frame"].geom + (f"_{i}" if i else "")
+                            for i in range(len(objects["rack_frame"].pieces))
+                        ],
+                    )
+                )
+                if assembling
+                else workshop_supports
+            ),
         )
+        if args.disturbance == "grasp_impulse":
+            target = "rack_frame" if assembling else "spanner" if args.task == "hang" else "screwdriver"
+            robot.environment_hook = GraspImpulse(robot, target)
+        robot.trace_enabled = args.trace
 
         def displayed_estimate():
             name = robot.target.object_id
@@ -198,7 +306,11 @@ def main():
             for obj in objects.values():
                 worker.wait(worker.submit(model_bundle=obj.bundle))
 
-        def observe(name, camera=CAMERA_NAME, *, region=None, track=False, prior=None, moving=False):
+        def observe(
+            name, camera=CAMERA_NAME, *, region=None, track=False, prior=None, moving=False, register=False
+        ):
+            if assembling and name == "spanner" and region is None and prior is None:
+                region = "rack_spanner"
             cap = observer.capture(
                 d, camera=camera, object_id=name, region=region, prior=prior, vertices=objects[name].vertices
             )
@@ -214,14 +326,45 @@ def main():
                     K=cap["K"],
                     world_T_camera=cap["world_T_camera"],
                     capture_time_s=cap["capture_time_s"],
-                    register=not track and prior is None,
+                    register=register or (not track and prior is None),
                     world_T_object_prior=prior,
                 )
                 info = worker.wait(
                     request,
-                    on_wait=(lambda: robot.tick(stage="TRACK_FEED", realtime=True)) if moving else None,
+                    on_wait=(
+                        (lambda: robot.tick(stage="TRACK_FEED", realtime=True))
+                        if moving and args.sensor_delay is None
+                        else None
+                    ),
                 )
+                if moving and args.sensor_delay is not None:
+                    robot.hold(args.sensor_delay, "TRACK_FEED")
+                    info["fixed_virtual_sensor_delay_s"] = args.sensor_delay
                 pose = np.asarray(info["world_T_object"])
+            raw_pose = pose.copy()
+            if (
+                not args.ground_truth
+                and name == "rack_frame"
+                and (camera == WRIST_CAMERA or prior is not None)
+            ):
+                pose, info["depth_refinement"] = refine_depth_pose(cap, objects[name].mesh, pose)
+            if not args.ground_truth and name == "rack_frame" and camera == CAMERA_NAME and prior is not None:
+                # Co-observe the installed part and marker. Express their
+                # relative pose in the most recent wrist-localized fixture
+                # frame, cancelling their shared fixed-camera extrinsic error.
+                try:
+                    same_view_fixture, anchor = observer.fixture_pose(cap)
+                    pose = robot.fixture_estimate @ np.linalg.inv(same_view_fixture) @ pose
+                    info["fixture_relative_anchor"] = anchor
+                except RuntimeError as exc:
+                    info["fixture_relative_anchor_unavailable"] = str(exc)
+            pose = control_pose(pose, args.method)
+            info["control_world_T_object"] = pose.tolist()
+            info["capture_truth_evaluation_only"] = truth.tolist()
+            info["raw_estimator_metrics_evaluation_only"] = pose_errors(
+                raw_pose, truth, objects[name].vertices
+            )
+            info["control_pose_metrics_evaluation_only"] = pose_errors(pose, truth, objects[name].vertices)
             info.update(
                 object_id=name,
                 camera=camera,
@@ -250,7 +393,9 @@ def main():
                     if camera != WRIST_CAMERA:
                         raise
                     K, extrinsic, _ = observer.camera_calibration(d, camera)
-                    point = (np.linalg.inv(extrinsic) @ robot.fixture_estimate @ WORKSHOP_T_MARKER)[:3, 3]
+                    point = (np.linalg.inv(extrinsic) @ robot.fixture_estimate @ observer.fixture_T_marker)[
+                        :3, 3
+                    ]
                     initial = robot.tcp_pose()
                     found = False
                     for pixel in ([300.0, 210.0], [980.0, 210.0], [300.0, 380.0], [980.0, 380.0]):
@@ -276,6 +421,7 @@ def main():
             info["translation_error_mm_evaluation_only"] = float(
                 np.linalg.norm(pose[:3, 3] - truth[:3, 3]) * 1000
             )
+            info["rotation_error_deg_evaluation_only"] = pose_errors(pose, truth)["rotation_error_deg"]
             report["rack_observations"].append(info)
             robot.event("rack_localized", camera=camera)
             return pose
@@ -286,11 +432,57 @@ def main():
         robot.hold(0.6, "INSPECT_WORKBENCH")
 
         def held_refinement():
+            if args.method == "no_wrist":
+                robot.event("wrist_refinement_disabled", object_id=robot.target.object_id)
+                return
             robot.hold(0.3, "WRIST_INSPECT_TOOL")
             prior = robot.tcp_pose() @ robot.tool_T_object
             pose, _ = observe(robot.target.object_id, WRIST_CAMERA, prior=prior)
             robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ pose
             locate_rack(WRIST_CAMERA)
+
+        if assembling:
+            robot.select("rack_frame")
+            robot.grasp(robot.known["rack_frame"])
+            held_refinement()
+            tool = objects["rack_frame"]
+            goal = robot.fixture_estimate @ RACK_T_FRAME
+            # Seating offset uses the observed bottom of the reconstructed tenon.
+            goal[:3, 3] += goal[:3, 2] * (-0.036 - tool.bounds[0, 2] + 0.0015)
+            tcp = goal @ np.linalg.inv(robot.tool_T_object)
+            axis = goal[:3, 2]
+            high = tcp.copy()
+            high[:3, 3] += axis * 0.12
+            robot.move(high, "ORIENT_RACK_FRAME", joint_space=True)
+            if args.method != "no_wrist":
+                prior = robot.tcp_pose() @ robot.tool_T_object
+                held, _ = observe("rack_frame", WRIST_CAMERA, prior=prior)
+                robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held
+                tcp = goal @ np.linalg.inv(robot.tool_T_object)
+            pre = tcp.copy()
+            pre[:3, 3] += axis * 0.06
+            robot.move(pre, "ALIGN_RACK_FRAME")
+            robot.hold(0.3, "TARE_FRAME_INSERTION")
+            bias = robot.wrench()
+            for distance in np.linspace(0.06, 0.0, 31)[1:]:
+                step = tcp.copy()
+                step[:3, 3] += axis * distance
+                if not robot.move(step, "INSERT_FRAME", allow_support=True, force_bias=bias, force_limit=7.0):
+                    retreat = robot.tcp_pose()
+                    retreat[:3, 3] += axis * 0.05
+                    robot.move(retreat, "RETRACT_FRAME", allow_support=True)
+                    raise MotionFailure("Rack frame insertion contact guard triggered")
+            robot.release(retreat_distance=0.035)
+            robot.known["rack_frame"] = goal
+            clear = transform([0.43, -0.04, 0.64], np.diag([1.0, -1.0, -1.0]))
+            robot.move(clear, "CLEAR_ASSEMBLED_FRAME", joint_space=True)
+            robot.hold(2.0, "CHECK_FRAME_SEATING")
+            result = frame_seating_evaluation(scene)
+            report["outcomes"]["rack_frame"] = result
+            # Locate the free assembled support after release, rather than
+            # assuming its actual position equals the commanded seat pose.
+            observe("rack_frame", prior=goal)
+            robot.obstacle_clearances["rack_frame"] = 0.004
 
         if args.task in ("all", "insert"):
             robot.select("hammer")
@@ -322,13 +514,21 @@ def main():
                         robot.hold(0.35, "TRACK_FEED", realtime=True)
                 horizon = 5.0
                 for _ in range(3):
-                    pose = history.predict(float(d.time) + horizon)
+                    pose = (
+                        history.samples[-1][1].copy()
+                        if args.method == "no_prediction"
+                        else history.predict(float(d.time) + horizon)
+                    )
                     robot.known["screwdriver"] = pose
                     approach = pose @ objects["screwdriver"].acquisition_grasp(pose)
                     approach[:3, 3] -= approach[:3, 2] * 0.10
                     _, duration = robot.plan_move(approach, "PLAN_INTERCEPT")
                     horizon = duration + 0.25 + 2.0 + 0.25 + 0.35
-                pose = history.predict(float(d.time) + horizon)
+                pose = (
+                    history.samples[-1][1].copy()
+                    if args.method == "no_prediction"
+                    else history.predict(float(d.time) + horizon)
+                )
                 report["feed"] = {
                     "visual_velocity_m_s": history.velocity.tolist(),
                     "unconstrained_visual_velocity_m_s": history.unconstrained_velocity.tolist(),
@@ -359,8 +559,9 @@ def main():
             robot.move(high, "ORIENT_DRIVER")
             robot.hold(0.4, "SETTLE_ORIENTED_DRIVER")
             prior = robot.tcp_pose() @ robot.tool_T_object
-            held, _ = observe("screwdriver", WRIST_CAMERA, prior=prior)
-            robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held
+            if args.method != "no_wrist":
+                held, _ = observe("screwdriver", WRIST_CAMERA, prior=prior)
+                robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held
             tcp = object_goal @ np.linalg.inv(robot.tool_T_object)
             pre = tcp.copy()
             pre[:3, 3] += axis * (SOCKET_DEPTH + 0.020)
@@ -389,9 +590,13 @@ def main():
             if not result["success"]:
                 raise MotionFailure(f"Driver seating failed: {result}")
 
-        if args.task in ("all", "hang"):
+        if args.task in ("all", "hang", "rack"):
             robot.select("spanner")
             pose, _ = observe("spanner")
+            if assembling:
+                approach = pose @ objects["spanner"].acquisition_grasp(pose)
+                approach[:3, 3] -= approach[:3, 2] * 0.10
+                robot.move(approach, "ROUTE_TO_SPANNER", joint_space=True)
             robot.grasp(pose)
             # Put the tool on two physical rails, open, withdraw, reobserve,
             # and grasp a different part of the handle. No attachment weld.
@@ -399,7 +604,7 @@ def main():
             target = flat @ np.linalg.inv(robot.tool_T_object)
             high = target.copy()
             high[2, 3] = 0.57
-            robot.move(high, "TRANSFER_TO_REGRASP")
+            robot.move(high, "TRANSFER_TO_REGRASP", joint_space=assembling)
             robot.move(target, "PLACE_REGRASP", allow_support=True)
             robot.release()
             robot.known["spanner"] = flat
@@ -408,33 +613,40 @@ def main():
             report["physical_regrasp_executed"] = True
             held_refinement()
             tool = objects["spanner"]
-            rotation = robot.fixture_estimate[:3, :3] @ SPANNER_HANG_ROTATION
+            mount = robot.known["rack_frame"] if assembling else robot.fixture_estimate
+            hook = objects["rack_frame"].hook if assembling else HOOK_CENTRE
+            rotation = mount[:3, :3] @ SPANNER_HANG_ROTATION
 
             def eye_goal(y, z):
-                hole = (robot.fixture_estimate @ np.r_[HOOK_CENTRE + [0.0, y, z], 1.0])[:3]
+                hole = (mount @ np.r_[hook + [0.0, y, z], 1.0])[:3]
                 return transform(hole - rotation @ tool.eye, rotation)
 
-            approach_object = eye_goal(-0.035, 0.0)
+            standoff, thread_depth = (0.060, 0.015) if assembling else (0.035, 0.025)
+            approach_object = eye_goal(-standoff, 0.0)
             approach = approach_object @ np.linalg.inv(robot.tool_T_object)
             robot.move(approach, "REORIENT_AND_APPROACH_RACK", joint_space=True)
             robot.hold(0.3, "TARE_HANG_FORCE")
             bias = robot.wrench()
-            for y in np.linspace(-0.035, 0.025, 25)[1:]:
+            for y in np.linspace(-standoff, thread_depth, 25)[1:]:
                 goal = eye_goal(y, 0.0) @ np.linalg.inv(robot.tool_T_object)
                 if not robot.move(goal, "THREAD_EYE", allow_support=True, force_bias=bias, force_limit=7.0):
                     raise MotionFailure("Hanging eye contact guard triggered")
             # Position the eye just above the peg's support surface. Gravity
             # finishes seating after release, with contact checked below.
             drop = max(0.0, tool.eye_radius - HOOK_RADIUS - 0.0015)
-            final_object = eye_goal(0.025, -drop)
+            final_object = eye_goal(thread_depth, -drop)
             robot.move(final_object @ np.linalg.inv(robot.tool_T_object), "SEAT_EYE", allow_support=True)
             robot.release(retreat_distance=0.10)
             robot.known["spanner"] = final_object
             robot.hold(4.0, "CHECK_HANG_STABILITY")
-            result = physical_evaluation(scene, "spanner")
+            result = physical_evaluation(scene, "spanner", assembled_frame=assembling)
             report["outcomes"]["spanner"] = result
             if not result["success"]:
                 raise MotionFailure(f"Hanging failed: {result}")
+            if assembling:
+                report["outcomes"]["rack_frame_loaded"] = frame_seating_evaluation(scene)
+                if not report["outcomes"]["rack_frame_loaded"]["success"]:
+                    raise MotionFailure("Assembled frame did not remain stable under the hanging tool load")
 
         robot.hold(1.0, "TOOLS_READY")
         report["success"] = all(v["success"] for v in report["outcomes"].values())
@@ -452,7 +664,24 @@ def main():
                     pass
     finally:
         if robot is not None:
+            if args.task == "rack":
+                report["terminal_outcomes_evaluation_only"] = {
+                    "rack_frame": frame_seating_evaluation(scene),
+                    "spanner": physical_evaluation(scene, "spanner", assembled_frame=True),
+                }
+            else:
+                names = (
+                    ("screwdriver", "spanner")
+                    if args.task == "all"
+                    else (("screwdriver",) if args.task == "insert" else ("spanner",))
+                )
+                report["terminal_outcomes_evaluation_only"] = {
+                    name: physical_evaluation(scene, name) for name in names
+                }
             report["execution"] = robot.save()
+            report["timing"] = timing_metrics(report, robot, started)
+            report["last_stage"] = robot.stage
+            report["simulation_seconds"] = float(d.time)
             np.savez(
                 out / "final_state_evaluation_only.npz",
                 qpos=d.qpos,

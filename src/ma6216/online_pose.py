@@ -6,8 +6,10 @@ can continue stepping while the separate CUDA process estimates a pose.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import queue
+import socket
 import subprocess
 import threading
 import time
@@ -23,10 +25,20 @@ class PoseWorker:
         self.output = Path(output).resolve()
         self.output.mkdir(parents=True, exist_ok=False)
         self.log = (self.output / "worker.log").open("w")
-        self.process = subprocess.Popen(
+        self.socket = None
+        endpoint = os.environ.get("MA6216_POSE_SOCKET")
+        if endpoint:
+            self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            self.socket.connect(endpoint)
+            self.process = None
+            self.input = self.socket.makefile("w")
+            self.stream = self.socket.makefile("r")
+        else:
+            self.process = subprocess.Popen(
             [str(Path(python).resolve()), "-u", str(project_root() / "scripts/serve_model_free_pose.py"),
              "--repository", str(Path(repository).resolve()), "--debug-dir", str(self.output / "debug")],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.log, text=True, bufsize=1)
+            self.input, self.stream = self.process.stdin, self.process.stdout
         self.queue = queue.Queue()
         self.results, self.pending = {}, {}
         self.count = 0
@@ -37,7 +49,7 @@ class PoseWorker:
             try:
                 message = self.queue.get(timeout=.2)
             except queue.Empty:
-                if self.process.poll() is not None:
+                if not self.reader.is_alive():
                     raise RuntimeError("Pose worker exited during startup; see worker.log")
                 continue
             if message.get("ready"):
@@ -46,7 +58,7 @@ class PoseWorker:
         raise TimeoutError("Pose worker did not initialize")
 
     def _read(self):
-        for line in self.process.stdout:
+        for line in self.stream:
             if line.startswith("MA6216_REPLY "):
                 try:
                     self.queue.put(json.loads(line[len("MA6216_REPLY "):]))
@@ -70,8 +82,8 @@ class PoseWorker:
                 request["camera_T_object_prior"] = (np.linalg.inv(world_T_camera) @ world_T_object_prior).tolist()
         self.pending[self.count] = (request, None if world_T_camera is None else
                                     validate_rigid_transform(world_T_camera).copy())
-        self.process.stdin.write(json.dumps(request) + "\n")
-        self.process.stdin.flush()
+        self.input.write(json.dumps(request) + "\n")
+        self.input.flush()
         return self.count
 
     def poll(self, request_id):
@@ -90,7 +102,7 @@ class PoseWorker:
                 json.dumps({"request": request, "result": result}, indent=2) + "\n")
         if request_id in self.results:
             return self.results.pop(request_id)
-        if self.process.poll() is not None:
+        if not self.reader.is_alive():
             raise RuntimeError("Pose worker exited before returning a result")
         return None
 
@@ -109,7 +121,15 @@ class PoseWorker:
         raise TimeoutError(f"Pose request {request_id} timed out")
 
     def close(self):
-        if self.process.poll() is None:
+        if self.socket is not None:
+            try:
+                self.input.write('{"operation":"shutdown"}\n')
+                self.input.flush()
+            except BrokenPipeError:
+                pass
+            self.socket.shutdown(socket.SHUT_RDWR)
+            self.socket.close()
+        elif self.process.poll() is None:
             try:
                 self.process.stdin.write('{"operation":"shutdown"}\n')
                 self.process.stdin.flush()
@@ -122,6 +142,8 @@ class PoseWorker:
                     self.process.kill()
                     self.process.wait()
         self.reader.join(timeout=2.)
+        self.input.close()
+        self.stream.close()
         self.log.close()
 
 

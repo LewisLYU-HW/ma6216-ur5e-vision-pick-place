@@ -58,6 +58,29 @@ def spanner_geometry():
     return trimesh.util.concatenate([ring, handle, *jaw_sectors]), [*sectors, handle, *jaw_sectors]
 
 
+FRAME_PROFILE = np.array([[-0.012, -0.009], [0.012, -0.009], [0.012, 0.003], [0.006, 0.009], [-0.012, 0.009]])
+FRAME_DEPTH = 0.036
+FRAME_HOOK = np.array([0.0, -0.055, 0.170])
+
+
+def rack_frame_geometry():
+    """Load-bearing removable hook with an asymmetric keyed tenon."""
+    stem = trimesh.convex.convex_hull(
+        np.array([[x, y, z] for z in (-FRAME_DEPTH, 0.0) for x, y in FRAME_PROFILE])
+    )
+    post = trimesh.creation.box([0.016, 0.014, 0.174])
+    post.apply_translation([0.0, 0.0, 0.087])
+    shoulder = trimesh.creation.box([0.034, 0.028, 0.004])
+    shoulder.apply_translation([0.0, 0.0, 0.002])
+    hook = trimesh.creation.cylinder(radius=0.004, height=0.055, sections=32)
+    hook.apply_transform(trimesh.transformations.rotation_matrix(np.pi / 2, [1.0, 0.0, 0.0]))
+    hook.apply_translation([0.0, -0.0275, 0.170])
+    tip = trimesh.creation.icosphere(subdivisions=2, radius=0.006)
+    tip.apply_translation(FRAME_HOOK)
+    pieces = [stem, post, shoulder, hook, tip]
+    return trimesh.util.concatenate(pieces), pieces
+
+
 @dataclass(frozen=True)
 class WorkshopTool:
     object_id: str
@@ -77,7 +100,7 @@ class WorkshopTool:
     @cached_property
     def geometry(self):
         if self.folder is None:
-            return spanner_geometry()
+            return rack_frame_geometry() if self.object_id == "rack_frame" else spanner_geometry()
         directory = project_root() / "assets/library/gso" / self.folder
         mesh = trimesh.load(directory / "model.obj", force="mesh", process=False)
         centre = mesh.bounds.mean(axis=0)
@@ -136,7 +159,19 @@ class WorkshopTool:
             mass=0,
             group=2,
         )
-        if not self.folder:
+        if self.object_id == "rack_frame":
+            for z, colour in ((0.12, [0.88, 0.49, 0.10, 1.0]), (0.145, [0.92, 0.92, 0.87, 1.0])):
+                body.add_geom(
+                    name=f"{name}_stripe_{z}",
+                    type=mujoco.mjtGeom.mjGEOM_BOX,
+                    pos=[0.00805, 0.0, z],
+                    size=[0.00005, 0.007, 0.005],
+                    rgba=colour,
+                    contype=0,
+                    conaffinity=0,
+                    mass=0,
+                )
+        elif not self.folder:
             # The handle strip is appearance only. Physics is supplied by
             # the solid steel body.
             body.add_geom(
@@ -182,3 +217,6 @@ TOOLS = {
     ),
     "spanner": WorkshopTool("spanner", "target_spanner"),
 }
+RACK_FRAME = WorkshopTool("rack_frame", "target_cube", mass_kg=0.15)
+RACK_TOOLS = {"rack_frame": RACK_FRAME, "spanner": TOOLS["spanner"]}
+SCAN_TOOLS = {**TOOLS, "rack_frame": RACK_FRAME}

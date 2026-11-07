@@ -17,9 +17,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--output", type=Path, default=ROOT / "artifacts/workshop_preview")
     p.add_argument("--viewer", action="store_true")
+    p.add_argument("--rack-assembly", action="store_true", help="Preview the independent support assembly task")
     args = p.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    scene = build_workshop_scene()
+    scene = build_workshop_scene(rack_assembly=args.rack_assembly)
     for _ in range(1000):
         mujoco.mj_step(scene.model, scene.data)
     with mujoco.Renderer(scene.model, height=960, width=1280) as renderer:

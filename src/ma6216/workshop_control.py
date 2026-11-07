@@ -101,17 +101,44 @@ class ReconstructedTool:
             "hammer": "target_cube",
             "screwdriver": "target_screwdriver",
             "spanner": "target_spanner",
+            "rack_frame": "target_cube",
         }[self.object_id]
         self.geom = self.body + "_geom"
         self.joint = self.body + "_freejoint"
         self.mesh = trimesh.load(path, force="mesh", process=False)
         self.vertices = self.mesh.vertices.copy()
         self.bounds = self.mesh.bounds.copy()
-        self.pieces = local_convex_parts(self.mesh, planar_holes=self.object_id == "spanner")
+        if self.object_id == "rack_frame":
+            # Slice along the long upright and the hook; a single XY strip
+            # would incorrectly fill the empty inside corner of this L shape.
+            scan = self.mesh.copy()
+            swap = transform([0.0, 0.0, 0.0], np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [-1.0, 0.0, 0.0]]))
+            scan.apply_transform(swap)
+            self.pieces = local_convex_parts(scan, planar_holes=True)
+            for piece in self.pieces:
+                piece.apply_transform(np.linalg.inv(swap))
+        else:
+            self.pieces = local_convex_parts(self.mesh, planar_holes=self.object_id == "spanner")
         self.features = {"source": "RGB-D reconstruction in reference scan frame"}
         if self.object_id == "spanner":
             self.eye, self.eye_radius = eye_from_reconstruction(self.mesh)
             self.features.update(eye_centre_m=self.eye.tolist(), eye_radius_m=self.eye_radius)
+        elif self.object_id == "rack_frame":
+            front = self.vertices[self.vertices[:, 1] < self.bounds[0, 1] + 0.008]
+            design = np.c_[2 * front, np.ones(len(front))]
+            solution, *_ = np.linalg.lstsq(design, np.sum(front * front, axis=1), rcond=None)
+            self.hook = solution[:3]
+            radius = float(np.sqrt(max(0.0, solution[3] + self.hook @ self.hook)))
+            if not 0.003 < radius < 0.012:
+                raise ValueError(f"Unusable reconstructed hook tip: radius {radius}")
+            post = self.vertices[(self.vertices[:, 2] > 0.06) & (self.vertices[:, 2] < 0.11)]
+            self.frame_grasp = np.r_[np.median(post[:, :2], axis=0), 0.085]
+            self.features.update(
+                hook_centre_m=self.hook.tolist(),
+                hook_tip_radius_m=radius,
+                stem_bottom_z_m=float(self.bounds[0, 2]),
+                grasp_point_m=self.frame_grasp.tolist(),
+            )
         elif self.object_id == "screwdriver":
             shaft = self.vertices[self.vertices[:, 0] < self.bounds[0, 0] + 0.38 * np.ptp(self.bounds[:, 0])]
             centre = shaft.mean(axis=0)
@@ -162,6 +189,17 @@ class ReconstructedTool:
         return transform(position, np.diag([1.0, -1.0, -1.0]))
 
     def acquisition_grasp(self, pose):
+        if self.object_id == "rack_frame":
+            point = (pose @ np.r_[self.frame_grasp, 1.0])[:3] + [0.0, 0.0, 0.002]
+            x = -pose[:3, 2].copy()
+            x[2] = 0.0
+            if np.linalg.norm(x) < 1e-6:
+                x = pose[:3, 0].copy()
+                x[2] = 0.0
+            x /= np.linalg.norm(x)
+            z = np.array([0.0, 0.0, -1.0])
+            y = np.cross(z, x)
+            return np.linalg.inv(pose) @ transform(point, np.column_stack([x, y, z]))
         if self.object_id != "screwdriver":
             return self.top_grasp()
         # A nearly cylindrical handle has a weakly observable axial roll.

@@ -17,6 +17,7 @@ from .parts import Part
 from .pose_insertion import transform
 from .reconstructed import validate_bundle
 from .scene import matrix_to_quat, mujoco
+from .evaluation import pose_errors, distribution
 
 
 def expected_supports(stage):
@@ -155,9 +156,16 @@ class TaskRobot:
         self.tool_T_object = None
         self.events = []
         self.samples = []
+        self.endpoints = []
+        self.tracking_data = mujoco.MjData(self.model)
+        self.trace = []
+        self.trace_enabled = False
+        self.next_trace_time = float(self.data.time)
+        self.wall_started = time.perf_counter()
         self.ticks = 0
         self.moves = 0
         self.environment_hook = None
+        self.obstacle_clearances = {}
         self.stage = "INITIALIZE"
         self.peak_force = 0.
         self.loaded_steps = 0
@@ -201,6 +209,11 @@ class TaskRobot:
             self.environment_hook(self.stage)
         mujoco.mj_step(self.model, self.data)
         self.ticks += 1
+        # Evaluation-only trajectory snapshots allow failure videos to replay
+        # the original measured run without re-running stochastic perception.
+        if self.trace_enabled and self.data.time + 1e-8 >= self.next_trace_time:
+            self.capture_trace()
+            self.next_trace_time += .04
         bad = self.robot.collision_contacts(self.data, allow_cube=allow_target)
         if bad:
             raise MotionFailure(f"Unexpected robot contact at {self.stage}: {bad}")
@@ -227,8 +240,23 @@ class TaskRobot:
         if self.ticks % 10 == 0:
             wrench = self.wrench()
             self.peak_force = max(self.peak_force, float(np.linalg.norm(wrench[:3])))
+            self.tracking_data.qpos[:] = self.data.qpos
+            mujoco.mj_kinematics(self.model, self.tracking_data)
+            measured = transform(self.tracking_data.site_xpos[self.robot.sid].copy(),
+                                 self.tracking_data.site_xmat[self.robot.sid].reshape(3, 3).copy())
+            self.tracking_data.qpos[self.robot.qids] = self.data.ctrl[self.robot.aids]
+            mujoco.mj_kinematics(self.model, self.tracking_data)
+            command = transform(self.tracking_data.site_xpos[self.robot.sid].copy(),
+                                self.tracking_data.site_xmat[self.robot.sid].reshape(3, 3).copy())
+            metrics = pose_errors(measured, command)
+            joint_errors = self.data.qpos[self.robot.qids] - self.data.ctrl[self.robot.aids]
             self.samples.append({"time_s": float(self.data.time), "stage": self.stage,
-                                 "tcp_pose": self.tcp_pose().tolist(), "wrist_wrench": wrench.tolist(),
+                                 "wall_time_s": time.perf_counter()-self.wall_started,
+                                 "tcp_pose": measured.tolist(), "wrist_wrench": wrench.tolist(),
+                                 "tracking_translation_mm": metrics["translation_error_mm"],
+                                 "tracking_rotation_deg": metrics["rotation_error_deg"],
+                                 "joint_tracking_rmse_rad": float(np.sqrt(np.mean(joint_errors**2))),
+                                 "joint_tracking_max_rad": float(np.max(np.abs(joint_errors))),
                                  "gripper_command": float(self.data.ctrl[self.robot.gid])})
             self.recorder.capture(self.data, self.stage, f"wrist force {np.linalg.norm(wrench[:3]):.1f} N")
         if realtime:
@@ -238,13 +266,20 @@ class TaskRobot:
         for _ in range(round(seconds / self.model.opt.timestep)):
             self.tick(stage=stage, realtime=realtime)
 
-    def prepare_planner(self):
+    def capture_trace(self):
+        pose = self.tcp_pose() @ self.tool_T_object if self.carrying else self.known.get(self.target.object_id)
+        self.trace.append((float(self.data.time), self.stage, self.data.qpos.copy(), self.data.qvel.copy(),
+                           self.data.ctrl.copy(), self.data.mocap_pos.copy(), self.data.mocap_quat.copy(),
+                           self.target.object_id, np.full((4, 4), np.nan) if pose is None else pose.copy()))
+
+    def prepare_planner(self, clearance_scale=1.):
         pm = self.planning_scene.model
         if pm.opt.disableflags & (int(mujoco.mjtDisableBit.mjDSBL_CONSTRAINT) | int(mujoco.mjtDisableBit.mjDSBL_CONTACT)):
             raise MotionFailure("Collision planning requires contact and constraint stages to remain enabled")
         # Proprioception supplies robot/belt coordinates; every free object's
         # coordinates are overwritten by visual estimates before FK/collision.
         self.planner.initial_qpos[:] = self.data.qpos
+        self.planner.obstacle_clearances = {}
         for key, obj in self.objects.items():
             if key not in self.known:
                 raise MotionFailure(f"Object {key} has not been visually localized")
@@ -252,6 +287,14 @@ class TaskRobot:
             pose = self.known[key]
             self.planner.initial_qpos[adr:adr + 3] = pose[:3, 3]
             self.planner.initial_qpos[adr + 3:adr + 7] = matrix_to_quat(pose[:3, :3])
+            if key in self.obstacle_clearances:
+                clearance = self.obstacle_clearances[key] * clearance_scale
+                body = pm.body(obj.body).id
+                for geom in range(pm.ngeom):
+                    if pm.geom_bodyid[geom] == body and (pm.geom_contype[geom] or pm.geom_conaffinity[geom]):
+                        pm.geom_margin[geom] = clearance
+                        pm.geom_gap[geom] = clearance
+                        self.planner.obstacle_clearances[geom] = clearance
         if self.fixture_estimate is None:
             raise MotionFailure("Fixture has not been visually localized")
         mid = pm.body_mocapid[pm.body("target_tray").id]
@@ -296,9 +339,12 @@ class TaskRobot:
                 if self.carrying:
                     for contact in planner.scratch.contact:
                         pair = (int(contact.geom1), int(contact.geom2))
-                        if not planner.cgids.intersection(pair) or contact.dist >= -.001:
+                        if not planner.cgids.intersection(pair):
                             continue
                         other = pair[1] if pair[0] in planner.cgids else pair[0]
+                        clearance = planner.obstacle_clearances.get(other, -.001)
+                        if contact.dist >= clearance:
+                            continue
                         if other in planner.cgids or other in planner.pad_sides:
                             continue
                         name = planner.model.geom(other).name
@@ -318,7 +364,7 @@ class TaskRobot:
         Cartesian approach/insertion still uses plan_move. This planner uses
         only the private estimated scene and reconstructed payload geometry.
         """
-        self.prepare_planner()
+        self.prepare_planner(clearance_scale=5.)
         planner = self.planner
         start = self.data.ctrl[self.robot.aids].copy()
         if self.carrying:
@@ -362,9 +408,11 @@ class TaskRobot:
             if self.carrying:
                 for c in planner.scratch.contact:
                     pair = (int(c.geom1), int(c.geom2))
-                    if not planner.cgids.intersection(pair) or c.dist >= -0.0005:
+                    if not planner.cgids.intersection(pair):
                         continue
                     other = pair[1] if pair[0] in planner.cgids else pair[0]
+                    if c.dist >= planner.obstacle_clearances.get(other, -0.0005):
+                        continue
                     if other not in planner.cgids and other not in planner.pad_sides:
                         return False
             return True
@@ -444,6 +492,7 @@ class TaskRobot:
             method="joint interpolation" if direct_route else "RRT-Connect",
             reconstructed_payload=True,
             self_clearance_mm=3.0,
+            obstacle_clearance_mm={key: value * 5000 for key, value in self.obstacle_clearances.items()},
         )
         return path, duration
 
@@ -479,12 +528,24 @@ class TaskRobot:
             + "\n"
         )
         steps = max(1, round(duration / self.model.opt.timestep))
+        retimed_steps = 0
         for step in range(steps + 1):
             u = step / steps
             progress = (10 * u**3 - 15 * u**4 + 6 * u**5) * (len(path) - 1)
             index = min(int(progress), len(path) - 2)
             q = path[index] + (progress - index) * (path[index + 1] - path[index])
             self.tick(q, stage)
+            if joint_space and self.obstacle_clearances:
+                # Slow progress along the already checked path when actuator
+                # tracking lags. Only joint encoders and the current command
+                # are used; no payload truth is available to this controller.
+                for _ in range(1000):
+                    if np.max(np.abs(self.data.qpos[self.robot.qids]-q)) <= .010:
+                        break
+                    self.tick(stage=stage)
+                    retimed_steps += 1
+                else:
+                    raise MotionFailure(f"Joint tracking failed to settle at {stage}")
             if force_limit is not None and np.linalg.norm(self.wrench()[:3] - force_bias[:3]) > force_limit:
                 if self.carrying:
                     self.known[self.target.object_id] = self.tcp_pose() @ self.tool_T_object
@@ -495,6 +556,10 @@ class TaskRobot:
                 )
                 return False
         self.hold(0.25, stage + "_SETTLE")
+        if retimed_steps:
+            self.event("joint_path_retimed", stage=stage, extra_steps=retimed_steps, joint_error_limit_rad=.010)
+        self.endpoints.append({"stage": stage, "time_s": float(self.data.time),
+                               **pose_errors(self.tcp_pose(), destination)})
         if self.carrying:
             self.known[self.target.object_id] = self.tcp_pose() @ self.tool_T_object
         return True
@@ -542,8 +607,21 @@ class TaskRobot:
         self.hold(.5, "SETTLE")
 
     def save(self):
+        if self.trace_enabled:
+            self.capture_trace()
+            keys = ("time", "stage", "qpos", "qvel", "ctrl", "mocap_pos", "mocap_quat", "object_id", "estimated_pose")
+            np.savez_compressed(self.output / "trajectory_evaluation_only.npz",
+                                **{key: np.asarray(values) for key, values in zip(keys, zip(*self.trace))})
         (self.output / "samples.json").write_text(json.dumps(self.samples) + "\n")
+        (self.output / "endpoints.json").write_text(json.dumps(self.endpoints, indent=2) + "\n")
         return {"loaded_bilateral_fraction": self.loaded_steps / max(1, self.holding_steps),
+                "tcp_tracking_translation_mm": distribution([s["tracking_translation_mm"] for s in self.samples]),
+                "tcp_tracking_rotation_deg": distribution([s["tracking_rotation_deg"] for s in self.samples]),
+                "joint_tracking_rmse_rad": distribution([s["joint_tracking_rmse_rad"] for s in self.samples]),
+                "joint_tracking_max_rad": distribution([s["joint_tracking_max_rad"] for s in self.samples]),
+                "move_endpoint_translation_mm": distribution([s["translation_error_mm"] for s in self.endpoints]),
+                "move_endpoint_rotation_deg": distribution([s["rotation_error_deg"] for s in self.endpoints]),
+                "tracking_reference": "commanded-joint FK versus measured TCP; task outcome evaluated separately",
                 "peak_wrist_force_n": self.peak_force, "events": self.events,
                 "controller_uses_live_object_qpos_writes": False,
                 "planning_object_geometry": "convex hulls of RGB-D neural reconstructions"}

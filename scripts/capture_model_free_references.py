@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from ma6216.scene import look_at_quat, mujoco
 from ma6216.simulation_objects import OBJECTS
-from ma6216.workshop_assets import TOOLS
+from ma6216.workshop_assets import SCAN_TOOLS as TOOLS
 
 
 def main():

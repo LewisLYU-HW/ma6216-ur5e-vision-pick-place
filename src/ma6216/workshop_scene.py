@@ -13,7 +13,7 @@ from .config import project_root
 from .direct_route import configure_direct_table, set_front_ready
 from .pose_insertion import transform
 from .scene import build_scene, look_at_quat, matrix_to_quat, mujoco
-from .workshop_assets import TOOLS, ring_mesh
+from .workshop_assets import TOOLS, RACK_TOOLS, RACK_FRAME, FRAME_PROFILE, FRAME_DEPTH, ring_mesh
 
 TABLE_Z = 0.375
 BELT_TOP = 0.414
@@ -21,6 +21,7 @@ CRADLE = np.array([0.345, 0.015, 0.444])
 PARK = np.array([0.600, -0.280, 0.447])
 RACK_POSE = transform([0.50, 0.205, 0.391], Rotation.from_euler("z", 20.0, degrees=True).as_matrix())
 WORKSHOP_T_MARKER = transform([-0.105, -0.035, 0.0015])
+ASSEMBLY_T_MARKER = transform([-0.130, -0.025, 0.0915])
 HOOK_CENTRE = np.array([-0.055, -0.012, 0.205])
 HOOK_RADIUS = 0.004
 HOOK_AXIS = np.array([0.0, -1.0, 0.0])
@@ -28,10 +29,14 @@ SOCKET_POSE = transform([0.090, -0.150, 0.072], Rotation.from_euler("y", 8.0, de
 SOCKET_INNER = 0.0045
 SOCKET_DEPTH = 0.036
 SPANNER_HANG_ROTATION = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, -1.0], [-1.0, 0.0, 0.0]])
+RACK_T_FRAME = transform([-0.055, 0.010, 0.110])
+FRAME_CLEARANCE = 0.0015
 
 # Surveyed pickup regions are deliberately broad. They associate a task name
 # with a station, not with a simulator segmentation ID or true object pose.
 PICK_REGIONS = {
+    "rack_spanner": ([0.44, -0.075, TABLE_Z + 0.002], [0.65, 0.05, 0.44]),
+    "rack_frame": ([0.33, -0.22, 0.395], [0.59, -0.05, 0.49]),
     "screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.12, 0.48]),
     "hammer": ([0.42, -0.17, TABLE_Z + 0.002], [0.59, -0.055, 0.46]),
     "spanner": ([0.44, -0.01, TABLE_Z + 0.002], [0.65, 0.10, 0.44]),
@@ -66,7 +71,7 @@ def label_texture(spec, name, title, subtitle, *, colour=(32, 49, 61)):
     return mat.name
 
 
-def add_rack(spec):
+def add_rack(spec, *, assembly=False):
     rack = spec.body("target_tray")
     rack.mocap = True
     rack.pos = RACK_POSE[:3, 3]
@@ -131,7 +136,48 @@ def add_rack(spec):
         rgba=[0.46, 0.50, 0.54, 1.0],
     )
     box(rack, "socket_bracket", [0.09, -0.05, 0.022], [0.018, 0.106, 0.007], [0.24, 0.31, 0.36, 1.0])
-    add_marker(rack, WORKSHOP_T_MARKER)
+    if assembly:
+        box(
+            rack,
+            "assembly_marker_pedestal",
+            [-0.130, -0.025, 0.045],
+            [0.040, 0.040, 0.045],
+            [0.16, 0.23, 0.28, 1.0],
+        )
+        for name in ("rack_hook", "rack_hook_tip"):
+            geom = spec.geom(name)
+            geom.contype = geom.conaffinity = 0
+            geom.rgba = [0.0, 0.0, 0.0, 0.0]
+        mount = rack.add_body(name="frame_socket", pos=RACK_T_FRAME[:3, 3])
+        box(
+            rack,
+            "frame_pedestal",
+            [*RACK_T_FRAME[:2, 3], 0.035],
+            [0.035, 0.030, 0.035],
+            [0.16, 0.23, 0.28, 1.0],
+        )
+        box(
+            mount,
+            "frame_socket_floor",
+            [0.0, 0.0, -FRAME_DEPTH - 0.002],
+            [0.028, 0.025, 0.002],
+            [0.16, 0.23, 0.28, 1.0],
+        )
+        # Offset polygon edges leave a real asymmetric bore, without a weld.
+        for i, a in enumerate(FRAME_PROFILE):
+            b = FRAME_PROFILE[(i + 1) % len(FRAME_PROFILE)]
+            edge = b - a
+            normal = np.array([edge[1], -edge[0]]) / np.linalg.norm(edge)
+            xy = (a + b) / 2 + normal * (FRAME_CLEARANCE + 0.004)
+            g = box(
+                mount,
+                f"frame_socket_wall_{i}",
+                [*xy, -FRAME_DEPTH / 2],
+                [np.linalg.norm(edge) / 2 + 0.004, 0.004, FRAME_DEPTH / 2],
+                [0.29, 0.38, 0.44, 1.0],
+            )
+            g.quat = matrix_to_quat(Rotation.from_euler("z", np.arctan2(edge[1], edge[0])).as_matrix())
+    add_marker(rack, ASSEMBLY_T_MARKER if assembly else WORKSHOP_T_MARKER)
     # Marker remains readable next to both tools; it localizes the whole rack.
     mat = label_texture(spec, "rack_label", "TOOL DOCK", "01  HANG     /     02  INSERT")
     box(
@@ -225,8 +271,9 @@ def add_bench(spec):
     )
 
 
-def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed=0.003):
-    parts = tuple(TOOLS.values()) if planning_parts is None else tuple(planning_parts)
+def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed=0.003, rack_assembly=False):
+    physical_tools = RACK_TOOLS if rack_assembly else TOOLS
+    parts = tuple(physical_tools.values()) if planning_parts is None else tuple(planning_parts)
     rng = np.random.default_rng(seed)
     poses = {
         "hammer": transform([0.50, -0.10, 0.401], Rotation.from_euler("z", -18.0, degrees=True).as_matrix()),
@@ -240,6 +287,18 @@ def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed
     if seed:
         for pose in poses.values():
             pose[:2, 3] += rng.uniform(-0.004, 0.004, 2)
+    if rack_assembly:
+        poses["spanner"][1, 3] -= 0.065
+        # Hook points upward on the source rails. This also exposes the front
+        # side for the final horizontal-hand approach, clear of the backboard.
+        poses = {
+            "rack_frame": transform(
+                [0.385, -0.120, 0.433], np.column_stack(([0.0, -1.0, 0.0], [0.0, 0.0, -1.0], [1.0, 0.0, 0.0]))
+            ),
+            "spanner": poses["spanner"],
+        }
+        if seed:
+            poses["rack_frame"][:2, 3] += rng.uniform(-0.004, 0.004, 2)
 
     def configure(spec):
         add_bench(spec)
@@ -267,7 +326,18 @@ def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed
             ("wrist_torque", mujoco.mjtSensor.mjSENS_TORQUE),
         ):
             spec.add_sensor(name=name, type=kind, objtype=mujoco.mjtObj.mjOBJ_SITE, objname="wrist_ft_site")
-        add_rack(spec)
+        add_rack(spec, assembly=rack_assembly)
+        if rack_assembly:
+            for i, x in enumerate((0.030, 0.145)):
+                p = poses["rack_frame"][:3, 3] + np.array([x, 0.0, 0.0])
+                p[2] = 0.3985
+                box(
+                    spec.worldbody,
+                    f"frame_source_rail_{i}",
+                    p,
+                    [0.008, 0.024, 0.0235],
+                    [0.28, 0.34, 0.38, 1.0],
+                )
         # A short, finite translating feed tray, driven by a velocity actuator.
         belt = spec.worldbody.add_body(name="conveyor", pos=[0.390, -0.245, BELT_TOP - 0.009], gravcomp=1.0)
         belt.add_joint(name="belt_slide", type=mujoco.mjtJoint.mjJNT_SLIDE, axis=[0.0, 1.0, 0.0], damping=5.0)
@@ -341,7 +411,7 @@ def build_workshop_scene(seed=0, *, planning_parts=None, empty=False, belt_speed
             )
 
     m, d = build_scene((0.635, -0.205), calibration_board=False, configure_spec=configure, object_z=0.401)
-    for name, tool in TOOLS.items():
+    for name, tool in physical_tools.items():
         pose = poses[name].copy()
         if empty:
             pose[2, 3] = -5.0
@@ -364,6 +434,8 @@ def workshop_supports(stage):
             "workshop_cradle_rail_1",
             "spanner_source_support_-1",
             "spanner_source_support_1",
+            "frame_source_rail_0",
+            "frame_source_rail_1",
         }
     if stage.startswith("PARK_HAMMER"):
         return {"tool_park"}
@@ -374,3 +446,11 @@ def workshop_supports(stage):
     if stage.startswith(("THREAD_EYE", "SEAT_EYE", "RETRACT_EYE")):
         return {"rack_hook", "rack_hook_tip"}
     return set()
+
+
+def rack_assembly_supports(stage, planning_frame_geoms=()):
+    if stage.startswith(("INSERT_FRAME", "RETRACT_FRAME")):
+        return {"frame_socket_floor", *(f"frame_socket_wall_{i}" for i in range(5))}
+    if stage.startswith(("THREAD_EYE", "SEAT_EYE", "RETRACT_EYE")):
+        return set(RACK_FRAME.collision_names) | set(planning_frame_geoms)
+    return workshop_supports(stage)

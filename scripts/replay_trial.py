@@ -1,0 +1,122 @@
+"""Render the original recorded physics trajectory, without rerunning a trial."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from ma6216.advanced_scene import build_task_scene
+from ma6216.scene import mujoco
+from ma6216.task_control import TaskRecorder
+from ma6216.workshop_control import WorkshopRecorder
+from ma6216.workshop_scene import build_workshop_scene
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--trial", type=Path, required=True)
+    p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--export", type=Path, help="H.264 combined overview/wrist MP4 destination")
+    p.add_argument("--export-wrist", type=Path)
+    args = p.parse_args()
+    report = json.loads((args.trial / "summary.json").read_text())
+    path = args.trial / "motion/trajectory_evaluation_only.npz"
+    trace = np.load(path, allow_pickle=False)
+    task, seed = report["task"], report["seed"]
+    workshop = task in ("all", "insert", "hang", "rack")
+    scene = (
+        build_workshop_scene(seed, rack_assembly=task == "rack") if workshop else build_task_scene(task, seed)
+    )
+    m, d = scene.model, scene.data
+    status = "SUCCESS" if report["success"] else "FAILURE"
+    source = f"RECORDED RUN | {report.get('method', 'full')} | seed {seed} | {report.get('disturbance', 'none')} | {status}"
+    if report.get("control_source") == "ground_truth_diagnostic":
+        source = "GROUND TRUTH DIAGNOSTIC | " + status
+    recorder = (
+        WorkshopRecorder(m, args.output, source=source)
+        if workshop
+        else TaskRecorder(m, args.output, task, source=source)
+    )
+    current = None
+    if workshop:
+        recorder.pose_provider = lambda: current
+    start, end = float(trace["time"][0]), float(trace["time"][-1])
+    times = start + np.arange(max(1, round((end - start) * 25) + 1)) / 25
+    try:
+        for number, timestamp in enumerate(times):
+            index = min(
+                len(trace["time"]) - 1,
+                max(0, int(np.searchsorted(trace["time"], timestamp, side="right") - 1)),
+            )
+            if number == len(times) - 1:
+                index = len(trace["time"]) - 1
+            for key in ("qpos", "qvel", "ctrl", "mocap_pos", "mocap_quat"):
+                getattr(d, key)[:] = trace[key][index]
+            d.time = float(timestamp)
+            mujoco.mj_forward(m, d)
+            estimate = trace["estimated_pose"][index]
+            current = (str(trace["object_id"][index]), estimate) if np.isfinite(estimate).all() else None
+            recorder.capture(d, str(trace["stage"][index]), f"{status}; original physics state replay")
+    finally:
+        recorder.close()
+    metadata = {
+        "trial": args.trial.name,
+        "task": task,
+        "method": report.get("method"),
+        "seed": seed,
+        "disturbance": report.get("disturbance"),
+        "success": report["success"],
+        "error": report.get("error"),
+        "trajectory_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "summary_sha256": hashlib.sha256((args.trial / "summary.json").read_bytes()).hexdigest(),
+        "simulation_start_s": start,
+        "simulation_end_s": end,
+        "frames": recorder.frames,
+        "fps": 25,
+        "replay": "Original 25 Hz state snapshots; no new inference or physics stepping; timestamps are simulation time",
+        "files": {},
+    }
+    for name, target in (("overview_wrist", args.export), ("wrist", args.export_wrist)):
+        if target is None:
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-n",
+                "-i",
+                str(args.output / (name + ".mp4")),
+                "-c:v",
+                "libx264",
+                "-crf",
+                "23",
+                "-preset",
+                "medium",
+                "-pix_fmt",
+                "yuv420p",
+                "-movflags",
+                "+faststart",
+                "-an",
+                str(target),
+            ],
+            check=True,
+        )
+        metadata["files"][target.name] = {
+            "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+            "bytes": target.stat().st_size,
+        }
+    (args.output / "replay.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    print(json.dumps(metadata))
+
+
+if __name__ == "__main__":
+    main()
