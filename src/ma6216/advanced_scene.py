@@ -42,10 +42,10 @@ class TaskScene:
         self.data.mocap_quat[mid] = matrix_to_quat(pose[:3, :3])
 
 
-def add_marker(body):
+def add_marker(body, mount=FIXTURE_T_MARKER):
     pattern = cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50),
                                             MARKER_ID, 6)
-    centre = FIXTURE_T_MARKER[:3, 3]
+    centre = mount[:3, 3]
     body.add_geom(name="marker_backing", type=mujoco.mjtGeom.mjGEOM_BOX,
                   pos=centre - [0., 0., .0005], size=[.04, .04, .0005],
                   rgba=[1., 1., 1., 1.], contype=0, conaffinity=0)

@@ -1,14 +1,44 @@
-# MA6216 · Model-free 6D 视觉操作
+# MA6216 · Model-free 6D 维修工具工作站
 
 **分支：`feat/model-free-manipulation`** · UR5e + Robotiq 2F-85 · MuJoCo · 官方 FoundationPose
 
-本分支接续小组原有抓放与码垛仿真，实现三个任务：**视觉装配与自动恢复、部分遮挡清理与换抓姿、运动目标跟踪与预测抓取**。
-先从标定 RGB-D 参考图重建工件，再用官方 FoundationPose 估计三维位置和朝向，驱动真实接触下的夹持、重定位和插装。
-颜色仅用于前景分割；抓取、翻转和装配使用完整 **6D pose（三维位置＋三维朝向）**。
+本分支接续小组原有抓放与码垛仿真，新增带真实扫描纹理的**维修工具归位工作站**：锤子归位、移动螺丝刀抓取与倾斜插架、扳手换抓与穿孔挂放。
+先从标定 RGB-D 参考图重建工具，再用官方 FoundationPose 估计 **6D pose（三维位置＋三维朝向）**，驱动实际接触下的夹持、转向、插入和悬挂。新工作站采用深度背景分割，无需给工具涂分割色。
+原有的视觉装配恢复、遮挡换抓和运动目标抓取任务继续保留。
 
-[演示视频](docs/videos/README.md) · [详细复现与限制](docs/MODEL_FREE_TASKS.md) · [实测数据](docs/results/model-free-tasks.json) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
+[演示视频](docs/videos/README.md) · [工作站复现与限制](docs/WORKSHOP.md) · [工作站实测数据](docs/results/workshop.json) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
-## 三个任务与视频
+## 新场景：维修工具归位
+
+![维修工作台：扫描锤子与螺丝刀、带孔扳手、送料台、换抓架和倾斜套筒](docs/media/workshop-overview.png)
+
+| 步骤 | 机器人操作 | 6D pose 的作用 |
+|---|---|---|
+| 锤子归位 | 从台面夹起扫描锤子，转向后放在停放架上 | 依据估计的工具坐标系构造抓取和放置关系 |
+| 运动螺丝刀插架 | 跟踪 3 mm/s 送料台上的螺丝刀，在运动时抓取，腕部复测后插入倾斜 8° 的套筒 | 重建轴线和尖端、接触位置预测、完整姿态变换与插入对齐 |
+| 扳手换抓挂放 | 放上两根支撑轨，实际松爪、重新观察与换抓，转为竖直后将环孔穿过挂钩 | 从重建表面找孔，调整孔平面与挂钩轴线，再释放并验证稳定支撑 |
+
+[完整全景＋腕部视频](docs/videos/workshop-overview-wrist.mp4) · [独立腕部视频](docs/videos/workshop-wrist.mp4) · [复现、尺寸和限制](docs/WORKSHOP.md) · [实验结果](docs/results/workshop.json)
+
+使用已配置的仿真环境与 FoundationPose GPU 环境：
+
+```bash
+export MUJOCO_GL=egl PYOPENGL_PLATFORM=egl
+FP_PYTHON=/path/to/foundationpose/env/bin/python
+python scripts/run_workshop.py --task all --record \
+  --foundationpose-python "$FP_PYTHON" \
+  --output "artifacts/workshop_$(date +%Y%m%d_%H%M%S)"
+```
+
+本次 seed 0 完整视觉运行通过：螺丝刀插入 **36.41 mm**、轴线误差 **2.83°**；扳手松爪后由挂钩稳定承载。
+完整录像 **121.4 秒**，13 项回归检查通过。这是固定配置演示，尚未统计随机场景成功率。
+
+![螺丝刀插架并松爪后的全景与腕部画面](docs/media/workshop-insertion.png)
+
+`--task insert` / `--task hang` 可分别运行；`python scripts/preview_workshop.py --viewer` 打开交互场景。
+每件工具的参考重建模型与纹理已放进仓库，运行任务无需重新训练。完整安装见下方“组员快速开始”。
+
+## 原有三个任务与视频
 
 | 任务 | 机器人做什么 | 6D pose 用在哪里 | 全景＋腕部录像 |
 |---|---|---|---|
@@ -130,6 +160,8 @@ python scripts/check_model_free_tasks.py
 
 | 文件 | 职责 |
 |---|---|
+| [run_workshop.py](scripts/run_workshop.py) / [workshop_scene.py](src/ma6216/workshop_scene.py) | 维修工作台的任务流程、工具架、送料台和物理道具 |
+| [workshop_control.py](src/ma6216/workshop_control.py) / [workshop_perception.py](src/ma6216/workshop_perception.py) | 重建工具特征、保孔碰撞分片、深度前景与双视角录像 |
 | [run_model_free_task.py](scripts/run_model_free_task.py) | 三任务的观测、抓取、重抓、恢复和验收流程 |
 | [capture_model_free_references.py](scripts/capture_model_free_references.py)、[reconstruct_neural_object.py](scripts/reconstruct_neural_object.py) | 参考图采集与官方 Neural Object Field 重建 |
 | [serve_model_free_pose.py](scripts/serve_model_free_pose.py) | 独立 GPU 进程，调用官方位姿注册和跟踪 |

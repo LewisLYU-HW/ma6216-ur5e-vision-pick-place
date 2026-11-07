@@ -12,11 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from ma6216.scene import look_at_quat, mujoco
 from ma6216.simulation_objects import OBJECTS
+from ma6216.workshop_assets import TOOLS
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--object", choices=OBJECTS, default="plug")
+    parser.add_argument("--object", choices=(*OBJECTS, *TOOLS), default="plug")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--size", type=int, default=320)
     args = parser.parse_args()
@@ -26,15 +27,20 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     for folder in ("rgb", "depth", "masks", "scan_T_camera"):
         (output / folder).mkdir()
-    part = OBJECTS[args.object]
+    workshop = args.object in TOOLS
+    part = TOOLS[args.object] if workshop else OBJECTS[args.object]
     # The simulator needs geometry to generate observations. Only images and
     # calibrated scanner extrinsics cross into the reconstruction process.
     spec = mujoco.MjSpec()
-    mesh = part.mesh()
-    spec.add_mesh(name="simulated_object", uservert=mesh.vertices.ravel().tolist(),
-                  userface=mesh.faces.ravel().tolist())
-    spec.worldbody.add_geom(name="reference_object", type=mujoco.mjtGeom.mjGEOM_MESH,
-                           meshname="simulated_object", rgba=part.rgba)
+    if workshop:
+        part.add_visual(spec, spec.worldbody, name="reference_object")
+    else:
+        mesh = part.mesh()
+        spec.add_mesh(name="simulated_object", uservert=mesh.vertices.ravel().tolist(),
+                      userface=mesh.faces.ravel().tolist())
+        spec.worldbody.add_geom(name="reference_object", type=mujoco.mjtGeom.mjGEOM_MESH,
+                               meshname="simulated_object", rgba=part.rgba)
+    radius = max(.22, float(np.linalg.norm(np.ptp(part.vertices, axis=0))) * 1.6)
     spec.worldbody.add_camera(name="scan_camera", pos=[.22, 0., 0.],
                               quat=look_at_quat([.22, 0., 0.], [0., 0., 0.]), fovy=45.)
     spec.visual.global_.offwidth = args.size
@@ -54,7 +60,7 @@ def main():
         for elevation in (-45., 0., 45.):
             for azimuth in np.arange(0., 360., 45.):
                 a, e = np.deg2rad([azimuth, elevation])
-                eye = .22 * np.array([np.cos(e) * np.cos(a), np.cos(e) * np.sin(a), np.sin(e)])
+                eye = radius * np.array([np.cos(e) * np.cos(a), np.cos(e) * np.sin(a), np.sin(e)])
                 model.cam_pos[cid] = eye
                 model.cam_quat[cid] = look_at_quat(eye, np.zeros(3))
                 mujoco.mj_forward(model, data)
@@ -62,10 +68,12 @@ def main():
                 renderer.scene.flags[mujoco.mjtRndFlag.mjRND_SHADOW] = False
                 renderer.scene.flags[mujoco.mjtRndFlag.mjRND_REFLECTION] = False
                 rgb = renderer.render().copy()
-                mask = (part.mask(rgb) * 255).astype(np.uint8)
                 renderer.enable_depth_rendering()
                 depth = renderer.render().astype(np.float32)
                 renderer.disable_depth_rendering()
+                # An isolated scan against a distant background admits an
+                # ordinary metric-depth foreground mask, irrespective of UVs.
+                mask = ((depth < 2 * radius) if workshop else part.mask(rgb)).astype(np.uint8) * 255
                 # Ideal scanner calibration is explicitly part of this
                 # synthetic reference protocol, not an object-pose label.
                 rotation = np.empty(9)
@@ -90,6 +98,7 @@ def main():
                 "scan_views": len(frames), "frames": frames, "files_sha256": files,
                 "cad_exported_to_reconstruction": False,
                 "simulation_geometry_used_only_for_rendering": True}
+    manifest["foreground_method"] = "isolated scanner depth threshold" if workshop else "HSV foreground"
     (output / "references.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(json.dumps({"output": str(output), "views": len(frames), "CAD_exported": False}))
 

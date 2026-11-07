@@ -136,13 +136,16 @@ class TaskRecorder:
 
 
 class TaskRobot:
-    def __init__(self, scene, objects, recorder, output):
+    def __init__(self, scene, objects, recorder, output, *, planning_scene=None,
+                 initial_target="plug", supports=expected_supports):
         self.scene, self.model, self.data = scene, scene.model, scene.data
         self.objects, self.recorder = objects, recorder
         self.output = Path(output)
         self.output.mkdir(parents=True, exist_ok=False)
         parts = tuple(obj.planning_part() for obj in objects.values())
-        self.planning_scene = build_task_scene(scene.task, scene.seed, planning_parts=parts)
+        self.planning_scene = (planning_scene if planning_scene is not None else
+                               build_task_scene(scene.task, scene.seed, planning_parts=parts))
+        self.supports = supports
         self.known = {}
         self.fixture_estimate = None
         self.target = None
@@ -159,7 +162,7 @@ class TaskRobot:
         self.peak_force = 0.
         self.loaded_steps = 0
         self.holding_steps = 0
-        self.select("plug")
+        self.select(initial_target)
 
     def select(self, object_id):
         if self.carrying:
@@ -167,8 +170,14 @@ class TaskRobot:
         self.target = self.objects[object_id]
         kw = dict(target_vertices=self.target.vertices, target_body=self.target.body,
                   target_geom=self.target.geom, target_joint=self.target.joint)
-        self.robot = Robot(self.model, self.data, **kw)
-        self.planner = Robot(self.planning_scene.model, self.planning_scene.data, **kw)
+        physical_names = [self.model.geom(i).name for i in range(self.model.ngeom)
+                          if self.model.geom_bodyid[i] == self.model.body(self.target.body).id
+                          and (self.model.geom_contype[i] or self.model.geom_conaffinity[i])]
+        planning_names = [self.planning_scene.model.geom(i).name for i in range(self.planning_scene.model.ngeom)
+                          if self.planning_scene.model.geom_bodyid[i] == self.planning_scene.model.body(self.target.body).id
+                          and (self.planning_scene.model.geom_contype[i] or self.planning_scene.model.geom_conaffinity[i])]
+        self.robot = Robot(self.model, self.data, target_geoms=physical_names, **kw)
+        self.planner = Robot(self.planning_scene.model, self.planning_scene.data, target_geoms=planning_names, **kw)
 
     def tcp_pose(self):
         return transform(self.data.site_xpos[self.robot.sid].copy(), self.data.site_xmat[self.robot.sid].reshape(3, 3).copy())
@@ -209,10 +218,10 @@ class TaskRobot:
             # independently of the reconstructed planning geometry.
             for contact in self.data.contact:
                 pair = (int(contact.geom1), int(contact.geom2))
-                if self.robot.cgid not in pair or contact.dist >= -.0005:
+                if not self.robot.cgids.intersection(pair) or contact.dist >= -.0005:
                     continue
-                other = pair[1] if pair[0] == self.robot.cgid else pair[0]
-                if other in self.robot.pad_sides or self.model.geom(other).name in expected_supports(self.stage):
+                other = pair[1] if pair[0] in self.robot.cgids else pair[0]
+                if other in self.robot.cgids or other in self.robot.pad_sides or self.model.geom(other).name in self.supports(self.stage):
                     continue
                 raise MotionFailure(f"Unexpected physical payload contact at {self.stage}: {self.model.geom(other).name}")
         if self.ticks % 10 == 0:
@@ -231,6 +240,8 @@ class TaskRobot:
 
     def prepare_planner(self):
         pm = self.planning_scene.model
+        if pm.opt.disableflags & (int(mujoco.mjtDisableBit.mjDSBL_CONSTRAINT) | int(mujoco.mjtDisableBit.mjDSBL_CONTACT)):
+            raise MotionFailure("Collision planning requires contact and constraint stages to remain enabled")
         # Proprioception supplies robot/belt coordinates; every free object's
         # coordinates are overwritten by visual estimates before FK/collision.
         self.planner.initial_qpos[:] = self.data.qpos
@@ -285,13 +296,13 @@ class TaskRobot:
                 if self.carrying:
                     for contact in planner.scratch.contact:
                         pair = (int(contact.geom1), int(contact.geom2))
-                        if planner.cgid not in pair or contact.dist >= -.001:
+                        if not planner.cgids.intersection(pair) or contact.dist >= -.001:
                             continue
-                        other = pair[1] if pair[0] == planner.cgid else pair[0]
-                        if other in planner.pad_sides:
+                        other = pair[1] if pair[0] in planner.cgids else pair[0]
+                        if other in planner.cgids or other in planner.pad_sides:
                             continue
                         name = planner.model.geom(other).name
-                        expected = expected_supports(stage) if allow_support else set()
+                        expected = self.supports(stage) if allow_support else set()
                         if name not in expected:
                             raise MotionFailure(f"Offline payload collision at {stage}: {name}, penetration {-contact.dist * 1000:.3f} mm")
             path.append(q_next.copy())
@@ -301,12 +312,172 @@ class TaskRobot:
         duration = max(minimum_duration, float(np.max(np.abs(np.diff(path, axis=0)))) * (len(path) - 1) / .35)
         return path, duration
 
-    def move(self, destination, stage, *, min_duration=0., allow_support=False, force_bias=None, force_limit=None):
-        path, duration = self.plan_move(destination, stage, allow_support=allow_support)
+    def plan_joint_move(self, destination, stage, *, max_iterations=1200):
+        """Collision-checked RRT-Connect for large free-space reorientations.
+
+        Cartesian approach/insertion still uses plan_move. This planner uses
+        only the private estimated scene and reconstructed payload geometry.
+        """
+        self.prepare_planner()
+        planner = self.planner
+        start = self.data.ctrl[self.robot.aids].copy()
+        if self.carrying:
+            pose = destination @ self.tool_T_object
+            adr = planner.cube_qposadr
+            planner.initial_qpos[adr : adr + 3] = pose[:3, 3]
+            planner.initial_qpos[adr + 3 : adr + 7] = matrix_to_quat(pose[:3, :3])
+        goal, _ = planner.solve(destination[:3, 3], destination[:3, :3], start, multistart=True)
+        forearm = [
+            i
+            for i in range(planner.model.ngeom)
+            if planner.model.body(int(planner.model.geom_bodyid[i])).name == "forearm_link"
+            and (planner.model.geom_contype[i] or planner.model.geom_conaffinity[i])
+        ]
+        gripper = [
+            i
+            for i in range(planner.model.ngeom)
+            if planner.model.body(int(planner.model.geom_bodyid[i])).name.startswith("gripper_")
+            and (planner.model.geom_contype[i] or planner.model.geom_conaffinity[i])
+        ]
+        checked = 0
+
+        def valid(q):
+            nonlocal checked
+            checked += 1
+            planner.scratch.qpos[:] = planner.initial_qpos
+            p, r = planner.fk(q)
+            if self.carrying:
+                pose = transform(p, r) @ self.tool_T_object
+                adr = planner.cube_qposadr
+                planner.scratch.qpos[adr : adr + 3] = pose[:3, 3]
+                planner.scratch.qpos[adr + 3 : adr + 7] = matrix_to_quat(pose[:3, :3])
+                mujoco.mj_forward(planner.model, planner.scratch)
+            if planner.collision_contacts(allow_cube=True, penetration=0.0):
+                return False
+            # Leave clearance for actuator tracking error during wrist turns.
+            for a in forearm:
+                for b in gripper:
+                    if mujoco.mj_geomDistance(planner.model, planner.scratch, a, b, 0.003, None) < 0.003:
+                        return False
+            if self.carrying:
+                for c in planner.scratch.contact:
+                    pair = (int(c.geom1), int(c.geom2))
+                    if not planner.cgids.intersection(pair) or c.dist >= -0.0005:
+                        continue
+                    other = pair[1] if pair[0] in planner.cgids else pair[0]
+                    if other not in planner.cgids and other not in planner.pad_sides:
+                        return False
+            return True
+
+        def edge(a, b):
+            n = max(1, math.ceil(np.max(np.abs(b - a)) / 0.025))
+            return all(valid(a + (b - a) * u) for u in np.linspace(0.0, 1.0, n + 1))
+
+        if not valid(start) or not valid(goal):
+            raise MotionFailure(f"Joint planner start/goal lacks clearance at {stage}")
+        route = None
+        if edge(start, goal):
+            route = [start, goal]
+        direct_route = route is not None
+        rng = np.random.default_rng(617 + self.moves)
+        low = np.maximum(planner.low, np.minimum(start, goal) - 1.3)
+        high = np.minimum(planner.high, np.maximum(start, goal) + 1.3)
+        nodes = [[start], [goal]]
+        parents = [[-1], [-1]]
+
+        def extend(which, target):
+            tree = nodes[which]
+            nearest = int(np.argmin([np.linalg.norm(q - target) for q in tree]))
+            delta = target - tree[nearest]
+            length = np.max(np.abs(delta))
+            proposal = target.copy() if length <= 0.18 else tree[nearest] + delta * (0.18 / length)
+            if not edge(tree[nearest], proposal):
+                return None, False
+            tree.append(proposal)
+            parents[which].append(nearest)
+            return len(tree) - 1, length <= 0.18
+
+        def trace(which, index):
+            result = []
+            while index >= 0:
+                result.append(nodes[which][index])
+                index = parents[which][index]
+            return result[::-1]
+
+        for iteration in range(max_iterations if route is None else 0):
+            a = iteration % 2
+            b = 1 - a
+            target = nodes[b][-1] if rng.random() < 0.25 else rng.uniform(low, high)
+            index, _ = extend(a, target)
+            if index is None:
+                continue
+            point = nodes[a][index]
+            for _ in range(80):
+                other, reached = extend(b, point)
+                if other is None:
+                    break
+                if reached:
+                    first, second = trace(a, index), trace(b, other)
+                    route = first + second[-2::-1] if a == 0 else second + first[-2::-1]
+                    break
+            if route is not None:
+                break
+        if route is None:
+            raise MotionFailure(f"No collision-free joint route at {stage} after {checked} checks")
+        for _ in range(60):
+            if len(route) < 3:
+                break
+            i, j = sorted(rng.choice(len(route), 2, replace=False))
+            if j > i + 1 and edge(route[i], route[j]):
+                route = route[: i + 1] + route[j:]
+        dense = [route[0]]
+        for a, b in zip(route[:-1], route[1:]):
+            n = max(1, math.ceil(np.max(np.abs(b - a)) / 0.025))
+            dense.extend(a + (b - a) * u for u in np.linspace(0.0, 1.0, n + 1)[1:])
+        path = np.asarray(dense)
+        duration = max(1.2, float(np.sum(np.max(np.abs(np.diff(path, axis=0)), axis=1))) / 0.22)
+        self.event(
+            "joint_route_planned",
+            stage=stage,
+            collision_checks=checked,
+            waypoints=len(path),
+            method="joint interpolation" if direct_route else "RRT-Connect",
+            reconstructed_payload=True,
+            self_clearance_mm=3.0,
+        )
+        return path, duration
+
+    def move(
+        self,
+        destination,
+        stage,
+        *,
+        min_duration=0.0,
+        allow_support=False,
+        force_bias=None,
+        force_limit=None,
+        joint_space=False,
+    ):
+        path, duration = (
+            self.plan_joint_move(destination, stage)
+            if joint_space
+            else self.plan_move(destination, stage, allow_support=allow_support)
+        )
         duration = max(duration, min_duration)
         self.moves += 1
-        (self.output / f"move_{self.moves:03d}_{stage}.json").write_text(json.dumps(
-            {"stage": stage, "target_tcp": destination.tolist(), "path_q": path.tolist(), "duration_s": duration}, indent=2) + "\n")
+        (self.output / f"move_{self.moves:03d}_{stage}.json").write_text(
+            json.dumps(
+                {
+                    "stage": stage,
+                    "target_tcp": destination.tolist(),
+                    "path_q": path.tolist(),
+                    "duration_s": duration,
+                    "joint_space": joint_space,
+                },
+                indent=2,
+            )
+            + "\n"
+        )
         steps = max(1, round(duration / self.model.opt.timestep))
         for step in range(steps + 1):
             u = step / steps
@@ -317,9 +488,13 @@ class TaskRobot:
             if force_limit is not None and np.linalg.norm(self.wrench()[:3] - force_bias[:3]) > force_limit:
                 if self.carrying:
                     self.known[self.target.object_id] = self.tcp_pose() @ self.tool_T_object
-                self.event("force_guard_triggered", stage=stage, force_delta_n=float(np.linalg.norm(self.wrench()[:3] - force_bias[:3])))
+                self.event(
+                    "force_guard_triggered",
+                    stage=stage,
+                    force_delta_n=float(np.linalg.norm(self.wrench()[:3] - force_bias[:3])),
+                )
                 return False
-        self.hold(.25, stage + "_SETTLE")
+        self.hold(0.25, stage + "_SETTLE")
         if self.carrying:
             self.known[self.target.object_id] = self.tcp_pose() @ self.tool_T_object
         return True
@@ -327,8 +502,11 @@ class TaskRobot:
     def grasp(self, pose, object_T_tcp=None):
         self.known[self.target.object_id] = pose.copy()
         if object_T_tcp is None:
-            object_T_tcp = (self.target.upper_face_grasp(pose) if self.target.object_id == "blocker"
-                            else self.target.top_grasp())
+            if hasattr(self.target, "acquisition_grasp"):
+                object_T_tcp = self.target.acquisition_grasp(pose)
+            else:
+                object_T_tcp = (self.target.upper_face_grasp(pose) if self.target.object_id == "blocker"
+                                else self.target.top_grasp())
         grasp = pose @ object_T_tcp
         approach = grasp.copy()
         approach[:3, 3] -= grasp[:3, 2] * .10
@@ -338,7 +516,7 @@ class TaskRobot:
         self.hold(1.5, "CLOSE_GRIPPER")
         force, opposition = self.robot.finger_contacts()
         if min(force.values()) < .1 or opposition is None or opposition > -.8:
-            raise MotionFailure(f"No bilateral grasp: {force}")
+            raise MotionFailure(f"No bilateral grasp: {force}; opposing normal dot={opposition}")
         self.tool_T_object = np.linalg.inv(grasp) @ pose
         self.carrying = True
         self.event("physical_grasp", object_id=self.target.object_id, forces_n=force)

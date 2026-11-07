@@ -126,7 +126,8 @@ class ImageObserver:
             vt[-1] *= -1
             rotation = vt.T @ u.T
         camera_T_marker = transform(corner_xyz.mean(axis=0), rotation)
-        pose = capture["world_T_camera"] @ camera_T_marker @ np.linalg.inv(FIXTURE_T_MARKER)
+        mount = getattr(self, "fixture_T_marker", FIXTURE_T_MARKER)
+        pose = capture["world_T_camera"] @ camera_T_marker @ np.linalg.inv(mount)
         evidence = {"method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount",
                     "initial_pnp_reprojection_rmse_px": error, "depth_plane_rmse_mm": plane_rmse * 1000,
                     "world_T_fixture": pose.tolist(),

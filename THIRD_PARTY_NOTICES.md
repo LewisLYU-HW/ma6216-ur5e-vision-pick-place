@@ -31,6 +31,19 @@ FoundationPose / BundleSDF Neural Object Field 得到的表面与纹理；记录
 
 论文引用可在项目技术展示中使用。
 
+## 维修工具工作站（2026-11-07）
+
+`src/ma6216/workshop_assets.py` 复用上述两件 GSO 工具，保留原始纹理，锤子缩放 50%、
+螺丝刀缩放 75%，以包围盒中心作为参考扫描坐标原点。载入到 MuJoCo 的内联网格时转换
+UV 的纵轴约定，原始 OBJ、PNG 和来源哈希文件不变。扫描工具及其重建纹理派生物继续保留
+Google Scanned Objects / Laura Downs 等与 Kevin Zakka 的归属，沿用源资产 CC BY 4.0。
+
+`assets/reconstructed/workshop/` 为这些模拟物体的标定 RGB-D 观测经官方 FoundationPose
+Neural Object Field 得到的重建，并非直接导出的扫描网格。每个模型包记录独立的参考哈希和重建参数。
+带孔扳手、工具挂架、套筒、工作台及标牌由本项目代码生成，没有引入其他工具模型或背景图片。
+
+## 方法引用
+
 - Bowen Wen, Wei Yang, Jan Kautz, Stan Birchfield. *FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects*. CVPR 2024. [论文](https://openaccess.thecvf.com/content/CVPR2024/html/Wen_FoundationPose_Unified_6D_Pose_Estimation_and_Tracking_of_Novel_Objects_CVPR_2024_paper.html)
 - Bowen Wen, Jonathan Tremblay, Valts Blukis, Stephen Tyree, Thomas Müller, Alex Evans, Dieter Fox, Jan Kautz, Stan Birchfield. *BundleSDF: Neural 6-DoF Tracking and 3D Reconstruction of Unknown Objects*. CVPR 2023. [上游引用信息](https://github.com/NVlabs/FoundationPose/tree/a1b694b83e633c2cb6115b9063d940a687759392#bibtex)
 - Zhengyou Zhang. *A Flexible New Technique for Camera Calibration*. IEEE TPAMI, 2000. [作者机构资料](https://www.microsoft.com/en-us/research/project/a-flexible-new-technique-for-camera-calibration-2/publications/)
