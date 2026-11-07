@@ -54,6 +54,10 @@ export MA6216_FOUNDATIONPOSE_DIR="$PWD/third_party/FoundationPose"
 
 按该提交的[官方安装说明](https://github.com/NVlabs/FoundationPose/tree/a1b694b83e633c2cb6115b9063d940a687759392)配置 Docker 或 Conda。需验证 PyTorch CUDA、PyTorch3D、NVDiffRast 和 `mycpp` 扩展。本项目所用 Model-based 路线不需要先搭建 Model-free 的 NeRF 重建流程。
 
+`feat/model-free-manipulation` 分支另提供参考图重建和三个操作任务。使用随仓库提供的
+重建表面可直接运行位姿推理；自行重建时还需 Kaolin 和 BundleSDF 扩展。
+独立仿真/GPU Python 的运行方式与新增依赖见 [MODEL_FREE_TASKS.md](MODEL_FREE_TASKS.md)。
+
 从[官方权重入口](https://drive.google.com/drive/folders/1DFezOAD0oD1BblsXVxqDsl8fj0qzB82i?usp=sharing)下载并放到 FoundationPose 仓库，检查下列文件存在。
 
 ```text

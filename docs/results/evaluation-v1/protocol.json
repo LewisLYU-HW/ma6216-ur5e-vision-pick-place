@@ -1,0 +1,428 @@
+{
+  "config": {
+    "version": 1,
+    "seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+    ],
+    "schedule_seed": 20261107,
+    "fixed_virtual_sensor_delay_s": 1.0,
+    "tasks": {
+      "assembly": {
+        "baseline": "no_recovery",
+        "disturbance": "fixture_shift"
+      },
+      "clutter": {
+        "baseline": "yaw_only",
+        "disturbance": "grasp_impulse"
+      },
+      "conveyor": {
+        "baseline": "no_prediction",
+        "disturbance": "grasp_impulse"
+      },
+      "insert": {
+        "baseline": "no_wrist",
+        "disturbance": "grasp_impulse"
+      },
+      "hang": {
+        "baseline": "no_wrist",
+        "disturbance": "grasp_impulse"
+      },
+      "rack": {
+        "baseline": "no_wrist",
+        "disturbance": "grasp_impulse"
+      }
+    },
+    "confidence_level": 0.95,
+    "success_interval": "Wilson score interval",
+    "continuous_interval": "10000 bootstrap resamples of trial means; seed 6216",
+    "paired_difference_interval": "Conservative 95% difference bound from Bonferroni-adjusted exact binomial marginal intervals; paired discordances and exact McNemar p also reported",
+    "failure_selection": "Up to six original trajectories: first failed seed per task/method, none before disturbance, task order as listed; first two full-method task failures and first four baseline task failures. All remaining failures retain logs and states. No rerun footage.",
+    "interpretation": "Named module ablations, not competitive external algorithms; no guarantee that the full method wins. Ten trials give wide uncertainty."
+  },
+  "sources_sha256": {
+    "scripts/run_model_free_task.py": "180cf79cf04e695819ec4ceebe582af1a806ff9edc8354310bb93313fe3205e5",
+    "scripts/run_workshop.py": "237c50aec2c9de32eb78036404e841c7427d62a4762dbe0121cea8bc26ffe703",
+    "scripts/serve_model_free_pose.py": "e43d4651b3c017cc5b55b2c27f5438b589a625ff92b5c79838cfd6798ae521a0",
+    "scripts/serve_pose_pool.py": "a6ddae7254756f2f9c326ec54fb0b558e0dbc921d7267d4ffa9c4f58c67d96c0",
+    "src/ma6216/__init__.py": "aceb4801f3434772749bd8cd3485610bf07f8c4354d8ff48130f40f4ee183be8",
+    "src/ma6216/advanced_scene.py": "774d93fc16a6a6a068fd4a07f4f513ddd1d7cc00b08eda552541f4b9449adc8c",
+    "src/ma6216/calibration.py": "0a52e567d0b867df0fc2538f2fe5542202ed5076a9eb8542a0cfb5eded0250f3",
+    "src/ma6216/config.py": "45176e403ec9606357f422e43ebd7f51a0971610520b4dc145bb62546b5c7ec2",
+    "src/ma6216/direct_route.py": "1c6d401db87c17601b3acc4719c31840a4a1d2b96847dae03b0a144debf08670",
+    "src/ma6216/evaluation.py": "4b7b5b91cbf3d690ad0ff466d3dc99fb05d6323dc4dec1ef4305a5f097ad4eb8",
+    "src/ma6216/experiments.py": "16e6c5c957087fac16457cabe6b5c977156512f80e18a83058c8daf85fbe2092",
+    "src/ma6216/foundationpose.py": "cd93eb727226855494127b93945b0af88b71bbb45ede769f1daec4a9cce70ad7",
+    "src/ma6216/motion.py": "45e2d958f35638094d42e5bbe784ecff7f1f4e9b6e160e5b114eb0ea82e5cab0",
+    "src/ma6216/multi_object.py": "78bbddd33e48762d5a1484c13eb2da08878049347866321a8f3ab4df9cc2a537",
+    "src/ma6216/object_library.py": "397396247eb86ee52557c182b6d83f54ca062e29aede5c801d89fad46c450994",
+    "src/ma6216/online_pose.py": "ea776f6da85ea81ed8bcecc2a3ca5d3cc62ea783d84a125e5a667db9aacc7fb8",
+    "src/ma6216/palletizing.py": "5094bf3aaaa26a85861d617a53da5787d807e9a2ad8578d07aac9fd789c9310a",
+    "src/ma6216/parts.py": "85800fa007cf2bb0eada570b688476739ead52f0ba802c52bae8cb324ef099c1",
+    "src/ma6216/pose_insertion.py": "8a9ad8714bb9f86f50a5ad6f0e2c6ec4e220a3f792b9460cd1bf55be5040676c",
+    "src/ma6216/reconstructed.py": "d94e09059b643a7a491faeb69a0db80e43f4f242fa7e670f58a6bb67a037ec83",
+    "src/ma6216/runner.py": "17373b7cc3ea80d97d694b0a5c624f78ea42892955d93d3b62c772179ecc7bfa",
+    "src/ma6216/scene.py": "90843ae34fa23807bef51c2c8bdee93db6951bd265fc3a8f9d20ec126c0374fd",
+    "src/ma6216/simulation_objects.py": "15ec511a04081771d399e62bead763ef03eb4fce74332ff2d0578d25066b6b06",
+    "src/ma6216/task_control.py": "6c568a9392d3b646fba21bd2e4249a615102150e4ca0bbf7bd55034a5f785ac9",
+    "src/ma6216/task_perception.py": "7fd49423015ab9b3ee9860a1075c98a44f785dc42e9c6fb3c55a6a935f542f98",
+    "src/ma6216/vision.py": "9541d78b0f69beb875686b91e3fcff82f7b915eabfba5bdc6654122aa01c6c76",
+    "src/ma6216/workcell.py": "d828e8770d361b8119dd64e3c4d1ca1956f4f32229261d71bc47e513fb947aec",
+    "src/ma6216/workpiece.py": "6c0cb2d7350e782bbc1754b01b8e819ed91060237475478783279ed4aedf98be",
+    "src/ma6216/workshop_assets.py": "de6df436bdcefca2374ca59110475356d1473c818b270ba641cf2104a1d99370",
+    "src/ma6216/workshop_control.py": "06d32beb7f9dffbfb7abc50a440ab9477a92adbadaa8b9d3bf3bc3f639e838df",
+    "src/ma6216/workshop_perception.py": "975e6a58b3cda8dd85a2ba497bf8d4914a0d53dbcf25d999ece1fcc7901f95fb",
+    "src/ma6216/workshop_scene.py": "83e52c8284d6ca170065fb50b05aea0bdf3a2667f2bef1ab14aed7a36eb53f1b",
+    "assets/reconstructed/blocker/model_free.json": "ff4cd50591ca3879cc73a07bf5cd768667530073b8a417fece7435a077073e33",
+    "assets/reconstructed/plug/model_free.json": "faf7750265a1b076ec58e17b4b37d5e6ccddb4fc2b70d61f7a2a775f2a695664",
+    "assets/reconstructed/workshop/hammer/model_free.json": "4a084726dbe61407a267d8779bd9d1d86bc39700a5f7877d1f63d4338a4d3bc7",
+    "assets/reconstructed/workshop/rack_frame/model_free.json": "fbb9e53e82f7a1e9488f04634740e10e91313a0c57f5d64caa5fb26f5a76e8c6",
+    "assets/reconstructed/workshop/screwdriver/model_free.json": "8e163d76d1d5d5dc4fab3630a8e1a4d820931bed4af2d3649e40036cb14a3cb4",
+    "assets/reconstructed/workshop/spanner/model_free.json": "010b30af6eb7957aa9a091a692fee347fd99a563b8fefc8a00c6fbeb3d17cdfb",
+    "demo_data/calibration/estimated/cam_K.txt": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+    "demo_data/calibration/estimated/world_T_camera.txt": "3a97ec9b05546c68e97e88f4439f4507fd1df8ec862558ffc704612feb617735"
+  },
+  "git_parent": "9a28b31eb5c675eca6260f865da04829831857aa",
+  "created_utc": "2026-11-07T12:51:15.377931+00:00",
+  "runtime": {
+    "python": "3.11.14 (main, Dec  9 2025, 19:02:23) [Clang 21.1.4 ]",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "parallel_trials": 8,
+    "foundationpose_python": "/home/arm-pc/miniconda3/envs/any6d/bin/python",
+    "versions": {
+      "mujoco": "3.17.0",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "trimesh": "5.2.0"
+    }
+  },
+  "network_weights_sha256": {
+    "third_party/FoundationPose/weights/2024-01-11-20-02-45/config.yml": "a79db4de3b95885dd5ae86833b37b8698a75dad81e87d1086cd50b2fcd8dda3f",
+    "third_party/FoundationPose/weights/2024-01-11-20-02-45/model_best.pth": "81924d384bf5c26c646ee4783104982ae3d1e049c181c36641b6a7aeae494c26",
+    "third_party/FoundationPose/weights/2023-10-28-18-33-37/config.yml": "28a6ba94a33230ee5fc3c51939486281578b0972542bd9e38ca6123e75605686",
+    "third_party/FoundationPose/weights/2023-10-28-18-33-37/model_best.pth": "774700586ddc435d408fc01c9809c43e151232936369dfbea0f0f964ba471d60"
+  },
+  "source_amendments": [
+    {
+      "utc": "2026-11-07T13:13:06.184947+00:00",
+      "type": "infrastructure_only",
+      "commit": "e4b9de8d88ab6a29170bdb5ed9c44c49a10b3d40",
+      "reason": "Atomic replacement of deterministic PNG cache files; initialized trials are retained and only invalid initialization is retried.",
+      "changed_source_hashes": {
+        "src/ma6216/workshop_scene.py": {
+          "before": "75e284c25287ff34978ed94a91e8da22cdb888ae5d0d3c1bea6962bf254ea779",
+          "after": "83e52c8284d6ca170065fb50b05aea0bdf3a2667f2bef1ab14aed7a36eb53f1b"
+        }
+      },
+      "identical_texture_bytes_sha256": {
+        "artifacts/workshop_texture_cache/bench_brand.png": {
+          "sha256": "8a310bb2e3c4fa46303d1924c6dc474de35f1490b4dbf57da028b718b2c255df",
+          "bytes": 16066
+        },
+        "artifacts/workshop_texture_cache/rack_label.png": {
+          "sha256": "99f797bbe3c7c30a3207940d6d918d4879c57928fa09fc3c401091e9c9220110",
+          "bytes": 10058
+        }
+      },
+      "retained_valid_trials": [
+        {
+          "trial": "assembly__full__fixture_shift__103",
+          "summary_sha256": "e15d42181c03461932739d695cc31cfd75fddc9423a2e84daef5e97a0cd96ce2"
+        },
+        {
+          "trial": "assembly__full__fixture_shift__105",
+          "summary_sha256": "d3d455a27b29df4df1ac4711b2b03ba54874fe9f172e56595cf94473c2036794"
+        },
+        {
+          "trial": "assembly__full__none__107",
+          "summary_sha256": "f6b89600b633c936256dbd7686ba9f0c3245254bddd6726140108209b2054aab"
+        },
+        {
+          "trial": "assembly__full__none__108",
+          "summary_sha256": "781b28bcf056e12a2005f539eb346abb5df1934f796d181953a0be8518e17398"
+        },
+        {
+          "trial": "assembly__full__none__109",
+          "summary_sha256": "f0fbfced0e06db65aad3a33e57886f391eb99af772a51de2f5564a34a1e58a40"
+        },
+        {
+          "trial": "assembly__no_recovery__fixture_shift__100",
+          "summary_sha256": "36369872e507bb392f0d2c4184934476921b01be085d3452e78280a3d2b4dc51"
+        },
+        {
+          "trial": "assembly__no_recovery__fixture_shift__101",
+          "summary_sha256": "9b9610d02683a567a55ac3befc601c4ed2c739f0bdae10db7a97c945afc2903e"
+        },
+        {
+          "trial": "assembly__no_recovery__fixture_shift__102",
+          "summary_sha256": "4f8de63cf333ea8ef005253ea9b9ba50e86db260af69eafc5b19d2db204a8e71"
+        },
+        {
+          "trial": "assembly__no_recovery__fixture_shift__105",
+          "summary_sha256": "482091dae789feec7bcf4c8f6d8e663ba18306157339c3b38203f2b30bcebeb3"
+        },
+        {
+          "trial": "assembly__no_recovery__fixture_shift__107",
+          "summary_sha256": "179453a8c249a64cac1131d7bc11c8dd1b19e644ca086c696d32aa6e55144234"
+        },
+        {
+          "trial": "assembly__no_recovery__none__102",
+          "summary_sha256": "bd534b4abc34fc4f39439d1096e4ebdbb069e4a64e006d8aa9dd91aaacd6564a"
+        },
+        {
+          "trial": "assembly__no_recovery__none__103",
+          "summary_sha256": "1426d009886426588e35d89d017de36a04bf9311d927cd018492cf6e2c2bec4c"
+        },
+        {
+          "trial": "assembly__no_recovery__none__104",
+          "summary_sha256": "5b0c670e86908948381ae256a30bbadb5f03095d0e49e535975c7deb550ac754"
+        },
+        {
+          "trial": "assembly__no_recovery__none__105",
+          "summary_sha256": "dca17bf28d9f2058891855843d13ba3632626fbed7e1fa00802c4b20de7b86ca"
+        },
+        {
+          "trial": "assembly__no_recovery__none__109",
+          "summary_sha256": "d9ce3e92353f840ea062ead4f5081eb58783c936729235675e4271d91f5ac7ac"
+        },
+        {
+          "trial": "clutter__full__grasp_impulse__101",
+          "summary_sha256": "cde1e755f4367f095893ae9131043909597effaf5970c73267792531c7fe5ace"
+        },
+        {
+          "trial": "clutter__full__grasp_impulse__102",
+          "summary_sha256": "0b259ee6d907ff49e6906fca024ace9c80b04d75a79b0bd2c5397a2f6243657b"
+        },
+        {
+          "trial": "clutter__full__grasp_impulse__107",
+          "summary_sha256": "5378311d9124b2a1e08c2c9e33995ce0f11a02e0914948e8dbe182fe171d03f1"
+        },
+        {
+          "trial": "clutter__full__none__106",
+          "summary_sha256": "0eb3bb94da06f898799df7af8b989261aeca593f82144fe800500de24376fc0f"
+        },
+        {
+          "trial": "clutter__full__none__109",
+          "summary_sha256": "b6d5f49930590fa7f04394f0f2d8b21c48261abf481c5529b70333850d561dd0"
+        },
+        {
+          "trial": "clutter__yaw_only__grasp_impulse__100",
+          "summary_sha256": "c1f9e80d5676e0484701e2c62214cdfe9b8bb56ee72f6446ac27d78b591e6158"
+        },
+        {
+          "trial": "clutter__yaw_only__grasp_impulse__107",
+          "summary_sha256": "c56ad693142d5c3fb6df56bf661aa872eadde1a5bf20974cf8ee7ecb08e70f97"
+        },
+        {
+          "trial": "clutter__yaw_only__grasp_impulse__108",
+          "summary_sha256": "c774f2cf2683df602a9a76ba18f9498ca45b34b52889d7796c8009e1b9024dac"
+        },
+        {
+          "trial": "clutter__yaw_only__none__101",
+          "summary_sha256": "c05a957fed0fdbd11ef3d510f3750db2932075875302a9f04a713c55e7473a48"
+        },
+        {
+          "trial": "clutter__yaw_only__none__105",
+          "summary_sha256": "04b01c4c215fc2eeedb2534984d97891336976708cf0b79f2b600083e1aeea8a"
+        },
+        {
+          "trial": "clutter__yaw_only__none__107",
+          "summary_sha256": "fc0091586ec3d16afa90dcba8b6b1b3ccf2225554615590967e5e79584acdcaa"
+        },
+        {
+          "trial": "conveyor__full__grasp_impulse__100",
+          "summary_sha256": "2c9fee74bcc97d0f0d2d2539904a83beb376c02ccc15b1e67b10bd354b0ec51e"
+        },
+        {
+          "trial": "conveyor__full__grasp_impulse__104",
+          "summary_sha256": "1afe2fc69e333f3f0991f9c5b32e52bb2b743f92b843981843010b9a8b330b14"
+        },
+        {
+          "trial": "conveyor__full__none__104",
+          "summary_sha256": "d7abeac695bfde77d87f42fa418b47c580dabd79a528f3d4733c31317bedad59"
+        },
+        {
+          "trial": "conveyor__full__none__105",
+          "summary_sha256": "11755cb7f5b521ad9c2fe749a65b70725926b491da9e922e10f8397d7a343318"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__100",
+          "summary_sha256": "a94a10159146e1c8d18256edddf6abbc1635ae1552ab7ec0a48bd924cc5dfeb0"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__101",
+          "summary_sha256": "9538bcd83b196bc09eb43b74ebed53f94107dda03460336c80ac625ad2140f2a"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__102",
+          "summary_sha256": "46e4a374bff33a74b8aa2138e2743acdd2aa8900fb0a34994fdc4470db1d1cbd"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__104",
+          "summary_sha256": "64a8882f79e867e57db7f046905899ac97c078d486f0933d68323e69bf1ed8cf"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__105",
+          "summary_sha256": "658d0315f836cb545b1cb1b9c723f507c645ae19481998d7e34575d8ae81bba9"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__106",
+          "summary_sha256": "23bfee370b5048ecad2fffe9ef2564f1ae8ec5b324319960920ea5bf28be3d2b"
+        },
+        {
+          "trial": "conveyor__no_prediction__grasp_impulse__107",
+          "summary_sha256": "39d925c6008a27ade9ef6a90577fc4f818f3f079ea06c4eed9e9d0cf3ea4cf66"
+        },
+        {
+          "trial": "conveyor__no_prediction__none__103",
+          "summary_sha256": "85daddcb8166e7e174e5bb62df46fad12d2992f305ff1d965d03775540166cc6"
+        },
+        {
+          "trial": "hang__full__grasp_impulse__101",
+          "summary_sha256": "4d80d1f50206aa10e291e7f89b8ce8ae718c694ad61368189762af85b8256168"
+        },
+        {
+          "trial": "hang__full__grasp_impulse__102",
+          "summary_sha256": "085db248861827698b986b76c298cab7e14a3b7ae0f739961a407d5463a73a71"
+        },
+        {
+          "trial": "hang__full__grasp_impulse__105",
+          "summary_sha256": "e3a2d59ad0c16dd787f826a9da70481828f54f6b4684c45463e12b32d675f62e"
+        },
+        {
+          "trial": "hang__full__grasp_impulse__108",
+          "summary_sha256": "4b688d15a4d8ec32bb8e6ab10816279c412f85219ab0a07d5702496d6084625b"
+        },
+        {
+          "trial": "hang__full__grasp_impulse__109",
+          "summary_sha256": "37494e83774ad6510a72862b35e5fe632f2aec7e03fd8ed491d66201ac30365b"
+        },
+        {
+          "trial": "hang__full__none__102",
+          "summary_sha256": "1a6f8cb2ea69be6ffd21e5f8a694e5c2728eba852481cd30d6cb30ea66c1b2c4"
+        },
+        {
+          "trial": "hang__no_wrist__grasp_impulse__104",
+          "summary_sha256": "96f2f4cf433ca8a36d9989e2be197e246e2f9fbdc6fd07e9c0ce9d4641ec5444"
+        },
+        {
+          "trial": "hang__no_wrist__none__101",
+          "summary_sha256": "498e07045a9418634596c93aecc2e379ee566d87cb62e0bd904c3c2e0273c124"
+        },
+        {
+          "trial": "hang__no_wrist__none__105",
+          "summary_sha256": "6cf6d9c7daf762c4d028e5c56c03a5bf9d78c1b38ce381933380d52f419960e1"
+        },
+        {
+          "trial": "insert__full__grasp_impulse__101",
+          "summary_sha256": "f1cde09b130beecf318a0ed2c3c34ad82d5ae62e2c69ffff59a6622926f84dd9"
+        },
+        {
+          "trial": "insert__full__grasp_impulse__103",
+          "summary_sha256": "649c5750b36eb7d53f4a1e2bcdab80ce93116c341e805afe1156abe9267cdd56"
+        },
+        {
+          "trial": "insert__full__grasp_impulse__107",
+          "summary_sha256": "29ddaefad1b45dc6e226a0907015cd7bbc70128c78a15e6d647f33dc3775cbaa"
+        },
+        {
+          "trial": "insert__full__grasp_impulse__109",
+          "summary_sha256": "8fb86da37ff85ba162eb484628819e5e171ae177163ff23ffec74da1388ca816"
+        },
+        {
+          "trial": "insert__full__none__102",
+          "summary_sha256": "92c3aeb99f03cc7d77354c1508ae16db020b4d66199d94fd49c2996d576d1190"
+        },
+        {
+          "trial": "insert__full__none__107",
+          "summary_sha256": "fc69c28c015cb4eec81d620f29be1d265ab70c06ec752a844908df265a76a648"
+        },
+        {
+          "trial": "insert__no_wrist__grasp_impulse__105",
+          "summary_sha256": "6d8e6e9f53970fdd9a2e1c2c0880f70d9ff82afb2f843e4d4866bf7f7b90ac7e"
+        },
+        {
+          "trial": "insert__no_wrist__grasp_impulse__106",
+          "summary_sha256": "931ae1e55c162de07152ca6bb2baaa5a37d7942cd3b5d5ffe46f52649b11fc79"
+        },
+        {
+          "trial": "insert__no_wrist__none__105",
+          "summary_sha256": "83f3a060d0e427f6de1bce6f4d2bcfac31e2d893225861caae5023f191efbb15"
+        },
+        {
+          "trial": "insert__no_wrist__none__107",
+          "summary_sha256": "aecb8049da250048283f002e60e2c05b4df59ed944439fbed5e302813ba1994e"
+        },
+        {
+          "trial": "rack__full__grasp_impulse__103",
+          "summary_sha256": "324e0397d1fc7bef9fe0af5a7c23ba06bd80ca97dbb352f9e56ce566287d73c8"
+        },
+        {
+          "trial": "rack__full__none__102",
+          "summary_sha256": "3df4bd1a099bcbf53f4e5f45ec0af1a47f6eb8c1d81858f984987c330c37b967"
+        },
+        {
+          "trial": "rack__full__none__104",
+          "summary_sha256": "5501a242bc7b8ae164ca4b7a9278cac59bd110703577e8fb0f7ca650274cc72f"
+        },
+        {
+          "trial": "rack__full__none__107",
+          "summary_sha256": "b833e3260dd3b3a3117ca84793f2de4583e0d6092520eec0b9638a4051316884"
+        },
+        {
+          "trial": "rack__full__none__109",
+          "summary_sha256": "1a35946f2945dc0ee5cb2f0576ddf7cdd48b2e5fd51b09c4475dbf8ca1a36554"
+        },
+        {
+          "trial": "rack__no_wrist__grasp_impulse__103",
+          "summary_sha256": "1e9b1e927ce8ae53c865d99ad5acf0615f277e1b0af5de2df6d619ddcd7b873c"
+        },
+        {
+          "trial": "rack__no_wrist__grasp_impulse__107",
+          "summary_sha256": "a4fb830cad4287eb24f841007a8e579ed83f4d7b1dd5fba995bb0caf93dffd80"
+        },
+        {
+          "trial": "rack__no_wrist__grasp_impulse__108",
+          "summary_sha256": "3ebc82c9c1a179936b3194d2d722f88e760a5eccea3a521ab7e60b5e1a7e868f"
+        },
+        {
+          "trial": "rack__no_wrist__grasp_impulse__109",
+          "summary_sha256": "c5b0ef10ed3e6336ed1f7db30de61c94a956576dd536a0bd7fe271e7326d6a63"
+        },
+        {
+          "trial": "rack__no_wrist__none__102",
+          "summary_sha256": "1cfb0ddc31919f0d1b6a9ae48ae458f7e13bc0d4bf3c7b0f0b71ba07e2067f27"
+        },
+        {
+          "trial": "rack__no_wrist__none__103",
+          "summary_sha256": "d4800485526dcaf0dd3bcd475ca56d9d351542c2b7746297699bc9d5c9187b6f"
+        },
+        {
+          "trial": "rack__no_wrist__none__106",
+          "summary_sha256": "59c9980efbb0195503cb8adfb7e1c4eb1dfe959a54c8cff3d3e14f4c20f73695"
+        },
+        {
+          "trial": "rack__no_wrist__none__107",
+          "summary_sha256": "af13d15a187bdc4ae4e3b0a2a8c551d27d0686bcae8fbf6a78017909459903d5"
+        }
+      ],
+      "excluded_unscored_attempts": [
+        {
+          "trial": "insert__full__grasp_impulse__102",
+          "summary_sha256": "10068597362c0118809c7435ddea365c388122af9acbe164f7f72a332f0e3ba6",
+          "archive": "infrastructure_incidents/insert__full__grasp_impulse__102/attempt_1",
+          "reason": "Concurrent texture-cache initialization read an empty PNG; no controller, observations or task execution existed"
+        }
+      ],
+      "control_policy_geometry_thresholds_seeds_unchanged": true
+    }
+  ]
+}

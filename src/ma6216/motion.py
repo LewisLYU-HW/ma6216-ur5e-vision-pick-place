@@ -68,7 +68,9 @@ class Robot:
         for c in d.contact:
             g1,g2=int(c.geom1),int(c.geom2)
             b1,b2=int(self.model.geom_bodyid[g1]),int(self.model.geom_bodyid[g2])
-            if c.dist>=-penetration:continue
+            clearance = max(getattr(self, "obstacle_clearances", {}).get(g1, -penetration),
+                            getattr(self, "obstacle_clearances", {}).get(g2, -penetration))
+            if c.dist>=clearance:continue
             if b1 not in self.robot_bodies and b2 not in self.robot_bodies:continue
             if allow_cube and self.cgids.intersection((g1,g2)) and any(g in self.pad_sides for g in (g1,g2)):continue
             bad.append({'geom1':self.model.geom(g1).name or f'geom_{g1}', 'geom2':self.model.geom(g2).name or f'geom_{g2}', 'body1':self.model.body(b1).name,'body2':self.model.body(b2).name,'penetration_m':float(-c.dist)})

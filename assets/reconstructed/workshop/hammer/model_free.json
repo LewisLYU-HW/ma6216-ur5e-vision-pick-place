@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "method": "official FoundationPose few-shot Neural Object Field",
+  "inputs": "RGB + metric depth + foreground masks + calibrated reference camera poses",
+  "cad_used_for_reconstruction": false,
+  "object_pose_ground_truth_input": false,
+  "reference_manifest_sha256": "a51b738b54d8b3a6f690ba42be3be03491be68062a2b4d5c9acce4e4852209fb",
+  "reference_views": 24,
+  "object_id": "hammer",
+  "reference_pose_refinement_enabled": false,
+  "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+  "gpu": "NVIDIA RTX 2000 Ada Generation",
+  "mesh_file": "model.obj",
+  "mesh_vertices": 31700,
+  "mesh_faces": 42620,
+  "observed_extents_m": [
+    0.14736479176510614,
+    0.030339397911793846,
+    0.04914639925913318
+  ],
+  "bounds_m": [
+    [
+      -0.07381730047653502,
+      -0.01512651098367214,
+      -0.024723403516012828
+    ],
+    [
+      0.07354749128857113,
+      0.015212886928121708,
+      0.02442299574312035
+    ]
+  ],
+  "training_steps": 1200,
+  "model_frame": "reference scanner frame",
+  "mesh_resolution_mm": 0.8,
+  "export_round_trip_validated": true,
+  "worker_exit_strategy": "one-shot process; skip native interpreter finalizers after synchronized export",
+  "files_sha256": {
+    "material.mtl": "0d90fe7d688a6da0b82b0f8053231a1c8986de34aa839f8113ed53a610c09227",
+    "model.obj": "934290c7221f8425960ebd3980252023ee919c443f314e8d365783d252e4f355",
+    "material_0.png": "5f874cd8279059d8a34d4561ecce390d56a9521f201c678c0c24184a64a96aee"
+  },
+  "wall_clock_seconds": 127.3574076579971
+}

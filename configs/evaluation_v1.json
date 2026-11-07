@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "seeds": [100, 101, 102, 103, 104, 105, 106, 107, 108, 109],
+  "schedule_seed": 20261107,
+  "fixed_virtual_sensor_delay_s": 1.0,
+  "tasks": {
+    "assembly": {"baseline": "no_recovery", "disturbance": "fixture_shift"},
+    "clutter": {"baseline": "yaw_only", "disturbance": "grasp_impulse"},
+    "conveyor": {"baseline": "no_prediction", "disturbance": "grasp_impulse"},
+    "insert": {"baseline": "no_wrist", "disturbance": "grasp_impulse"},
+    "hang": {"baseline": "no_wrist", "disturbance": "grasp_impulse"},
+    "rack": {"baseline": "no_wrist", "disturbance": "grasp_impulse"}
+  },
+  "confidence_level": 0.95,
+  "success_interval": "Wilson score interval",
+  "continuous_interval": "10000 bootstrap resamples of trial means; seed 6216",
+  "paired_difference_interval": "Conservative 95% difference bound from Bonferroni-adjusted exact binomial marginal intervals; paired discordances and exact McNemar p also reported",
+  "failure_selection": "Up to six original trajectories: first failed seed per task/method, none before disturbance, task order as listed; first two full-method task failures and first four baseline task failures. All remaining failures retain logs and states. No rerun footage.",
+  "interpretation": "Named module ablations, not competitive external algorithms; no guarantee that the full method wins. Ten trials give wide uncertainty."
+}

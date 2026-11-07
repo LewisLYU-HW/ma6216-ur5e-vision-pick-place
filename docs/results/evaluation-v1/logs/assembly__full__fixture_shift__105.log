@@ -1,0 +1,26 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "fixture_localized", "simulation_time_s": 1.5500000000000012, "camera": "vision_camera", "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"}
+{"event": "visual_pose", "simulation_time_s": 1.5500000000000012, "object_id": "plug", "camera": "vision_camera", "capture_time_s": 1.5500000000000012, "foreground_pixels": 5863}
+{"event": "physical_grasp", "simulation_time_s": 13.158000000001064, "object_id": "plug", "forces_n": {"left": 43.37536604676834, "right": 45.418217816964784}}
+{"event": "visual_pose", "simulation_time_s": 21.509999999998957, "object_id": "plug", "camera": "wrist_camera", "capture_time_s": 21.509999999998957, "foreground_pixels": 88952}
+{"event": "fixture_localized", "simulation_time_s": 22.961999999998152, "camera": "wrist_camera", "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"}
+{"event": "environment_fixture_displaced", "simulation_time_s": 34.97399999999678, "controller_receives_delta": false}
+{"event": "force_guard_triggered", "simulation_time_s": 38.5940000000012, "stage": "INSERT_1", "force_delta_n": 8.36791223119382}
+{"event": "wrist_view_rejected", "simulation_time_s": 40.04600000000298, "pixel_target": [300.0, 210.0], "reason": "No collision-free offline IK at [0.5683186093282684, 0.2192937485867767, 0.5367780572698538]; best={'p_error': 7.017771025467605e-15, 'r_error': 1.8651424334186115e-14, 'contacts': [{'geom1': 'geom_13"}
+{"event": "fixture_localized", "simulation_time_s": 49.544000000014584, "camera": "wrist_camera", "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"}
+{"event": "visual_pose", "simulation_time_s": 49.544000000014584, "object_id": "plug", "camera": "wrist_camera", "capture_time_s": 49.544000000014584, "foreground_pixels": 88572}
+{"event": "relocalized_for_retry", "simulation_time_s": 49.544000000014584, "attempt": 2}
+{"event": "reached_visual_insertion_target", "simulation_time_s": 67.70400000002361, "attempt": 2}
+{"event": "released", "simulation_time_s": 68.90400000002082, "object_id": "plug"}
+{"success": true, "task": "assembly", "error": null, "wall_seconds": 130.8852379480013}

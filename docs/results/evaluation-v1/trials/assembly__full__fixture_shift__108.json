@@ -1,0 +1,853 @@
+{
+  "success": true,
+  "task": "assembly",
+  "seed": 108,
+  "method": "full",
+  "disturbance": "fixture_shift",
+  "fixed_virtual_sensor_delay_s": 1.0,
+  "control_source": "FoundationPose official reconstructed-model inference",
+  "model_free": true,
+  "reconstruction_input": "reference RGB-D, masks, calibrated scan poses; no CAD",
+  "wrist_calibration": "ideal synthetic hand-eye mount and robot kinematics",
+  "fixture_perception": "RGB-D ArUco marker plane and surveyed marker mounting",
+  "recovery_enabled": true,
+  "perception": [
+    {
+      "id": 2,
+      "success": true,
+      "operation": "register",
+      "capture_time_s": 1.5500000000000012,
+      "camera_T_object": [
+        [
+          -0.9585340023040771,
+          -0.1907913237810135,
+          -0.21168671548366547,
+          -0.12979257106781006
+        ],
+        [
+          0.014165925793349743,
+          0.7099992036819458,
+          -0.7040599584579468,
+          0.06137056276202202
+        ],
+        [
+          0.28462591767311096,
+          -0.677864134311676,
+          -0.6778556108474731,
+          1.319108247756958
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "inference_seconds": 4.269399248998525,
+      "wall_seconds": 4.332526939000672,
+      "original_image_size": [
+        1280,
+        960
+      ],
+      "inference_image_size": [
+        800,
+        600
+      ],
+      "model_sha256": "c6243292d947792ea0f243e98fec78b53df55079a7b5ce22b083b638b8038c37",
+      "model_free": true,
+      "cad_used_for_reconstruction": false,
+      "visual_kinematic_prior_used": false,
+      "object_pose_ground_truth_input": false,
+      "shared_gpu_worker": true,
+      "world_T_object": [
+        [
+          -0.9471737195407046,
+          0.3087827118989169,
+          -0.08669000070834601,
+          0.40177410799295266
+        ],
+        [
+          -0.2755972294147825,
+          -0.9218621192426162,
+          -0.27242687905721047,
+          -0.18197686582355677
+        ],
+        [
+          -0.16403698420855878,
+          -0.23414408594515063,
+          0.9582631992922427,
+          0.4411028986622585
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "control_world_T_object": [
+        [
+          -0.9471737195407046,
+          0.3087827118989169,
+          -0.08669000070834601,
+          0.40177410799295266
+        ],
+        [
+          -0.2755972294147825,
+          -0.9218621192426162,
+          -0.27242687905721047,
+          -0.18197686582355677
+        ],
+        [
+          -0.16403698420855878,
+          -0.23414408594515063,
+          0.9582631992922427,
+          0.4411028986622585
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_truth_evaluation_only": [
+        [
+          0.9433162564838672,
+          -0.3204637319643185,
+          -0.08635645169161459,
+          0.39994120981806264
+        ],
+        [
+          0.2872930978711526,
+          0.9187044472898552,
+          -0.2710070376308328,
+          -0.1801566607397128
+        ],
+        [
+          0.16618398288902886,
+          0.23083573169105498,
+          0.9586958583439255,
+          0.43983625043050256
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "raw_estimator_metrics_evaluation_only": {
+        "translation_error_mm": 2.8769880100162126,
+        "rotation_error_deg": 179.28513915324768,
+        "within_5mm_5deg": false,
+        "add_mm": 61.410489619394966,
+        "adds_mm": 3.580239661457274,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "control_pose_metrics_evaluation_only": {
+        "translation_error_mm": 2.8769880100162126,
+        "rotation_error_deg": 179.28513915324768,
+        "within_5mm_5deg": false,
+        "add_mm": 61.410489619394966,
+        "adds_mm": 3.580239661457274,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "object_id": "plug",
+      "camera": "vision_camera",
+      "foreground_pixels": 5878,
+      "translation_error_mm_evaluation_only": 2.8769880100162126,
+      "rotation_error_deg_evaluation_only": 179.28513915324768
+    },
+    {
+      "id": 3,
+      "success": true,
+      "operation": "register",
+      "capture_time_s": 21.349999999999046,
+      "camera_T_object": [
+        [
+          -0.009875483810901642,
+          0.999883234500885,
+          0.011661745607852936,
+          0.0004437332390807569
+        ],
+        [
+          0.8292014002799988,
+          0.0016706767491996288,
+          0.5589473843574524,
+          -0.016713766381144524
+        ],
+        [
+          0.5588626861572266,
+          0.015189808793365955,
+          -0.8291211128234863,
+          0.1561591923236847
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "inference_seconds": 5.73384602599981,
+      "wall_seconds": 5.80050944499817,
+      "original_image_size": [
+        1280,
+        960
+      ],
+      "inference_image_size": [
+        800,
+        600
+      ],
+      "model_sha256": "c6243292d947792ea0f243e98fec78b53df55079a7b5ce22b083b638b8038c37",
+      "model_free": true,
+      "cad_used_for_reconstruction": false,
+      "visual_kinematic_prior_used": false,
+      "object_pose_ground_truth_input": false,
+      "shared_gpu_worker": true,
+      "world_T_object": [
+        [
+          -0.9773081363119814,
+          -0.19203865486124344,
+          0.08938661936656817,
+          0.4832818925876946
+        ],
+        [
+          0.1904832648528976,
+          -0.9813540345608042,
+          -0.025697941721089104,
+          0.16386756703626346
+        ],
+        [
+          0.09265485359689887,
+          -0.008088138119946556,
+          0.995665427033515,
+          0.5313873708102284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "control_world_T_object": [
+        [
+          -0.9773081363119814,
+          -0.19203865486124344,
+          0.08938661936656817,
+          0.4832818925876946
+        ],
+        [
+          0.1904832648528976,
+          -0.9813540345608042,
+          -0.025697941721089104,
+          0.16386756703626346
+        ],
+        [
+          0.09265485359689887,
+          -0.008088138119946556,
+          0.995665427033515,
+          0.5313873708102284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_truth_evaluation_only": [
+        [
+          -0.9797215883347038,
+          -0.18150789029226572,
+          0.08485573117107101,
+          0.4843974661636168
+        ],
+        [
+          0.18103758021294497,
+          -0.9833866530010534,
+          -0.013269711753773374,
+          0.164127963102675
+        ],
+        [
+          0.08585455084949054,
+          0.0023614531622603253,
+          0.9963048828734082,
+          0.5317963848535975
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "raw_estimator_metrics_evaluation_only": {
+        "translation_error_mm": 1.216389330096069,
+        "rotation_error_deg": 0.942270217071043,
+        "within_5mm_5deg": true,
+        "add_mm": 1.3065610420247231,
+        "adds_mm": 1.2730158105157217,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "control_pose_metrics_evaluation_only": {
+        "translation_error_mm": 1.216389330096069,
+        "rotation_error_deg": 0.942270217071043,
+        "within_5mm_5deg": true,
+        "add_mm": 1.3065610420247231,
+        "adds_mm": 1.2730158105157217,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "object_id": "plug",
+      "camera": "wrist_camera",
+      "foreground_pixels": 89292,
+      "translation_error_mm_evaluation_only": 1.216389330096069,
+      "rotation_error_deg_evaluation_only": 0.942270217071043
+    },
+    {
+      "id": 4,
+      "success": true,
+      "operation": "track",
+      "capture_time_s": 49.19400000001416,
+      "camera_T_object": [
+        [
+          -0.005017938558012247,
+          0.9999867081642151,
+          0.0011491263285279274,
+          0.0001340072340099141
+        ],
+        [
+          0.8308708667755127,
+          0.0035298888105899096,
+          0.5564539432525635,
+          -0.017204349860548973
+        ],
+        [
+          0.5564426183700562,
+          0.003747022245079279,
+          -0.8308776617050171,
+          0.15588288009166718
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "inference_seconds": 0.09024577500167652,
+      "wall_seconds": 0.14082249700004468,
+      "original_image_size": [
+        1280,
+        960
+      ],
+      "inference_image_size": [
+        800,
+        600
+      ],
+      "model_sha256": "c6243292d947792ea0f243e98fec78b53df55079a7b5ce22b083b638b8038c37",
+      "model_free": true,
+      "cad_used_for_reconstruction": false,
+      "visual_kinematic_prior_used": true,
+      "object_pose_ground_truth_input": false,
+      "shared_gpu_worker": true,
+      "world_T_object": [
+        [
+          0.9823514005008516,
+          0.16874090562631194,
+          0.08069807232745219,
+          0.6007239643676362
+        ],
+        [
+          -0.16725031761376397,
+          0.9855990282954281,
+          -0.024935893528086076,
+          0.000884146506979145
+        ],
+        [
+          -0.08374378600408314,
+          0.010999044837730728,
+          0.9964266267566476,
+          0.507623759847167
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "control_world_T_object": [
+        [
+          0.9823514005008516,
+          0.16874090562631194,
+          0.08069807232745219,
+          0.6007239643676362
+        ],
+        [
+          -0.16725031761376397,
+          0.9855990282954281,
+          -0.024935893528086076,
+          0.000884146506979145
+        ],
+        [
+          -0.08374378600408314,
+          0.010999044837730728,
+          0.9964266267566476,
+          0.507623759847167
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_truth_evaluation_only": [
+        [
+          0.9826722382488369,
+          0.16388689643651877,
+          0.0865815069828928,
+          0.6003969182348985
+        ],
+        [
+          -0.16214296620142493,
+          0.9864018412725875,
+          -0.0268526729666603,
+          0.0007841599661347934
+        ],
+        [
+          -0.08980495914161155,
+          0.012348793886716475,
+          0.9958828126858694,
+          0.5080989500055224
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "raw_estimator_metrics_evaluation_only": {
+        "translation_error_mm": 0.5854589378312863,
+        "rotation_error_deg": 0.4575397008380622,
+        "within_5mm_5deg": true,
+        "add_mm": 0.6203317640584962,
+        "adds_mm": 0.618240144610618,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "control_pose_metrics_evaluation_only": {
+        "translation_error_mm": 0.5854589378312863,
+        "rotation_error_deg": 0.4575397008380622,
+        "within_5mm_5deg": true,
+        "add_mm": 0.6203317640584962,
+        "adds_mm": 0.618240144610618,
+        "reference_bbox_diagonal_m": 0.12440697227098248,
+        "adds_below_10pct_bbox_diagonal": true,
+        "surface": "fixed sampled reference reconstruction; not simulator CAD"
+      },
+      "object_id": "plug",
+      "camera": "wrist_camera",
+      "foreground_pixels": 88878,
+      "translation_error_mm_evaluation_only": 0.5854589378312863,
+      "rotation_error_deg_evaluation_only": 0.4575397008380622
+    }
+  ],
+  "fixture_perception_samples": [
+    {
+      "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount",
+      "initial_pnp_reprojection_rmse_px": 0.09393781946678205,
+      "depth_plane_rmse_mm": 0.06176800372880388,
+      "world_T_fixture": [
+        [
+          0.979744274333066,
+          0.18093255628186142,
+          0.08581705534965356,
+          0.4797733409843618
+        ],
+        [
+          -0.18043576673608627,
+          0.9834930809986144,
+          -0.013575481951450382,
+          0.1647107267335107
+        ],
+        [
+          -0.08685672682029358,
+          -0.0021839654678024647,
+          0.9962184194748163,
+          0.4015495348564435
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_time_s": 1.5500000000000012,
+      "camera": "vision_camera",
+      "translation_error_mm_evaluation_only": 3.91707816886,
+      "rotation_error_deg_evaluation_only": 0.4424989768734519
+    },
+    {
+      "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount",
+      "initial_pnp_reprojection_rmse_px": 0.05381280261218945,
+      "depth_plane_rmse_mm": 0.05791764053526596,
+      "world_T_fixture": [
+        [
+          0.9812894667461051,
+          0.17262184371499553,
+          0.08528001832538558,
+          0.4784871769699365
+        ],
+        [
+          -0.17196336014219404,
+          0.9849881651116226,
+          -0.015063776373914596,
+          0.16734906825979756
+        ],
+        [
+          -0.08660014562198252,
+          0.00011688658092004244,
+          0.9962431435727809,
+          0.3989370043792733
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_time_s": 22.80199999999824,
+      "camera": "wrist_camera",
+      "translation_error_mm_evaluation_only": 0.0839125380375423,
+      "rotation_error_deg_evaluation_only": 0.06804798726207568
+    },
+    {
+      "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount",
+      "initial_pnp_reprojection_rmse_px": 0.02478353763847339,
+      "depth_plane_rmse_mm": 0.053481024903260524,
+      "world_T_fixture": [
+        [
+          0.9947906596400276,
+          0.053041542321321196,
+          0.08705250301475291,
+          0.49053717846122014
+        ],
+        [
+          -0.05284767687797274,
+          0.9985923023210415,
+          -0.0045317539388693,
+          0.1715396510188833
+        ],
+        [
+          -0.08717033062664994,
+          -9.237606056835587e-05,
+          0.9961934174271097,
+          0.39896490004142465
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "capture_time_s": 49.19400000001416,
+      "camera": "wrist_camera",
+      "translation_error_mm_evaluation_only": 0.14623025639403966,
+      "rotation_error_deg_evaluation_only": 0.040836528510021126
+    }
+  ],
+  "assembly_attempts": [
+    {
+      "attempt": 1,
+      "reached_target": false,
+      "wrist_force_delta_n": 8.0249944644735
+    },
+    {
+      "attempt": 2,
+      "reached_target": true,
+      "wrist_force_delta_n": 0.01434283611102805
+    }
+  ],
+  "command": "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_model_free_task.py --task assembly --method full --disturbance fixture_shift --seed 108 --trace --sensor-delay 1.0 --output /home/arm-pc/projects/ma6216-ur5e-vision-pick-place/artifacts/evaluation_v1/trials/assembly__full__fixture_shift__108 --foundationpose-python /home/arm-pc/miniconda3/envs/any6d/bin/python --plug-model /home/arm-pc/projects/ma6216-ur5e-vision-pick-place/assets/reconstructed/plug",
+  "scope": "Synthetic calibrated references, deterministic workcells, ideal depth and wrist hand-eye calibration",
+  "initial_scene_state_sha256": "f69eac3b10fa196052cb291412ef80e51eac87c40c0d1a359933c199b66dfe03",
+  "calibration_evaluation_only": {
+    "fixed_extrinsic": {
+      "translation_error_mm": 4.245219849518042,
+      "rotation_error_deg": 0.12162178885774261,
+      "within_5mm_5deg": true
+    },
+    "focal_relative_error": [
+      0.0033028790156963694,
+      0.003255162163418035
+    ],
+    "principal_point_error_px": [
+      -2.1127440682674887,
+      1.1257259274847797
+    ],
+    "wrist_hand_eye": {
+      "status": "ideal synthetic mount, not independently estimated",
+      "measured_error": null
+    },
+    "calibration_files_sha256": {
+      "cam_K.txt": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+      "world_T_camera.txt": "3a97ec9b05546c68e97e88f4439f4507fd1df8ec862558ffc704612feb617735"
+    },
+    "checkerboard_reprojection": {
+      "intrinsic_train": {
+        "count": 19,
+        "mean_rmse_px": 0.053021433224019254,
+        "max_rmse_px": 0.07832925021648407
+      },
+      "intrinsic_validation": {
+        "count": 4,
+        "mean_rmse_px": 0.049873569048941135,
+        "max_rmse_px": 0.07384947687387466
+      },
+      "extrinsic_train": {
+        "count": 5,
+        "mean_rmse_px": 0.06599047030216575,
+        "max_rmse_px": 0.10328792367249016
+      },
+      "extrinsic_validation": {
+        "count": 5,
+        "mean_rmse_px": 0.07445640247586904,
+        "max_rmse_px": 0.12235106695975534
+      }
+    },
+    "checkerboard_report_sha256": "71dc9e9f3e2f405b38f83c9a75b6316d915f2f71df5ad10f8ebef9116e6b78c9"
+  },
+  "before_release_evaluation_only": {
+    "success": false,
+    "position_error_mm": 2.2559460485240628,
+    "rotation_error_deg": 0.3306692021177441,
+    "bottom_gap_mm": 2.0863631754898595,
+    "minimum_wall_clearance_mm": 2.5901646052841345,
+    "insertion_depth_mm": 22.913636824510142,
+    "support_force_n": 0.0,
+    "linear_speed_m_s": 0.002270148162604723,
+    "angular_speed_rad_s": 0.00010328044989909418
+  },
+  "final_evaluation_only": {
+    "success": true,
+    "position_error_mm": 0.2700814179416141,
+    "rotation_error_deg": 0.31209949064164677,
+    "bottom_gap_mm": -0.28329141313102046,
+    "minimum_wall_clearance_mm": 2.6357158832252954,
+    "insertion_depth_mm": 25.28329141313102,
+    "support_force_n": 0.9774428789009059,
+    "linear_speed_m_s": 2.174047386407937e-05,
+    "angular_speed_rad_s": 3.040940041737048e-05
+  },
+  "fixture_disturbance_executed": true,
+  "simulation_time_s": 77.60400000000054,
+  "execution": {
+    "loaded_bilateral_fraction": 1.0,
+    "tcp_tracking_translation_mm": {
+      "count": 3802,
+      "mean": 4.84900757929229,
+      "rmse": 7.932427035909707,
+      "median": 2.9921201551427012,
+      "p95": 17.85155256625764,
+      "max": 45.438373815609594
+    },
+    "tcp_tracking_rotation_deg": {
+      "count": 3802,
+      "mean": 1.329473437628997,
+      "rmse": 2.843830159392307,
+      "median": 0.036036367958865084,
+      "p95": 7.20886587693127,
+      "max": 10.519278101780474
+    },
+    "joint_tracking_rmse_rad": {
+      "count": 3802,
+      "mean": 0.015041649925159871,
+      "rmse": 0.022019400168993265,
+      "median": 0.008904015646058364,
+      "p95": 0.04884300644761444,
+      "max": 0.055456914915010466
+    },
+    "joint_tracking_max_rad": {
+      "count": 3802,
+      "mean": 0.03172762618548703,
+      "rmse": 0.04816729014618018,
+      "median": 0.0160855732739352,
+      "p95": 0.11147899945255128,
+      "max": 0.1289645697592352
+    },
+    "move_endpoint_translation_mm": {
+      "count": 40,
+      "mean": 0.4426389562540919,
+      "rmse": 0.8232145080307927,
+      "median": 0.22772291929737576,
+      "p95": 1.2537534125406418,
+      "max": 4.2566243212613415
+    },
+    "move_endpoint_rotation_deg": {
+      "count": 40,
+      "mean": 0.035947625837339396,
+      "rmse": 0.038959541156224214,
+      "median": 0.03602052500733312,
+      "p95": 0.041690977490018086,
+      "max": 0.11442475509813663
+    },
+    "tracking_reference": "commanded-joint FK versus measured TCP; task outcome evaluated separately",
+    "peak_wrist_force_n": 53.885397718416186,
+    "events": [
+      {
+        "event": "fixture_localized",
+        "simulation_time_s": 1.5500000000000012,
+        "camera": "vision_camera",
+        "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"
+      },
+      {
+        "event": "visual_pose",
+        "simulation_time_s": 1.5500000000000012,
+        "object_id": "plug",
+        "camera": "vision_camera",
+        "capture_time_s": 1.5500000000000012,
+        "foreground_pixels": 5878
+      },
+      {
+        "event": "physical_grasp",
+        "simulation_time_s": 13.168000000001067,
+        "object_id": "plug",
+        "forces_n": {
+          "left": 43.29565820760256,
+          "right": 45.39789745015769
+        }
+      },
+      {
+        "event": "visual_pose",
+        "simulation_time_s": 21.349999999999046,
+        "object_id": "plug",
+        "camera": "wrist_camera",
+        "capture_time_s": 21.349999999999046,
+        "foreground_pixels": 89292
+      },
+      {
+        "event": "fixture_localized",
+        "simulation_time_s": 22.80199999999824,
+        "camera": "wrist_camera",
+        "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"
+      },
+      {
+        "event": "environment_fixture_displaced",
+        "simulation_time_s": 34.767999999996526,
+        "controller_receives_delta": false
+      },
+      {
+        "event": "force_guard_triggered",
+        "simulation_time_s": 38.12400000000063,
+        "stage": "INSERT_1",
+        "force_delta_n": 8.0249944644735
+      },
+      {
+        "event": "wrist_view_rejected",
+        "simulation_time_s": 39.5760000000024,
+        "pixel_target": [
+          300.0,
+          210.0
+        ],
+        "reason": "No collision-free offline IK at [0.5757346506304954, 0.22415917166891927, 0.5367741625195648]; best={'p_error': 0.0025577971056593013, 'r_error': 0.009467323642992439, 'contacts': [{'geom1': 'geom_13'"
+      },
+      {
+        "event": "fixture_localized",
+        "simulation_time_s": 49.19400000001416,
+        "camera": "wrist_camera",
+        "method": "ArUco corners + observed RGB-D plane + metric rigid alignment; surveyed marker mount"
+      },
+      {
+        "event": "visual_pose",
+        "simulation_time_s": 49.19400000001416,
+        "object_id": "plug",
+        "camera": "wrist_camera",
+        "capture_time_s": 49.19400000001416,
+        "foreground_pixels": 88878
+      },
+      {
+        "event": "relocalized_for_retry",
+        "simulation_time_s": 49.19400000001416,
+        "attempt": 2
+      },
+      {
+        "event": "reached_visual_insertion_target",
+        "simulation_time_s": 66.88200000002553,
+        "attempt": 2
+      },
+      {
+        "event": "released",
+        "simulation_time_s": 68.08200000002273,
+        "object_id": "plug"
+      }
+    ],
+    "controller_uses_live_object_qpos_writes": false,
+    "planning_object_geometry": "convex hulls of RGB-D neural reconstructions"
+  },
+  "timing": {
+    "benchmark_parallel_trials": 8,
+    "shared_gpu_worker": true,
+    "wall_seconds": 115.04487537000023,
+    "controller_setpoint_hz_simulation": 500.0,
+    "logged_execution_sample_hz_simulation": 50.0,
+    "executed_control_steps": 38027,
+    "effective_steps_per_wall_second": 330.5405814704906,
+    "physics_seconds_executed": 76.054,
+    "real_time_factor": 0.6610811629409813,
+    "pose_calls_per_wall_second_including_waits": 0.026076780824452937,
+    "inference_latency_seconds": {
+      "count": 3,
+      "mean": 3.3644970166666703,
+      "rmse": 4.127666996303869,
+      "median": 4.269399248998525,
+      "p95": 5.587401348299681,
+      "max": 5.73384602599981
+    },
+    "register_latency_seconds": {
+      "count": 2,
+      "mean": 5.0016226374991675,
+      "rmse": 5.054936211131797,
+      "median": 5.0016226374991675,
+      "p95": 5.660623687149746,
+      "max": 5.73384602599981
+    },
+    "track_latency_seconds": {
+      "count": 1,
+      "mean": 0.09024577500167652,
+      "rmse": 0.09024577500167652,
+      "median": 0.09024577500167652,
+      "p95": 0.09024577500167652,
+      "max": 0.09024577500167652
+    },
+    "depth_refinement_latency_seconds": {
+      "count": 0,
+      "mean": null,
+      "rmse": null,
+      "median": null,
+      "p95": null,
+      "max": null
+    },
+    "warning": "Simulation step rate, neural inference throughput, and achieved closed-loop frequency are different quantities; vision is intermittent."
+  },
+  "last_stage": "FINAL_STABILITY",
+  "simulation_seconds": 77.60400000000054,
+  "video_frames": 0,
+  "wall_seconds": 115.07153427500089
+}

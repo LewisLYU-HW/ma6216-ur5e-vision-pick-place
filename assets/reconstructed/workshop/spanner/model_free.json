@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "method": "official FoundationPose few-shot Neural Object Field",
+  "inputs": "RGB + metric depth + foreground masks + calibrated reference camera poses",
+  "cad_used_for_reconstruction": false,
+  "object_pose_ground_truth_input": false,
+  "reference_manifest_sha256": "b739385bd78bf0eb9105ebd80f8134965ba47fe33d189ea8e6358167a4e07bcd",
+  "reference_views": 24,
+  "object_id": "spanner",
+  "reference_pose_refinement_enabled": false,
+  "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+  "gpu": "NVIDIA RTX 2000 Ada Generation",
+  "mesh_file": "model.obj",
+  "mesh_vertices": 48058,
+  "mesh_faces": 64152,
+  "observed_extents_m": [
+    0.16740010117032905,
+    0.05536610474131112,
+    0.015399438321514858
+  ],
+  "bounds_m": [
+    [
+      -0.08699327180040858,
+      -0.02754882144728102,
+      -0.007570754379009338
+    ],
+    [
+      0.08040682936992045,
+      0.0278172832940301,
+      0.007828683942505521
+    ]
+  ],
+  "training_steps": 1500,
+  "model_frame": "reference scanner frame",
+  "mesh_resolution_mm": 0.8,
+  "export_round_trip_validated": true,
+  "worker_exit_strategy": "one-shot process; skip native interpreter finalizers after synchronized export",
+  "files_sha256": {
+    "material.mtl": "0d90fe7d688a6da0b82b0f8053231a1c8986de34aa839f8113ed53a610c09227",
+    "model.obj": "81ab79331641e58914c5cfb0e4c782993e5b1862de614bdb01ef058e80fcf789",
+    "material_0.png": "7616c0766766b114f6d08b6814db21977099aa2e3c73cc913280bb3aef3afd59"
+  },
+  "wall_clock_seconds": 208.2813075080012
+}
