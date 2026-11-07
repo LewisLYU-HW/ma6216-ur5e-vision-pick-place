@@ -41,13 +41,14 @@ SOCKET_DEPTH = 0.036
 SPANNER_HANG_ROTATION = np.array([[0.0, 1.0, 0.0], [0.0, 0.0, -1.0], [-1.0, 0.0, 0.0]])
 RACK_T_FRAME = transform([-0.055, 0.010, 0.110])
 FRAME_CLEARANCE = 0.0015
+COMPLETE_SPANNER_OFFSET = np.array([-0.045, -0.015])
 
 # Surveyed pickup regions are deliberately broad. They associate a task name
 # with a station, not with a simulator segmentation ID or true object pose.
 PICK_REGIONS = {
     "complete_hammer": ([0.575, -0.25, TABLE_Z + 0.002], [0.65, -0.04, 0.46]),
     "complete_screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.15, 0.48]),
-    "complete_spanner": ([0.44, -0.10, TABLE_Z + 0.002], [0.65, 0.02, 0.44]),
+    "complete_spanner": ([0.39, -0.09, TABLE_Z + 0.002], [0.62, 0.04, 0.44]),
     "rack_spanner": ([0.44, -0.075, TABLE_Z + 0.002], [0.65, 0.05, 0.44]),
     "rack_frame": ([0.33, -0.22, 0.395], [0.59, -0.05, 0.49]),
     "screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.12, 0.48]),
@@ -326,7 +327,7 @@ def build_workshop_scene(
             poses["rack_frame"] = frame_pose
             # Keep the wrist clear of the installed frame during the later
             # top-down spanner pickup, including visual pose uncertainty.
-            poses["spanner"][1, 3] -= 0.025
+            poses["spanner"][:2, 3] += COMPLETE_SPANNER_OFFSET
             # Separate the hammer from the removable frame and the feed tray.
             hammer_offset = poses["hammer"][:2, 3] - [0.50, -0.10]
             poses["hammer"] = transform(

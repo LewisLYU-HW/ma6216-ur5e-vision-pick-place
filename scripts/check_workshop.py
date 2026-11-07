@@ -112,8 +112,20 @@ class CompleteWorkshop(unittest.TestCase):
         self.assertEqual(len(ids), 4)
         self.assertEqual(len(joints), 4)
         self.assertTrue(all(m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE for j in joints))
+        initial_xy = {bid: d.xpos[bid, :2].copy() for bid in ids}
+        initial_contacts = [
+            (m.geom(c.geom1).name, m.geom(c.geom2).name, c.dist)
+            for c in d.contact
+            if m.geom_bodyid[c.geom1] in ids
+            and m.geom_bodyid[c.geom2] in ids
+            and m.geom_bodyid[c.geom1] != m.geom_bodyid[c.geom2]
+            and c.dist < -0.0005
+        ]
+        self.assertFalse(initial_contacts, initial_contacts)
         for _ in range(1000):
             mujoco.mj_step(m, d)
+        for bid, xy in initial_xy.items():
+            self.assertLess(np.linalg.norm(d.xpos[bid, :2] - xy), 0.005, m.body(bid).name)
         bad = [
             (m.geom(c.geom1).name, m.geom(c.geom2).name, c.dist)
             for c in d.contact

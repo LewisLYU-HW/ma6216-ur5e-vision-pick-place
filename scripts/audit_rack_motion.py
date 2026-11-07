@@ -80,13 +80,21 @@ def main():
     for stage in dict.fromkeys(trace["stage"].tolist()):
         indices = np.flatnonzero(trace["stage"] == stage)
         values = measured[indices]
+        # GRASP, RELEASE and other labels occur for several different tools.
+        # Do not count the intervening phases as time or joint travel of this
+        # stage merely because they share a label.
+        runs = np.split(indices, np.flatnonzero(np.diff(indices) != 1) + 1)
         stages[stage] = {
             "first_s": float(trace["time"][indices[0]]),
             "last_s": float(trace["time"][indices[-1]]),
-            "sampled_duration_s": float(trace["time"][indices[-1]] - trace["time"][indices[0]]),
+            "occurrences": len(runs),
+            "sampled_span_s": float(trace["time"][indices[-1]] - trace["time"][indices[0]]),
+            "sampled_duration_s": float(sum(trace["time"][run[-1]] - trace["time"][run[0]] for run in runs)),
             "joint_start_deg": np.rad2deg(values[0]).tolist(),
             "joint_end_deg": np.rad2deg(values[-1]).tolist(),
-            "joint_travel_deg": np.rad2deg(np.abs(np.diff(values, axis=0)).sum(axis=0)).tolist(),
+            "joint_travel_deg": np.rad2deg(
+                sum(np.abs(np.diff(measured[run], axis=0)).sum(axis=0) for run in runs)
+            ).tolist(),
         }
     final_path = args.trial / "final_state_evaluation_only.npz"
     restore(data, np.load(final_path, allow_pickle=False))
