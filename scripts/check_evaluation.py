@@ -1,11 +1,16 @@
 """Metric, statistical-unit, and loaded-frame acceptance regressions."""
 
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 from types import SimpleNamespace
 
 import numpy as np
+import cv2
 from scipy.spatial.transform import Rotation
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,9 +27,48 @@ from ma6216.workshop_scene import build_workshop_scene, RACK_POSE, RACK_T_FRAME,
 from run_workshop import frame_seating_evaluation, physical_evaluation
 from ma6216.workshop_scene import rack_assembly_supports
 from summarize_benchmark import comparison, interval, flatten
+from run_benchmark import assert_valid_run
+from ma6216.workshop_scene import label_texture
 
 
 class Metrics(unittest.TestCase):
+    def test_incomplete_initialization_cannot_be_scored_as_task_failure(self):
+        with self.assertRaisesRegex(RuntimeError, "Incomplete initialization"):
+            assert_valid_run({"success": False, "error": "empty PNG file"}, "broken")
+        assert_valid_run(
+            {
+                "success": True,
+                "initial_scene_state_sha256": "hash",
+                "execution": {"events": []},
+                "timing": {"wall_seconds": 1.0},
+            },
+            "valid",
+        )
+
+    def test_concurrent_texture_readers_only_see_complete_identical_pngs(self):
+        def create(_):
+            hashes = []
+
+            def read_texture(**kwargs):
+                data = Path(kwargs["file"]).read_bytes()
+                image = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
+                self.assertIsNotNone(image)
+                self.assertEqual(image.shape, (128, 512, 3))
+                hashes.append(hashlib.sha256(data).hexdigest())
+
+            spec = SimpleNamespace(
+                add_texture=read_texture,
+                add_material=lambda **k: SimpleNamespace(name=k["name"], textures={}),
+            )
+            label_texture(spec, "shared", "CONCURRENT", "CACHE READERS")
+            return hashes[0]
+
+        with tempfile.TemporaryDirectory() as folder:
+            with patch("ma6216.workshop_scene.project_root", return_value=Path(folder)):
+                with ThreadPoolExecutor(max_workers=8) as pool:
+                    hashes = list(pool.map(create, range(64)))
+        self.assertEqual(len(set(hashes)), 1)
+
     def test_clearance_guard_rejects_near_contact_without_disabling_collision(self):
         spec = mujoco.MjSpec()
         body = spec.worldbody.add_body(name="robot", pos=[0.0, 0.0, 0.2])

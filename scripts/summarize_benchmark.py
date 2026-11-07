@@ -14,7 +14,7 @@ from scipy.stats import beta, binomtest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from ma6216.evaluation import wilson_interval
-from run_benchmark import trial_id
+from run_benchmark import trial_id, assert_valid_run
 
 PRIMARY = {
     "assembly": ("plug",),
@@ -164,6 +164,7 @@ def summarize(source, output, *, allow_partial=False):
                         missing.append(name)
                         continue
                     report = json.loads(path.read_text())
+                    assert_valid_run(report, name)
                     if (
                         report.get("control_source") == "ground_truth_diagnostic"
                         or report.get("model_free") is not True

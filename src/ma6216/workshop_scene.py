@@ -6,6 +6,8 @@ tool shapes supplied to the controller come from reference reconstruction.
 
 import cv2
 import numpy as np
+import os
+import tempfile
 from scipy.spatial.transform import Rotation
 
 from .advanced_scene import TaskScene, WRIST_CAMERA, add_marker, set_initial_pose
@@ -64,7 +66,19 @@ def label_texture(spec, name, title, subtitle, *, colour=(32, 49, 61)):
     cv2.rectangle(rgb, (0, 0), (10, 127), (52, 173, 234), -1)
     cv2.putText(rgb, title, (27, 56), cv2.FONT_HERSHEY_DUPLEX, 1.05, (236, 239, 241), 2, cv2.LINE_AA)
     cv2.putText(rgb, subtitle, (28, 96), cv2.FONT_HERSHEY_SIMPLEX, 0.57, (172, 191, 202), 1, cv2.LINE_AA)
-    cv2.imwrite(str(path), rgb)
+    # Every concurrent reader must see a complete PNG, never a truncated write.
+    ok, encoded = cv2.imencode(".png", rgb)
+    if not ok:
+        raise RuntimeError("Could not encode workshop label texture")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=directory, suffix=".png", delete=False) as stream:
+            temporary = stream.name
+            stream.write(encoded.tobytes())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and os.path.exists(temporary):
+            os.unlink(temporary)
     spec.add_texture(name=name + "_texture", type=mujoco.mjtTexture.mjTEXTURE_2D, file=str(path))
     mat = spec.add_material(name=name + "_material", specular=0.1)
     mat.textures[1] = name + "_texture"

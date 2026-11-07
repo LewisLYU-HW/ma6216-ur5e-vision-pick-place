@@ -37,6 +37,10 @@ def trial_id(task, method, condition, seed):
 
 
 def assert_valid_run(report, name):
+    required = ("initial_scene_state_sha256", "execution", "timing")
+    missing = [key for key in required if not report.get(key)]
+    if missing:
+        raise RuntimeError(f"Incomplete initialization is not a task failure: {name}; missing {missing}")
     message = report.get("error") or ""
     infrastructure = (
         "CUDA out of memory",
@@ -46,6 +50,7 @@ def assert_valid_run(report, name):
         "Connection refused",
         "ModuleNotFoundError",
         "Pose request ",
+        "empty PNG file",
     )
     if any(token in message for token in infrastructure):
         raise RuntimeError(f"Infrastructure failure must be investigated, not scored: {name}: {message}")
