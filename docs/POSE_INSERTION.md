@@ -169,7 +169,9 @@ PyTorch 2.4.1+cu121 环境和 RTX 2000 Ada GPU。实际运行官方完整的 252
 |---|---|---|
 | ![倾斜料架上的自由料块](media/pose-insertion-initial.png) | ![完整位姿抓放后的定向落座](media/pose-insertion-final.png) | ![yaw-only 放置后料块倾斜卡在槽边](media/pose-insertion-yaw-only-failed.png) |
 
-完整演示录像在本轮本地输出的 `motion/physical_pick_place.mp4`；原始录像不进入 Git。
+已验证的展示录像随仓库保存在 [videos/](videos/README.md)，包括全景、腕部、
+同步双视角及 yaw-only 失败对照。每轮原始录像仍保存在本地输出的
+`motion/physical_pick_place.mp4`，便于追溯。
 `--clearance-mm` 和 `--target-yaw-deg` 可用于下一步实验，当前实测不覆盖更紧
 间隙或非零目标 yaw。
 
@@ -186,4 +188,4 @@ PyTorch 2.4.1+cu121 环境和 RTX 2000 Ada GPU。实际运行官方完整的 252
 
 实验摘要随本分支保存于 `docs/results/pose-insertion.json`。它记录实际执行的
 有限布局，不代表随机混杂场景成功率或真机精度。所有原始运行文件留在
-Git 忽略的 `artifacts/` 中。
+Git 忽略的 `artifacts/` 中；经验证的展示视频另导出到 `docs/videos/` 随代码提交。

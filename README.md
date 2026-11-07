@@ -43,6 +43,15 @@ python scripts/run_pose_insertion.py --layout 1 \
 运行条件、倾斜范围、接触设置、完整/简化姿态对照及实测范围见
 [POSE_INSERTION.md](docs/POSE_INSERTION.md)。
 
+演示视频已随仓库提供（H.264 MP4，点击查看或下载）：
+
+- [全景＋腕部同步演示](docs/videos/pose-insertion-overview-wrist.mp4)
+- [独立腕部视角](docs/videos/pose-insertion-wrist.mp4)
+- [完整 6D 位姿全景演示](docs/videos/pose-insertion-full.mp4)
+- [yaw-only 落座失败对照](docs/videos/pose-insertion-yaw-only-failure.mp4)
+
+场景、时长与文件校验信息见 [视频说明](docs/videos/README.md)。
+
 ## 运行视觉码垛
 
 在已有环境的 WSL 项目目录运行：
