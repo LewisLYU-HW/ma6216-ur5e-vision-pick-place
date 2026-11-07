@@ -23,11 +23,15 @@ python scripts/run_workshop.py --task rack --record --trace \
   --foundationpose-python "$FP_PYTHON" --output artifacts/rack_new
 ```
 
-[任务流程、尺寸和验收](docs/RACK_ASSEMBLY.md) · [完整全景＋腕部](docs/videos/evaluation-v1/rack__full__none__101.mp4) · [独立腕部](docs/videos/evaluation-v1/rack__full__none__101__wrist.mp4)
+[任务流程、尺寸和验收](docs/RACK_ASSEMBLY.md) · [修复后的全景＋腕部](docs/videos/rack-revision-v2/rack__full__none__202.mp4) · [独立腕部](docs/videos/rack-revision-v2/rack__full__none__202__wrist.mp4) · [动作修复说明](docs/RACK_MOTION_REVISION.md)
 
-## 240 次统一评测与失败案例
+装架后的大幅绕行和反复停顿已修正：衔接两次扳手抓姿、增加释放后的撤离距离，并补偿位置执行器的速度滞后。修改后用新种子 200–209 另做工具架 **40 次配对评测**，每配置仍为 10 次；[新版完整指标及置信区间](docs/results/rack-revision-v2/README.md)单独报告。当前仍有部分布局抓取规划失败，以及规定等待时间内摆动未降至验收阈值的情况，全部计入失败。
 
-六类任务 × 完整方法/模块消融 × 无扰动/规定扰动 × 每配置 10 次，使用相同种子 100–109 配对。每格为成功数/10；**全部置信区间、位姿误差、标定误差、执行精度、频率及动态扰动结果**见 [完整报告](docs/results/evaluation-v1/README.md)。
+新版完整方法无扰动 **3/10**（95% CI **10.8%–60.3%**）、有扰动 **2/10**（**5.7%–51.0%**）；关闭腕部观测均 **0/10**（**0%–27.8%**）。配对差异未达显著，不能宣称架构全面优越或成功率提高。[当前失败与同种子对照](docs/videos/rack-revision-v2/README.md)同时包含完整方法自身的失败。
+
+## 历史：240 次统一评测与失败案例
+
+以下对应工具架动作修复前的版本：六类任务 × 完整方法/模块消融 × 无扰动/规定扰动 × 每配置 10 次，使用相同种子 100–109 配对。每格为成功数/10；**全部置信区间、位姿误差、标定误差、执行精度、频率及动态扰动结果**见 [首轮完整报告](docs/results/evaluation-v1/README.md)。旧版工具架数据不混入新版统计。
 
 | 任务 | 完整：无扰动 | 完整：有扰动 | 基线 | 基线：无扰动 | 基线：有扰动 |
 |---|---|---|---|---|---|
@@ -44,7 +48,7 @@ python scripts/run_workshop.py --task rack --record --trace \
 
 [6 条失败录像与同种子完整方法对照](docs/videos/evaluation-v1/README.md) · [240 条原始摘要与 CSV](docs/results/evaluation-v1/) · [评测协议与复现](docs/EVALUATION.md)
 
-视频回放原试验保存的物理状态，不重新运行后替换失败；选中的原始轨迹也已随仓库保存。主视频采用最低成功种子 101，独立恢复其最终状态后，支架与扳手均通过承重验收，挂钩法向力约 **0.981 N**。这段成功演示不代表 10/10 成功率。
+视频回放原试验保存的物理状态，不重新运行后替换失败；选中的原始轨迹也已随仓库保存。旧版主视频 seed 101 的最终承重验收通过，但过程中存在绕行与停顿，现作为历史记录保留。新版主视频入口见上方，成功演示不代表每次运行都成功。
 
 ## 新场景：维修工具归位
 

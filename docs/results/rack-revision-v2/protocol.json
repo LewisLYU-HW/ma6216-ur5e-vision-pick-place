@@ -1,0 +1,94 @@
+{
+  "config": {
+    "version": 2,
+    "seeds": [
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209
+    ],
+    "schedule_seed": 20261108,
+    "fixed_virtual_sensor_delay_s": 1.0,
+    "tasks": {
+      "rack": {
+        "baseline": "no_wrist",
+        "disturbance": "grasp_impulse"
+      }
+    },
+    "confidence_level": 0.95,
+    "success_interval": "Wilson score interval",
+    "continuous_interval": "10000 bootstrap resamples of trial means; seed 6216",
+    "paired_difference_interval": "Conservative 95% difference bound from Bonferroni-adjusted exact binomial marginal intervals; paired discordances and exact McNemar p also reported",
+    "failure_selection": "First failed seed per method, none before disturbance; paired full-method trial included regardless of outcome. Main video is the lowest successful full-method seed without disturbance. Original trajectories only; no rerun footage.",
+    "interpretation": "Fresh rack-only evaluation after motion revision, separate from evaluation-v1. Seeds 100-109 informed development; 200-209 are reserved for this evaluation. Both methods receive identical motion fixes. No guarantee the full method wins. Ten trials give wide uncertainty."
+  },
+  "sources_sha256": {
+    "scripts/run_model_free_task.py": "180cf79cf04e695819ec4ceebe582af1a806ff9edc8354310bb93313fe3205e5",
+    "scripts/run_workshop.py": "e574c6fc3d2b8235126e20a414b7fdc1a1e766f0793098ee73e12ed848180d6c",
+    "scripts/serve_model_free_pose.py": "e43d4651b3c017cc5b55b2c27f5438b589a625ff92b5c79838cfd6798ae521a0",
+    "scripts/serve_pose_pool.py": "a6ddae7254756f2f9c326ec54fb0b558e0dbc921d7267d4ffa9c4f58c67d96c0",
+    "src/ma6216/__init__.py": "aceb4801f3434772749bd8cd3485610bf07f8c4354d8ff48130f40f4ee183be8",
+    "src/ma6216/advanced_scene.py": "774d93fc16a6a6a068fd4a07f4f513ddd1d7cc00b08eda552541f4b9449adc8c",
+    "src/ma6216/calibration.py": "0a52e567d0b867df0fc2538f2fe5542202ed5076a9eb8542a0cfb5eded0250f3",
+    "src/ma6216/config.py": "45176e403ec9606357f422e43ebd7f51a0971610520b4dc145bb62546b5c7ec2",
+    "src/ma6216/direct_route.py": "1c6d401db87c17601b3acc4719c31840a4a1d2b96847dae03b0a144debf08670",
+    "src/ma6216/evaluation.py": "4b7b5b91cbf3d690ad0ff466d3dc99fb05d6323dc4dec1ef4305a5f097ad4eb8",
+    "src/ma6216/experiments.py": "16e6c5c957087fac16457cabe6b5c977156512f80e18a83058c8daf85fbe2092",
+    "src/ma6216/foundationpose.py": "cd93eb727226855494127b93945b0af88b71bbb45ede769f1daec4a9cce70ad7",
+    "src/ma6216/joint_servo.py": "4c7f570772cf96a1dd7478e8108e59d081d7186d38f973bf40925f2f2d87733c",
+    "src/ma6216/motion.py": "45e2d958f35638094d42e5bbe784ecff7f1f4e9b6e160e5b114eb0ea82e5cab0",
+    "src/ma6216/multi_object.py": "78bbddd33e48762d5a1484c13eb2da08878049347866321a8f3ab4df9cc2a537",
+    "src/ma6216/object_library.py": "397396247eb86ee52557c182b6d83f54ca062e29aede5c801d89fad46c450994",
+    "src/ma6216/online_pose.py": "ea776f6da85ea81ed8bcecc2a3ca5d3cc62ea783d84a125e5a667db9aacc7fb8",
+    "src/ma6216/palletizing.py": "5094bf3aaaa26a85861d617a53da5787d807e9a2ad8578d07aac9fd789c9310a",
+    "src/ma6216/parts.py": "85800fa007cf2bb0eada570b688476739ead52f0ba802c52bae8cb324ef099c1",
+    "src/ma6216/pose_insertion.py": "8a9ad8714bb9f86f50a5ad6f0e2c6ec4e220a3f792b9460cd1bf55be5040676c",
+    "src/ma6216/reconstructed.py": "d94e09059b643a7a491faeb69a0db80e43f4f242fa7e670f58a6bb67a037ec83",
+    "src/ma6216/runner.py": "17373b7cc3ea80d97d694b0a5c624f78ea42892955d93d3b62c772179ecc7bfa",
+    "src/ma6216/scene.py": "90843ae34fa23807bef51c2c8bdee93db6951bd265fc3a8f9d20ec126c0374fd",
+    "src/ma6216/simulation_objects.py": "15ec511a04081771d399e62bead763ef03eb4fce74332ff2d0578d25066b6b06",
+    "src/ma6216/task_control.py": "eef9a21efad36472eff67a0c59ed0c819ab0cf76f8576a01e5086f3cc60bb222",
+    "src/ma6216/task_perception.py": "7fd49423015ab9b3ee9860a1075c98a44f785dc42e9c6fb3c55a6a935f542f98",
+    "src/ma6216/vision.py": "9541d78b0f69beb875686b91e3fcff82f7b915eabfba5bdc6654122aa01c6c76",
+    "src/ma6216/workcell.py": "d828e8770d361b8119dd64e3c4d1ca1956f4f32229261d71bc47e513fb947aec",
+    "src/ma6216/workpiece.py": "6c0cb2d7350e782bbc1754b01b8e819ed91060237475478783279ed4aedf98be",
+    "src/ma6216/workshop_assets.py": "de6df436bdcefca2374ca59110475356d1473c818b270ba641cf2104a1d99370",
+    "src/ma6216/workshop_control.py": "8b4bd4f2878b3bf412cf62f026f9a35e38140a6de2d07076747ecc7adce5cfb4",
+    "src/ma6216/workshop_perception.py": "975e6a58b3cda8dd85a2ba497bf8d4914a0d53dbcf25d999ece1fcc7901f95fb",
+    "src/ma6216/workshop_scene.py": "da845d267804567d87b043a63138463c63d8aaca2ca075a6f674b82169913e4a",
+    "assets/reconstructed/blocker/model_free.json": "ff4cd50591ca3879cc73a07bf5cd768667530073b8a417fece7435a077073e33",
+    "assets/reconstructed/plug/model_free.json": "faf7750265a1b076ec58e17b4b37d5e6ccddb4fc2b70d61f7a2a775f2a695664",
+    "assets/reconstructed/workshop/hammer/model_free.json": "4a084726dbe61407a267d8779bd9d1d86bc39700a5f7877d1f63d4338a4d3bc7",
+    "assets/reconstructed/workshop/rack_frame/model_free.json": "fbb9e53e82f7a1e9488f04634740e10e91313a0c57f5d64caa5fb26f5a76e8c6",
+    "assets/reconstructed/workshop/screwdriver/model_free.json": "8e163d76d1d5d5dc4fab3630a8e1a4d820931bed4af2d3649e40036cb14a3cb4",
+    "assets/reconstructed/workshop/spanner/model_free.json": "010b30af6eb7957aa9a091a692fee347fd99a563b8fefc8a00c6fbeb3d17cdfb",
+    "demo_data/calibration/estimated/cam_K.txt": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+    "demo_data/calibration/estimated/world_T_camera.txt": "3a97ec9b05546c68e97e88f4439f4507fd1df8ec862558ffc704612feb617735"
+  },
+  "git_parent": "f2a26ba5d1f1096bd6936d1d44b689e47f64efa4",
+  "created_utc": "2026-11-07T14:56:33.878792+00:00",
+  "runtime": {
+    "python": "3.11.14 (main, Dec  9 2025, 19:02:23) [Clang 21.1.4 ]",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+    "parallel_trials": 8,
+    "foundationpose_python": "/home/arm-pc/miniconda3/envs/any6d/bin/python",
+    "versions": {
+      "mujoco": "3.17.0",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "trimesh": "5.2.0"
+    }
+  },
+  "network_weights_sha256": {
+    "third_party/FoundationPose/weights/2024-01-11-20-02-45/config.yml": "a79db4de3b95885dd5ae86833b37b8698a75dad81e87d1086cd50b2fcd8dda3f",
+    "third_party/FoundationPose/weights/2024-01-11-20-02-45/model_best.pth": "81924d384bf5c26c646ee4783104982ae3d1e049c181c36641b6a7aeae494c26",
+    "third_party/FoundationPose/weights/2023-10-28-18-33-37/config.yml": "28a6ba94a33230ee5fc3c51939486281578b0972542bd9e38ca6123e75605686",
+    "third_party/FoundationPose/weights/2023-10-28-18-33-37/model_best.pth": "774700586ddc435d408fc01c9809c43e151232936369dfbea0f0f964ba471d60"
+  }
+}

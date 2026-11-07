@@ -1,0 +1,31 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3494}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 2807}
+{"event": "physical_grasp", "simulation_time_s": 15.824000000001954, "object_id": "rack_frame", "forces_n": {"left": 44.304276300743815, "right": 43.773336814552856}}
+{"event": "external_grasp_impulse_started", "simulation_time_s": 17.922000000000946, "object_id": "rack_frame", "world_wrench": [1.5, 0.0, 0.0, 0.0, 0.03, 0.0], "duration_s": 0.12, "controller_receives_object_pose": false}
+{"event": "external_grasp_impulse_finished", "simulation_time_s": 18.044000000000878, "object_id": "rack_frame"}
+{"event": "wrist_refinement_disabled", "simulation_time_s": 18.172000000000807, "object_id": "rack_frame"}
+{"event": "joint_route_planned", "simulation_time_s": 18.172000000000807, "stage": "ORIENT_RACK_FRAME", "collision_checks": 90, "waypoints": 88, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 28.245999999995224, "stage": "ORIENT_RACK_FRAME", "nominal_steps": 4911, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "force_guard_triggered", "simulation_time_s": 36.067999999998115, "stage": "INSERT_FRAME", "force_delta_n": 7.074298842360202}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 475, in main
+    raise MotionFailure("Rack frame insertion contact guard triggered")
+ma6216.motion.MotionFailure: Rack frame insertion contact guard triggered
+{"success": false, "task": "rack", "error": "MotionFailure: Rack frame insertion contact guard triggered", "wall_seconds": 151.50666196300153}

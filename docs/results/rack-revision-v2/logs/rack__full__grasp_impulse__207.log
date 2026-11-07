@@ -1,0 +1,50 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3516}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 2827}
+{"event": "physical_grasp", "simulation_time_s": 15.818000000001952, "object_id": "rack_frame", "forces_n": {"left": 43.74983053533037, "right": 44.265640913007985}}
+{"event": "external_grasp_impulse_started", "simulation_time_s": 17.93400000000094, "object_id": "rack_frame", "world_wrench": [1.5, 0.0, 0.0, 0.0, 0.03, 0.0], "duration_s": 0.12, "controller_receives_object_pose": false}
+{"event": "external_grasp_impulse_finished", "simulation_time_s": 18.05600000000087, "object_id": "rack_frame"}
+{"event": "object_localized", "simulation_time_s": 18.484000000000634, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 118825}
+{"event": "rack_view_rejected", "simulation_time_s": 18.484000000000634, "reason": "No collision-free offline IK at [0.4421113097214344, 0.1781362765961115, 0.567349205797228]; best={'p_error': 3.632809378521988e-14, 'r_error': 5.3093280779974476e-14, 'contacts': "}
+{"event": "rack_localized", "simulation_time_s": 19.93599999999983, "camera": "wrist_camera"}
+{"event": "joint_route_planned", "simulation_time_s": 19.93599999999983, "stage": "ORIENT_RACK_FRAME", "collision_checks": 87, "waypoints": 85, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 29.71199999999441, "stage": "ORIENT_RACK_FRAME", "nominal_steps": 4762, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "object_localized", "simulation_time_s": 29.71199999999441, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 117201}
+{"event": "released", "simulation_time_s": 44.724000000008694, "object_id": "rack_frame"}
+{"event": "joint_route_planned", "simulation_time_s": 46.67600000001108, "stage": "CLEAR_ASSEMBLED_FRAME", "collision_checks": 110, "waypoints": 108, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 59.06400000002622, "stage": "CLEAR_ASSEMBLED_FRAME", "nominal_steps": 6068, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "object_localized", "simulation_time_s": 61.06400000002866, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3728}
+{"event": "object_localized", "simulation_time_s": 61.06400000002866, "object_id": "spanner", "camera": "vision_camera", "pixels": 2898}
+{"event": "joint_route_planned", "simulation_time_s": 61.06400000002866, "stage": "ROUTE_TO_SPANNER", "collision_checks": 20, "waypoints": 18, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 63.144000000031205, "stage": "ROUTE_TO_SPANNER", "nominal_steps": 914, "recovery_steps": 0, "reference": "collision-checked joint path"}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 608, in main
+    robot.grasp(pose, acquisition)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 596, in grasp
+    self.move(grasp, "GRASP", min_duration=2.)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 518, in move
+    else self.plan_move(destination, stage, allow_support=allow_support)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 328, in plan_move
+    q_next, _ = planner.solve(tcp[:3, 3], tcp[:3, :3], q)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/motion.py", line 111, in solve
+    raise MotionFailure(f'No collision-free offline IK at {pos.tolist()}; best={min(diagnostics,key=lambda d:d["p_error"])}')
+ma6216.motion.MotionFailure: No collision-free offline IK at [0.5634661381969699, -0.02526138083473815, 0.4150606081087353]; best={'p_error': 7.665476240880912e-13, 'r_error': 2.034989017656668e-12, 'contacts': [{'geom1': 'geom_51', 'geom2': 'target_cube_geom_44', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.0028169613939095506}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_45', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.002250661789584593}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_52', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.002809787259285136}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_53', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.0022017236681126442}], 'q': [0.2029521470672774, -1.7258154775646424, -1.188796135668267, -1.800728180195809, 1.5539224269054657, -2.7197427921765462]}
+{"success": false, "task": "rack", "error": "MotionFailure: No collision-free offline IK at [0.5634661381969699, -0.02526138083473815, 0.4150606081087353]; best={'p_error': 7.665476240880912e-13, 'r_error': 2.034989017656668e-12, 'contacts': [{'geom1': 'geom_51', 'geom2': 'target_cube_geom_44', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.0028169613939095506}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_45', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.002250661789584593}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_52', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.002809787259285136}, {'geom1': 'geom_51', 'geom2': 'target_cube_geom_53', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.0022017236681126442}], 'q': [0.2029521470672774, -1.7258154775646424, -1.188796135668267, -1.800728180195809, 1.5539224269054657, -2.7197427921765462]}", "wall_seconds": 278.3794177689997}
