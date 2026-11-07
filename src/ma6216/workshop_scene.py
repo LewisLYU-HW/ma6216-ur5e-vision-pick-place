@@ -47,6 +47,7 @@ FRAME_CLEARANCE = 0.0015
 PICK_REGIONS = {
     "complete_hammer": ([0.575, -0.25, TABLE_Z + 0.002], [0.65, -0.04, 0.46]),
     "complete_screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.15, 0.48]),
+    "complete_spanner": ([0.44, -0.10, TABLE_Z + 0.002], [0.65, 0.02, 0.44]),
     "rack_spanner": ([0.44, -0.075, TABLE_Z + 0.002], [0.65, 0.05, 0.44]),
     "rack_frame": ([0.33, -0.22, 0.395], [0.59, -0.05, 0.49]),
     "screwdriver": ([0.275, -0.35, BELT_TOP + 0.0015], [0.515, -0.12, 0.48]),
@@ -323,6 +324,9 @@ def build_workshop_scene(
         )
         if complete_task:
             poses["rack_frame"] = frame_pose
+            # Keep the wrist clear of the installed frame during the later
+            # top-down spanner pickup, including visual pose uncertainty.
+            poses["spanner"][1, 3] -= 0.025
             # Separate the hammer from the removable frame and the feed tray.
             hammer_offset = poses["hammer"][:2, 3] - [0.50, -0.10]
             poses["hammer"] = transform(

@@ -344,7 +344,7 @@ def main():
             name, camera=CAMERA_NAME, *, region=None, track=False, prior=None, moving=False, register=False
         ):
             if assembling and name == "spanner" and region is None and prior is None:
-                region = "rack_spanner"
+                region = "complete_spanner" if complete else "rack_spanner"
             if complete and name in ("hammer", "screwdriver") and region is None and prior is None:
                 region = "complete_" + name
             cap = observer.capture(
