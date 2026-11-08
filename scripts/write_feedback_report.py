@@ -63,7 +63,7 @@ def main():
     table(["任务", "扰动", *MODES.values()], rows)
     add("![任务成功率与 Wilson 95% 区间](figures/success_rates.png)")
     add("## 完整流程的阶段验收")
-    add("以下是阶段完成当时的验收，分母仍为全部 10 次；括号给出实际进入该阶段的次数。整条任务还须在最后重新验收此前归位的物体，不能用某个阶段通过代替整链成功。")
+    add(f"以下是阶段完成当时的验收，分母仍为每配置全部 {len(config['seeds'])} 次；括号给出实际进入该阶段的次数。这些是完整流程中的阶段统计，不是独立任务成功率。整条任务还须在最后重新验收此前归位的物体，不能用某个阶段通过代替整链成功。")
     rows = []
     for condition in ("none", config["tasks"]["complete"]["disturbance"]):
         for obj, title in OBJECTS.items():
@@ -143,7 +143,9 @@ def main():
     failures = Counter((r["task"], r["method"], r.get("last_stage")) for r in reports if not r["success"])
     table(["任务", "模式", "停止阶段", "次数"], [[TASKS[t], MODES[m], stage, n] for (t, m, stage), n in sorted(failures.items())])
     add("## 数据与适用范围")
-    add("每个配置只包含有限布局扰动的 10 个仿真种子，不是十种真实环境。物体参考来自 RGB-D 重建；固定夹具属于已测量工位，深度与腕部手眼仍为理想仿真。几何、接触和速度真值用于独立统计、验收和安全停机，不生成视觉纠偏目标。完整任务保留 10 秒悬挂稳定窗口，独立挂放／工具架任务沿用 4 秒；不跨任务合并成功率。")
+    add(f"每个配置只包含有限布局扰动的 {len(config['seeds'])} 个仿真种子，不是同样数量的真实环境。物体参考来自 RGB-D 重建；固定夹具属于已测量工位，深度与腕部手眼仍为理想仿真。几何、接触和速度真值用于独立统计、验收和安全停机，不生成视觉纠偏目标。完整任务保留 10 秒悬挂稳定窗口；不跨任务合并成功率。")
+    if config.get("supersession"):
+        add("原 240 次视觉反馈计划开始后，按组员要求缩减为约 50 次。本轮另用新种子冻结 48 次完整流程，控制器保持不变；旧计划已启动的试验单独留存，不混入统计。")
     add("[证据清单](evidence_manifest.json)包含所有摘要、日志与轨迹的校验值，所选原轨迹在 `replay_inputs/`；完整 RGB-D 在本机源目录的无损归档中。历史报告保持不变。")
     (folder / "README.md").write_text("\n".join(lines) + "\n")
 

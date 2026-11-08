@@ -96,8 +96,9 @@ def main():
     write_csv(output / "success_rates.source-data.csv", rows)
 
     pairs = result["paired_module_comparisons"]
-    fig, ax = plt.subplots(figsize=(183/25.4, 140/25.4))
-    fig.subplots_adjust(left=0.37, right=0.97, top=0.96, bottom=0.12)
+    pair_height_mm = max(65, 26 + 7.1 * len(pairs))
+    fig, ax = plt.subplots(figsize=(183/25.4, pair_height_mm/25.4))
+    fig.subplots_adjust(left=0.37, right=0.97, top=0.93, bottom=0.23 if len(pairs) <= 4 else 0.12)
     labels, rows = [], []
     for i, item in enumerate(pairs):
         point = 100*item["success_difference"]
@@ -129,7 +130,7 @@ def main():
         "summary_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "groups_plotted": expected, "paired_comparisons_plotted": len(pairs),
         "excluded_configurations": [], "backend": "Python/matplotlib",
-        "dimensions_mm": {"success_rates": [183, 86], "paired_differences": [183, 140]},
+        "dimensions_mm": {"success_rates": [183, 86], "paired_differences": [183, pair_height_mm]},
         "uncertainty": "Wilson 95% for task rates; conservative exact marginal bounds for paired success differences",
         "unit": "one trial; never one video frame", "image_adjustments": "none; numerical plots only",
     }, indent=2) + "\n")

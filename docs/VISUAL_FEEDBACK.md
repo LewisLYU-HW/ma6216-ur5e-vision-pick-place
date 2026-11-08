@@ -42,7 +42,9 @@
 
 ## 正式矩阵与统计
 
-[冻结配置](../configs/visual_feedback_v1.json)：`complete`、`insert`、`hang`、`rack` 四类任务 × 三种反馈模式 × 无扰动／对准扰动 × 每配置 10 次，共 **240 次**，使用新种子 **300–309**。开发种子 0 及所有调试尝试不进入统计。三个模式在每个任务／种子下的初始物理状态哈希必须一致。
+[冻结配置](../configs/visual_feedback_48.json)：`complete` 四阶段完整任务 × 三种反馈模式 × 无扰动／对准扰动 × 每配置 8 次，共 **48 次**，使用新种子 **400–407**。开发种子 0 及所有调试尝试不进入统计。三个模式在每个任务／种子下的初始物理状态哈希必须一致。
+
+按组员要求将新评测缩减至约 50 次，集中比较完整流程，仍记录锤子、螺丝刀、支架、扳手各阶段的到达次数与验收结果；这些是整链中的阶段统计，不是四套独立任务试验。原 `visual_feedback_v1` 的 240 次计划已中止派发，启动过的试验和原协议单独保留，不选择其中的结果混入新统计。缩减只改变评测配置，不修改控制器。
 
 对准扰动 `alignment_impulse` 在名义对准完成时施加世界坐标力 `[1.5, 0, 0] N` 和力矩 `[0, 0.03, 0] N·m`，持续 0.12 s；它在分阶段复测之后、迭代反馈之前发生。完整流程三个适用阶段各施加一次。环境只施力，不传递真实位姿、偏移量，不瞬移物体。未到达某阶段的失败保留，并明确该扰动未送达。
 
@@ -50,7 +52,7 @@
 
 对准前后指标只存在于实际到达该阶段的试验，必须附带样本量；不把未到达阶段记成零误差，也不以该条件性诊断替代整条任务成功率。完整流程早期阶段通过不等于最后仍保持成功，整条任务仍须通过最终所有物体的重新验收。
 
-主要配对比较为 `iterative` 对 `open_loop`、`iterative` 对 `staged`，报告保守差值区间、精确 McNemar 检验及同一检验族内 Holm 校正。有／无扰动比较单独组成检验族。每格只有 10 次，不能预设新增反馈一定改善所有任务。
+主要配对比较为 `iterative` 对 `open_loop`、`iterative` 对 `staged`，报告保守差值区间、精确 McNemar 检验及同一检验族内 Holm 校正。有／无扰动比较单独组成检验族。每格只有 8 次，适合课程作业中的初步对比，不能预设新增反馈一定改善所有任务，也不能保证统计显著。
 
 ## 运行
 
@@ -67,10 +69,10 @@ FP_PYTHON=/path/to/foundationpose/env/bin/python
 
 ```bash
 MA6216_POSE_SOCKET=/tmp/ma6216-feedback.sock .venv/bin/python scripts/run_benchmark.py \
-  --config configs/visual_feedback_v1.json --jobs 8 \
-  --foundationpose-python "$FP_PYTHON" --output artifacts/visual_feedback_v1
+  --config configs/visual_feedback_48.json --jobs 8 \
+  --foundationpose-python "$FP_PYTHON" --output artifacts/visual_feedback_48
 .venv/bin/python scripts/summarize_benchmark.py \
-  --source artifacts/visual_feedback_v1 --output docs/results/visual-feedback-v1
+  --source artifacts/visual_feedback_48 --output docs/results/visual-feedback-v1
 ```
 
 控制源码变更会阻止续跑，不能用调试后的代码替换正式失败。正式运行结束后逐文件校验并无损压缩 RGB-D 输入，保留本机原始轨迹；在对应试验目录运行 `tar -xzf observations.tar.gz` 可还原原路径。所选视频必须直接回放原试验状态，不重新执行后替换结果。
