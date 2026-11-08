@@ -20,20 +20,24 @@ def main():
     if not result["complete"]:
         raise RuntimeError("Package evidence only after every scheduled trial has completed")
     reports = {p.stem: json.loads(p.read_text()) for p in sorted((args.results / "trials").glob("*.json"))}
+    config = json.loads((args.results / "protocol.json").read_text())["config"]
+    hero_task = "complete" if "complete" in config["tasks"] else "rack"
+    reference = config["tasks"].get(hero_task, {}).get("reference", "full")
     rack_successes = sorted(
         (
             r
             for r in reports.values()
-            if r["task"] == "rack" and r["method"] == "full" and r["disturbance"] == "none" and r["success"]
+            if r["task"] == hero_task and r["method"] == reference and r["disturbance"] == "none" and r["success"]
         ),
         key=lambda r: r["seed"],
     )
-    hero = f"rack__full__none__{rack_successes[0]['seed']}" if rack_successes else None
+    hero = f"{hero_task}__{reference}__none__{rack_successes[0]['seed']}" if rack_successes else None
     selected = [r["trial"] for r in result["failure_demos"]] + ([hero] if hero else [])
     paired_controls = {}
     for demo in result["failure_demos"]:
-        if demo["method"] != "full":
-            full = f"{demo['task']}__full__{demo['disturbance']}__{demo['seed']}"
+        reference = config["tasks"][demo["task"]].get("reference", "full")
+        if demo["method"] != reference:
+            full = f"{demo['task']}__{reference}__{demo['disturbance']}__{demo['seed']}"
             if full not in reports:
                 raise RuntimeError(f"Missing paired full-method trial: {full}")
             paired_controls[demo["trial"]] = full
@@ -42,6 +46,7 @@ def main():
     evidence = {
         "source_directory": str(args.source),
         "rack_success_demo": hero,
+        "success_demo": hero,
         "paired_full_method_replays": paired_controls,
         "replay_inputs": selected,
         "trials": {},
@@ -60,6 +65,8 @@ def main():
             "motion/samples.json",
             "motion/endpoints.json",
             "motion/events.json",
+            "observations.tar.gz",
+            "observations_archive.json",
         )
         hashes = {key: digest(source / key) for key in files if (source / key).exists()}
         if "motion/trajectory_evaluation_only.npz" not in hashes:
@@ -75,6 +82,8 @@ def main():
                 "summary.json",
                 "motion/trajectory_evaluation_only.npz",
                 "final_state_evaluation_only.npz",
+                "motion/events.json",
+                "motion/endpoints.json",
             ):
                 shutil.copy2(source / key, destination / key)
     shutil.copy2(args.source / "schedule.json", args.results / "schedule.json")

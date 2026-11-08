@@ -6,7 +6,11 @@
 先从标定 RGB-D 参考图重建工具，再用官方 FoundationPose 估计 **6D pose（三维位置＋三维朝向）**，驱动实际接触下的夹持、转向、插入和悬挂。新工作站采用深度背景分割，无需给工具涂分割色。
 原有的视觉装配恢复、遮挡换抓和运动目标抓取任务继续保留。
 
-[完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
+[视觉闭环与三组对照](docs/VISUAL_FEEDBACK.md) · [完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
+
+## 6D 视觉反馈
+
+新增独立的 `--visual-feedback open_loop/staged/iterative` 开关，对比无执行期视觉纠偏、关键阶段纠偏、以及接近插口／挂钩时的重复观察和限幅修正。保留相同的关节控制与接触保护，单独记录视觉残差、实际几何误差和反馈耗时；对遮挡造成的支架估计跳变执行质量检查。[反馈流程、统计协议与复现](docs/VISUAL_FEEDBACK.md)。下方既有完整视频属于此前的阶段反馈演示。
 
 ## 完整任务：四阶段连续视频
 

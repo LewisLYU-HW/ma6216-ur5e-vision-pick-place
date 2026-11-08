@@ -66,6 +66,9 @@ def main():
     start, end = float(trace["time"][0]), float(trace["time"][-1])
     times = start + np.arange(max(1, round((end - start) * 25) + 1)) / 25
     phase_events = []
+    events_path = args.trial / "motion/events.json"
+    all_events = json.loads(events_path.read_text()) if events_path.exists() else []
+    feedback_events = [event for event in all_events if event["event"] == "visual_servo_observation"]
     phase_labels = {
         "park_hammer": "1 OF 4 - HAMMER PARKING",
         "moving_driver_insertion": "2 OF 4 - MOVING DRIVER + TILTED INSERTION",
@@ -75,7 +78,7 @@ def main():
     if task == "complete":
         phase_events = [
             event
-            for event in json.loads((args.trial / "motion/events.json").read_text())
+            for event in all_events
             if event["event"] == "task_phase"
         ]
     try:
@@ -93,10 +96,21 @@ def main():
             estimate = trace["estimated_pose"][index]
             current = (str(trace["object_id"][index]), estimate) if np.isfinite(estimate).all() else None
             stage = str(trace["stage"][index])
+            frame_detail = detail
+            if stage.startswith("VISUAL_"):
+                available = [event for event in feedback_events
+                             if event["simulation_time_s"] <= timestamp
+                             and event.get("object_id") == str(trace["object_id"][index])]
+                if available:
+                    observation = available[-1]
+                    frame_detail = (f"{status} run | VISION residual: "
+                                    f"{observation['translation_error_mm']:.2f} mm / "
+                                    f"{observation['rotation_error_deg']:.2f} deg | "
+                                    f"observation {observation['iteration'] + 1}")
             phases = [event for event in phase_events if event["simulation_time_s"] <= timestamp]
             if phases:
                 stage = phase_labels[phases[-1]["phase"]] + "  |  " + stage.replace("_", " ")
-            recorder.capture(d, stage, detail)
+            recorder.capture(d, stage, frame_detail)
     finally:
         recorder.close()
     metadata = {

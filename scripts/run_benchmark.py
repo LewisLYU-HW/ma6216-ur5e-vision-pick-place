@@ -11,12 +11,15 @@ from importlib.metadata import version
 from pathlib import Path
 import random
 import signal
+import shutil
 import subprocess
 import sys
+import tarfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTROL_FILES = [
+    "scripts/run_benchmark.py",
     "scripts/run_model_free_task.py",
     "scripts/run_workshop.py",
     "scripts/serve_model_free_pose.py",
@@ -34,6 +37,46 @@ def manifest():
 
 def trial_id(task, method, condition, seed):
     return f"{task}__{method}__{condition}__{seed}"
+
+
+def configured_methods(spec):
+    methods = spec.get("methods")
+    if methods is None:
+        methods = ["full", spec["baseline"]]
+    if len(methods) < 2 or len(set(methods)) != len(methods):
+        raise ValueError("A paired evaluation needs at least two distinct method names")
+    return methods
+
+
+def archive_observations(folder):
+    """Lossless, verified compression of this trial's completed RGB-D inputs.
+
+    Only remove originals after every member hashes identically on reading
+    the archive. Extract with `tar -xzf observations.tar.gz -C TRIAL_DIR`.
+    """
+    directory = folder / "observations"
+    archive = folder / "observations.tar.gz"
+    if not directory.exists():
+        return
+    if archive.exists():
+        raise RuntimeError(f"Both archived and unpacked observations exist: {folder}")
+    paths = sorted(p for p in directory.rglob("*") if p.is_file())
+    hashes = {str(p.relative_to(folder)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+    temporary = folder / "observations.tar.gz.tmp"
+    with tarfile.open(temporary, "w:gz", compresslevel=1) as tar:
+        for path in paths:
+            tar.add(path, arcname=str(path.relative_to(folder)), recursive=False)
+    with tarfile.open(temporary, "r:gz") as tar:
+        for name, digest in hashes.items():
+            if hashlib.sha256(tar.extractfile(name).read()).hexdigest() != digest:
+                raise RuntimeError(f"Observation archive failed lossless verification: {name}")
+    temporary.replace(archive)
+    (folder / "observations_archive.json").write_text(json.dumps({
+        "archive": archive.name, "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+        "members_sha256": hashes,
+        "restore": "tar -xzf observations.tar.gz (run from this trial directory)",
+    }, indent=2) + "\n")
+    shutil.rmtree(directory)
 
 
 def assert_valid_run(report, name):
@@ -105,7 +148,7 @@ def main():
             continue
         for seed in config["seeds"]:
             for condition in ("none", spec["disturbance"]):
-                for method in ("full", spec["baseline"]):
+                for method in configured_methods(spec):
                     schedule.append((task, method, condition, seed))
     random.Random(config["schedule_seed"]).shuffle(schedule)
     (output / "schedule.json").write_text(json.dumps(schedule, indent=2) + "\n")
@@ -140,8 +183,8 @@ def main():
             str(ROOT / "scripts" / runner),
             "--task",
             task,
-            "--method",
-            method,
+            *config.get("method_arguments", {}).get(method, ["--method", method]),
+            *config.get("common_arguments", []),
             "--disturbance",
             condition,
             "--seed",
@@ -178,6 +221,8 @@ def main():
             )
         result = json.loads(result_file.read_text())
         assert_valid_run(result, name)
+        if config.get("archive_observations", False):
+            archive_observations(folder)
         return name, result["success"], result.get("last_stage")
 
     started = time.monotonic()

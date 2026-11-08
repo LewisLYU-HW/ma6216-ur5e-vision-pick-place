@@ -14,7 +14,7 @@ from scipy.stats import beta, binomtest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from ma6216.evaluation import wilson_interval
-from run_benchmark import trial_id, assert_valid_run
+from run_benchmark import trial_id, assert_valid_run, configured_methods
 
 PRIMARY = {
     "assembly": ("plug",),
@@ -23,6 +23,7 @@ PRIMARY = {
     "insert": ("screwdriver",),
     "hang": ("spanner",),
     "rack": ("rack_frame", "spanner"),
+    "complete": ("hammer", "screwdriver", "rack_frame", "spanner"),
 }
 
 
@@ -133,9 +134,38 @@ def flatten(report, name):
                 row[f"final_{obj}_{key}"] = value
     events = execution.get("events", [])
     row["disturbance_delivered"] = any(
-        e["event"] in ("external_grasp_impulse_started", "environment_fixture_displaced") for e in events
+        e["event"] in ("external_grasp_impulse_started", "environment_fixture_displaced", "external_alignment_impulse_started") for e in events
     )
     row["force_guard_count"] = sum(e["event"] == "force_guard_triggered" for e in events)
+    row["simulation_seconds"] = report.get("simulation_seconds", report.get("simulation_time_s"))
+    if report.get("visual_feedback", "legacy") != "legacy":
+        stages = report.get("visual_servo", [])
+        row["feedback_reached_stages"] = len(stages)
+        row["feedback_observations"] = sum(len(s["observations"]) for s in stages)
+        row["feedback_corrections"] = sum(s["corrections"] for s in stages)
+        row["feedback_wall_seconds"] = sum(s["wall_seconds"] for s in stages)
+        row["feedback_simulation_seconds"] = sum(s["simulation_seconds"] for s in stages)
+        row["feedback_updates_per_wall_second"] = (
+            row["feedback_observations"] / row["feedback_wall_seconds"]
+            if row["feedback_observations"] and row["feedback_wall_seconds"] else None
+        )
+        observations = [o for s in stages for o in s["observations"]]
+        row["feedback_measurement_age_simulation_s"] = mean([o["measurement_age_simulation_s"] for o in observations])
+        row["feedback_cycle_wall_seconds"] = mean([o.get("cycle_wall_seconds") for o in observations])
+        for stage in stages:
+            name = stage["object_id"]
+            row[f"feedback_{name}_converged"] = stage["converged"]
+            row[f"feedback_{name}_corrections"] = stage["corrections"]
+            row[f"feedback_{name}_wall_seconds"] = stage["wall_seconds"]
+            row[f"feedback_{name}_visual_recovery_simulation_seconds"] = stage.get("visual_recovery_simulation_seconds")
+            for point in ("before", "after"):
+                for metric in ("translation_error_mm", "rotation_error_deg"):
+                    row[f"alignment_{name}_{point}_{metric}"] = stage[point + "_evaluation_only"][metric]
+        phase_map = {"hammer": "park_hammer", "screwdriver": "moving_driver_insertion",
+                     "rack_frame": "install_frame", "spanner": "regrasp_and_hang_spanner"}
+        for name, phase in phase_map.items():
+            row[f"phase_{name}_entered"] = any(e["event"] == "task_phase" and e.get("phase") == phase for e in events)
+            row[f"phase_{name}_success"] = report.get("outcomes", {}).get(name, {}).get("success", False)
     return row
 
 
@@ -155,7 +185,7 @@ def summarize(source, output, *, allow_partial=False):
     shutil.copy2(source / "protocol.json", output / "protocol.json")
     rows, reports, missing = [], {}, []
     for task, spec in config["tasks"].items():
-        for method in ("full", spec["baseline"]):
+        for method in configured_methods(spec):
             for condition in ("none", spec["disturbance"]):
                 for seed in config["seeds"]:
                     name = trial_id(task, method, condition, seed)
@@ -165,6 +195,8 @@ def summarize(source, output, *, allow_partial=False):
                         continue
                     report = json.loads(path.read_text())
                     assert_valid_run(report, name)
+                    if (report["task"], report["method"], report["disturbance"], report["seed"]) != (task, method, condition, seed):
+                        raise ValueError(f"Trial labels do not match the scheduled configuration: {name}")
                     if (
                         report.get("control_source") == "ground_truth_diagnostic"
                         or report.get("model_free") is not True
@@ -186,7 +218,9 @@ def summarize(source, output, *, allow_partial=False):
                 raise RuntimeError(f"Unmatched initial scene in paired trial: {task}, seed {seed}")
     groups, pairs, robustness = [], [], []
     for task, spec in config["tasks"].items():
-        for method in ("full", spec["baseline"]):
+        methods = configured_methods(spec)
+        reference = spec.get("reference", "full")
+        for method in methods:
             for condition in ("none", spec["disturbance"]):
                 subset = [
                     r for r in rows if (r["task"], r["method"], r["disturbance"]) == (task, method, condition)
@@ -232,6 +266,14 @@ def summarize(source, output, *, allow_partial=False):
                             for kind in ("raw", "control")
                         },
                         "metrics": {key: interval([r.get(key) for r in subset]) for key in metrics},
+                        "phase_success": {
+                            obj: {"successes": sum(bool(r.get(f"phase_{obj}_success")) for r in subset),
+                                  "entered": sum(bool(r.get(f"phase_{obj}_entered")) for r in subset),
+                                  "n_trials": n,
+                                  "ci95": wilson_interval(sum(bool(r.get(f"phase_{obj}_success")) for r in subset), n)}
+                            for obj in ("hammer", "screwdriver", "rack_frame", "spanner")
+                            if obj in PRIMARY[task] and any(r.get(f"phase_{obj}_entered") for r in subset)
+                        },
                     }
                 )
 
@@ -240,16 +282,19 @@ def summarize(source, output, *, allow_partial=False):
 
         try:
             for condition in ("none", spec["disturbance"]):
-                pairs.append(
-                    {
-                        "task": task,
-                        "disturbance": condition,
-                        "a": "full",
-                        "b": spec["baseline"],
-                        **comparison(outcomes("full", condition), outcomes(spec["baseline"], condition)),
-                    }
-                )
-            for method in ("full", spec["baseline"]):
+                for baseline in methods:
+                    if baseline == reference:
+                        continue
+                    pairs.append(
+                        {
+                            "task": task,
+                            "disturbance": condition,
+                            "a": reference,
+                            "b": baseline,
+                            **comparison(outcomes(reference, condition), outcomes(baseline, condition)),
+                        }
+                    )
+            for method in methods:
                 robustness.append(
                     {
                         "task": task,
@@ -274,11 +319,14 @@ def summarize(source, output, *, allow_partial=False):
     for full, limit in ((True, 2), (False, 4)):
         candidates = []
         for task, spec in config["tasks"].items():
-            method = "full" if full else spec["baseline"]
-            failed = [r for r in rows if r["task"] == task and r["method"] == method and not r["success"]]
-            failed.sort(key=lambda r: (r["disturbance"] != "none", r["seed"]))
-            if failed:
-                candidates.append(failed[0])
+            reference = spec.get("reference", "full")
+            for method in configured_methods(spec):
+                if (method == reference) != full:
+                    continue
+                failed = [r for r in rows if r["task"] == task and r["method"] == method and not r["success"]]
+                failed.sort(key=lambda r: (r["disturbance"] != "none", r["seed"]))
+                if failed:
+                    candidates.append(failed[0])
         selected.extend(candidates[:limit])
     result = {
         "paired_initial_scene_hashes_verified": True,

@@ -50,3 +50,44 @@ class GraspImpulse:
             r.data.xfrc_applied[bid] = 0.0
             self.finished = True
             r.event("external_grasp_impulse_finished", object_id=self.target)
+
+
+class AlignmentImpulse:
+    """Identical force/torque pulse after nominal alignment, before feedback.
+
+    One intervention per applicable tool, including all three in a complete
+    run. Does not change qpos or disclose the resulting displacement.
+    """
+
+    stages = {
+        "screwdriver": "ALIGN_DRIVER_SETTLE",
+        "rack_frame": "ALIGN_RACK_FRAME_SETTLE",
+        "spanner": "REORIENT_AND_APPROACH_RACK_SETTLE",
+    }
+
+    def __init__(self, robot):
+        self.robot = robot
+        self.delivered = set()
+        self.active = None
+        self.duration = 0.12
+        self.wrench = np.array([1.5, 0.0, 0.0, 0.0, 0.03, 0.0])
+
+    def __call__(self, stage):
+        r = self.robot
+        target = r.target.object_id
+        if self.active is None and target not in self.delivered and stage == self.stages.get(target):
+            self.active = (target, float(r.data.time))
+            self.delivered.add(target)
+            r.event("external_alignment_impulse_started", object_id=target,
+                    world_wrench=self.wrench.tolist(), duration_s=self.duration,
+                    controller_receives_object_pose=False)
+        if self.active is None:
+            return
+        target, started = self.active
+        bid = r.model.body(r.objects[target].body).id
+        if r.data.time - started < self.duration:
+            r.data.xfrc_applied[bid] = self.wrench
+        else:
+            r.data.xfrc_applied[bid] = 0.0
+            r.event("external_alignment_impulse_finished", object_id=target)
+            self.active = None

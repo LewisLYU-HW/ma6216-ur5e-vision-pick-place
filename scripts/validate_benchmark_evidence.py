@@ -27,11 +27,12 @@ def main():
     evidence = json.loads((args.results / "evidence_manifest.json").read_text())
     videos = json.loads((args.videos / "manifest.json").read_text())
     config = protocol["config"]
-    expected = 4 * len(config["tasks"]) * len(config["seeds"])
+    n_groups = sum(2 * len(spec.get("methods", ["full", spec.get("baseline")])) for spec in config["tasks"].values())
+    expected = n_groups * len(config["seeds"])
     assert result["complete"] and result["n_trials"] == expected
     assert result["paired_initial_scene_hashes_verified"]
     assert len(evidence["trials"]) == expected
-    assert len(result["groups"]) == 4 * len(config["tasks"])
+    assert len(result["groups"]) == n_groups
     assert all(g["n_trials"] == len(config["seeds"]) for g in result["groups"])
     for name, digest in protocol["sources_sha256"].items():
         assert sha(ROOT / name) == digest, f"Control source changed: {name}"

@@ -16,6 +16,10 @@ from .task_perception import ImageObserver
 from .workshop_scene import PICK_REGIONS, WORKSHOP_T_MARKER
 
 
+class ObservationUnavailable(RuntimeError):
+    """Sensor foreground is occluded/absent; not a GPU infrastructure error."""
+
+
 def refine_depth_pose(capture, mesh, initial):
     """Bounded, robust point-to-plane alignment of reference RGB-D geometry.
 
@@ -94,11 +98,11 @@ def depth_region_mask(depth, K, world_T_camera, bounds, background=None):
         mask[depth >= background - 0.0015] = 0
     count, labels, stats, _ = cv2.connectedComponentsWithStats(mask)
     if count < 2:
-        raise RuntimeError("No observed RGB-D foreground in pickup station")
+        raise ObservationUnavailable("No observed RGB-D foreground in pickup station")
     chosen = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
     mask = (labels == chosen).astype(np.uint8) * 255
     if np.count_nonzero(mask) < 40:
-        raise RuntimeError("Too few foreground pixels for tool registration")
+        raise ObservationUnavailable("Too few foreground pixels for tool registration")
     return mask
 
 

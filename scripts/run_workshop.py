@@ -19,9 +19,10 @@ from ma6216.pose_insertion import transform
 from ma6216.scene import CAMERA_NAME, mujoco
 from ma6216.task_control import TaskRobot
 from ma6216.evaluation import pose_errors, camera_metrics, timing_metrics, state_fingerprint
-from ma6216.experiments import METHODS, control_pose, GraspImpulse
+from ma6216.experiments import METHODS, control_pose, GraspImpulse, AlignmentImpulse
+from ma6216.visual_feedback import FEEDBACK_MODES, ServoSettings, bounded_command, stationary_target_update
 from ma6216.workshop_control import FeedPoseHistory, ReconstructedTool, WorkshopRecorder
-from ma6216.workshop_perception import WorkshopObserver, refine_depth_pose
+from ma6216.workshop_perception import WorkshopObserver, refine_depth_pose, ObservationUnavailable
 from ma6216.workshop_scene import (
     build_workshop_scene,
     workshop_supports,
@@ -198,7 +199,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--task", choices=("all", "insert", "hang", "rack", "complete"), default="all")
     p.add_argument("--method", choices=METHODS, default="full")
-    p.add_argument("--disturbance", choices=("none", "grasp_impulse"), default="none")
+    p.add_argument("--disturbance", choices=("none", "grasp_impulse", "alignment_impulse"), default="none")
+    p.add_argument("--visual-feedback", choices=FEEDBACK_MODES, default="legacy")
+    p.add_argument("--feedback-delay", type=float, default=0.15,
+                   help="Fixed simulated latency for execution-time visual observations in new feedback modes")
     p.add_argument("--models", type=Path, default=ROOT / "assets/reconstructed/workshop")
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--ground-truth", action="store_true", help="Physics diagnostic; never a vision result")
@@ -218,6 +222,10 @@ def main():
     args = p.parse_args()
     if args.sensor_delay is not None and args.sensor_delay < 0:
         p.error("sensor-delay must be nonnegative")
+    if args.feedback_delay < 0 or not np.isfinite(args.feedback_delay):
+        p.error("feedback-delay must be finite and nonnegative")
+    if args.visual_feedback != "legacy" and args.method != "full":
+        p.error("Visual-feedback comparisons keep --method full; do not combine module ablations")
     if args.method == "no_recovery" or (
         args.method == "no_prediction" and args.task not in ("insert", "all", "complete")
     ):
@@ -230,7 +238,12 @@ def main():
         "success": False,
         "task": args.task,
         "seed": args.seed,
-        "method": args.method,
+        "method": args.method if args.visual_feedback == "legacy" else args.visual_feedback,
+        "module_method": args.method,
+        "visual_feedback": args.visual_feedback,
+        "feedback_latency_simulation_s": args.feedback_delay,
+        "visual_servo_settings": ServoSettings().as_dict(),
+        "visual_servo": [],
         "disturbance": args.disturbance,
         "fixed_virtual_sensor_delay_s": args.sensor_delay,
         "perception": [],
@@ -324,6 +337,8 @@ def main():
         if args.disturbance == "grasp_impulse":
             target = "rack_frame" if assembling else "spanner" if args.task == "hang" else "screwdriver"
             robot.environment_hook = GraspImpulse(robot, target)
+        elif args.disturbance == "alignment_impulse":
+            robot.environment_hook = AlignmentImpulse(robot)
         robot.trace_enabled = args.trace
         robot.joint_velocity_feedforward = assembling
 
@@ -340,9 +355,14 @@ def main():
             for obj in objects.values():
                 worker.wait(worker.submit(model_bundle=obj.bundle))
 
+        feedback_enabled = args.visual_feedback != "open_loop" and args.method != "no_wrist"
+
         def observe(
-            name, camera=CAMERA_NAME, *, region=None, track=False, prior=None, moving=False, register=False
+            name, camera=CAMERA_NAME, *, region=None, track=False, prior=None, moving=False,
+            register=False, feedback=False, update=True
         ):
+            observation_started = time.perf_counter()
+            capture_tcp = robot.tcp_pose()
             if assembling and name == "spanner" and region is None and prior is None:
                 region = "complete_spanner" if complete else "rack_spanner"
             if complete and name in ("hammer", "screwdriver") and region is None and prior is None:
@@ -382,7 +402,8 @@ def main():
                 not args.ground_truth
                 and (
                     (name == "rack_frame" and (camera == WRIST_CAMERA or prior is not None))
-                    or (complete and name == "screwdriver" and camera == WRIST_CAMERA)
+                    or ((complete or args.visual_feedback != "legacy")
+                        and name == "screwdriver" and camera == WRIST_CAMERA)
                 )
             ):
                 pose, info["depth_refinement"] = refine_depth_pose(cap, objects[name].mesh, pose)
@@ -415,7 +436,15 @@ def main():
                 ),
             )
             report["perception"].append(info)
-            robot.known[name] = pose.copy()
+            info["tcp_at_capture"] = capture_tcp.tolist()
+            if feedback and args.visual_feedback != "legacy":
+                robot.hold(args.feedback_delay, "VISUAL_FEEDBACK_WAIT")
+                info["feedback_virtual_latency_s"] = args.feedback_delay
+            info["available_time_s"] = float(d.time)
+            info["observation_wall_seconds"] = time.perf_counter() - observation_started
+            info["used_for_control_update"] = update
+            if update:
+                robot.known[name] = pose.copy()
             robot.event("object_localized", object_id=name, camera=camera, pixels=info["foreground_pixels"])
             return pose, cap["capture_time_s"]
 
@@ -470,42 +499,183 @@ def main():
         robot.hold(0.6, "INSPECT_WORKBENCH")
 
         def held_refinement():
-            if args.method == "no_wrist":
+            if not feedback_enabled:
                 robot.event("wrist_refinement_disabled", object_id=robot.target.object_id)
                 return
             robot.hold(0.3, "WRIST_INSPECT_TOOL")
             prior = robot.tcp_pose() @ robot.tool_T_object
-            pose, _ = observe(robot.target.object_id, WRIST_CAMERA, prior=prior)
-            robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ pose
+            pose, _ = observe(robot.target.object_id, WRIST_CAMERA, prior=prior, feedback=True)
+            capture_tcp = np.asarray(report["perception"][-1]["tcp_at_capture"])
+            robot.tool_T_object = np.linalg.inv(capture_tcp) @ pose
             locate_rack(WRIST_CAMERA)
+
+        def alignment_diagnostic(name, desired):
+            """Independent logging only; never used for servo decisions."""
+            if name == "spanner" and assembling:
+                estimated_mount = robot.known["rack_frame"]
+                actual_mount = evaluation_pose(m, d, objects["rack_frame"].body)
+            else:
+                estimated_mount = robot.fixture_estimate
+                actual_mount = evaluation_pose(m, d, "target_tray")
+            ideal_goal = actual_mount @ np.linalg.inv(estimated_mount) @ desired
+            return pose_errors(evaluation_pose(m, d, objects[name].body), ideal_goal)
+
+        def refresh_assembled_frame(record):
+            previous = robot.known["rack_frame"].copy()
+            try:
+                candidate, _ = observe("rack_frame", prior=previous, feedback=True, update=False)
+            except ObservationUnavailable as exc:
+                record.setdefault("target_view_unavailable", []).append(str(exc))
+                robot.event("visual_target_occluded", object_id="rack_frame", reason=str(exc))
+                return False
+            evidence = report["perception"][-1]
+            accepted, gate = stationary_target_update(previous, candidate, evidence.get("depth_refinement", {}))
+            evidence["stationary_target_gate"] = gate
+            evidence["used_for_control_update"] = accepted
+            evidence["candidate_world_T_object"] = candidate.tolist()
+            evidence["candidate_pose_metrics_evaluation_only"] = evidence["control_pose_metrics_evaluation_only"]
+            effective_target = candidate if accepted else previous
+            evidence["control_world_T_object"] = effective_target.tolist()
+            effective_metrics = pose_errors(effective_target, np.asarray(evidence["capture_truth_evaluation_only"]), objects["rack_frame"].vertices)
+            evidence["control_pose_metrics_evaluation_only"] = effective_metrics
+            evidence["translation_error_mm_evaluation_only"] = effective_metrics["translation_error_mm"]
+            evidence["rotation_error_deg_evaluation_only"] = effective_metrics["rotation_error_deg"]
+            record.setdefault("target_updates", []).append(gate)
+            if accepted:
+                robot.known["rack_frame"] = candidate
+            else:
+                robot.event("visual_target_update_rejected", object_id="rack_frame", **gate)
+            return accepted
+
+        def visual_align(name, desired_pose):
+            """Observe/correct/observe in free space before contact insertion.
+
+            Targets use marker observations or the visually relocated frame.
+            Truth diagnostics are written after decisions, never read back.
+            """
+            if args.visual_feedback == "legacy":
+                return
+            started_wall, started_sim = time.perf_counter(), float(d.time)
+            record = {"object_id": name, "mode": args.visual_feedback,
+                      "observations": [], "corrections": 0, "converged": None,
+                      "before_evaluation_only": alignment_diagnostic(name, desired_pose())}
+            report["visual_servo"].append(record)
+            try:
+                if args.visual_feedback != "iterative":
+                    return
+                settings = ServoSettings()
+                consecutive = 0
+                record["converged"] = False
+                for iteration in range(2 * settings.maximum_corrections + 3):
+                    cycle_wall, cycle_sim = time.perf_counter(), float(d.time)
+                    target_updated = False
+                    if name == "spanner" and assembling:
+                        target_updated = refresh_assembled_frame(record)
+                    else:
+                        # A hidden marker leaves the last measured target in
+                        # use; no wrist surveying motion or ground truth fallback.
+                        cap = observer.capture(d, camera=WRIST_CAMERA)
+                        try:
+                            target, evidence = observer.fixture_pose(cap)
+                            robot.fixture_estimate = target
+                            report["rack_observations"].append(evidence)
+                            target_updated = True
+                        except RuntimeError as exc:
+                            record.setdefault("target_view_unavailable", []).append(str(exc))
+                    prior = robot.tcp_pose() @ robot.tool_T_object
+                    measured, stamp = observe(name, WRIST_CAMERA, prior=prior, feedback=True)
+                    info = report["perception"][-1]
+                    capture_tcp = np.asarray(info["tcp_at_capture"])
+                    robot.tool_T_object = np.linalg.inv(capture_tcp) @ measured
+                    current_tcp = robot.tcp_pose()
+                    measured_now = current_tcp @ robot.tool_T_object
+                    robot.known[name] = measured_now.copy()
+                    desired = desired_pose()
+                    row = {"iteration": iteration, "capture_time_s": stamp,
+                           "decision_time_s": float(d.time), "target_updated": target_updated,
+                           "measurement_age_simulation_s": float(d.time) - stamp,
+                           "measured_object_pose": measured_now.tolist(),
+                           "desired_object_pose": desired.tolist()}
+                    record["observations"].append(row)
+                    try:
+                        command, residual = bounded_command(current_tcp, measured_now, desired, settings)
+                    except ValueError as exc:
+                        row["rejected"] = str(exc)
+                        row["cycle_wall_seconds"] = time.perf_counter() - cycle_wall
+                        row["cycle_simulation_seconds"] = float(d.time) - cycle_sim
+                        raise MotionFailure(str(exc)) from exc
+                    row.update(residual)
+                    consecutive = consecutive + 1 if residual["within_tolerance"] else 0
+                    row["alignment_evaluation_only"] = alignment_diagnostic(name, desired)
+                    robot.event("visual_servo_observation", object_id=name, iteration=iteration,
+                                **residual, consecutive_in_tolerance=consecutive)
+                    if consecutive >= settings.required_consecutive_observations:
+                        record["converged"] = True
+                        row["cycle_wall_seconds"] = time.perf_counter() - cycle_wall
+                        row["cycle_simulation_seconds"] = float(d.time) - cycle_sim
+                        return
+                    if not residual["within_tolerance"]:
+                        if record["corrections"] >= settings.maximum_corrections:
+                            raise MotionFailure("Visual servo exhausted its bounded correction budget")
+                        robot.move(command, "VISUAL_SERVO_" + name.upper(), min_duration=0.25)
+                        record["corrections"] += 1
+                    row["cycle_wall_seconds"] = time.perf_counter() - cycle_wall
+                    row["cycle_simulation_seconds"] = float(d.time) - cycle_sim
+                raise MotionFailure("Visual servo did not confirm convergence")
+            except Exception as exc:
+                record["error"] = f"{type(exc).__name__}: {exc}"
+                raise
+            finally:
+                record["after_evaluation_only"] = alignment_diagnostic(name, desired_pose())
+                record["wall_seconds"] = time.perf_counter() - started_wall
+                record["simulation_seconds"] = float(d.time) - started_sim
+                record["updates_per_wall_second"] = len(record["observations"]) / max(record["wall_seconds"], 1e-9)
+                disturbances = [e for e in robot.events if e["event"] == "external_alignment_impulse_started"
+                               and e.get("object_id") == name]
+                record["disturbance_delivered"] = bool(disturbances)
+                record["visual_recovery_simulation_seconds"] = (
+                    float(d.time) - disturbances[-1]["simulation_time_s"]
+                    if disturbances and record["converged"] else None
+                )
+                robot.event("visual_feedback_stage_finished", object_id=name,
+                            mode=args.visual_feedback, converged=record["converged"],
+                            corrections=record["corrections"])
 
         def install_frame():
             robot.select("rack_frame")
+            robot.event("task_phase", phase="install_frame")
             if complete:
-                robot.event("task_phase", phase="install_frame")
-                pose, _ = observe("rack_frame")
+                pose = robot.known["rack_frame"].copy()
+                if args.visual_feedback != "open_loop":
+                    pose, _ = observe("rack_frame")
                 approach = pose @ objects["rack_frame"].acquisition_grasp(pose)
                 approach[:3, 3] -= approach[:3, 2] * 0.10
                 robot.move(approach, "ROUTE_TO_FRAME", joint_space=True)
             robot.grasp(robot.known["rack_frame"])
             held_refinement()
             tool = objects["rack_frame"]
-            goal = robot.fixture_estimate @ RACK_T_FRAME
-            # Seating offset uses the observed bottom of the reconstructed tenon.
-            goal[:3, 3] += goal[:3, 2] * (-0.036 - tool.bounds[0, 2] + 0.0015)
+            def frame_goal(distance=0.0):
+                result = robot.fixture_estimate @ RACK_T_FRAME
+                result[:3, 3] += result[:3, 2] * (-0.036 - tool.bounds[0, 2] + 0.0015 + distance)
+                return result
+            goal = frame_goal()
             tcp = goal @ np.linalg.inv(robot.tool_T_object)
             axis = goal[:3, 2]
             high = tcp.copy()
             high[:3, 3] += axis * 0.12
             robot.move(high, "ORIENT_RACK_FRAME", joint_space=True)
-            if args.method != "no_wrist":
+            if feedback_enabled:
                 prior = robot.tcp_pose() @ robot.tool_T_object
-                held, _ = observe("rack_frame", WRIST_CAMERA, prior=prior)
-                robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held
+                held, _ = observe("rack_frame", WRIST_CAMERA, prior=prior, feedback=True)
+                robot.tool_T_object = np.linalg.inv(np.asarray(report["perception"][-1]["tcp_at_capture"])) @ held
                 tcp = goal @ np.linalg.inv(robot.tool_T_object)
             pre = tcp.copy()
             pre[:3, 3] += axis * 0.06
             robot.move(pre, "ALIGN_RACK_FRAME")
+            visual_align("rack_frame", lambda: frame_goal(0.06))
+            goal = frame_goal()
+            tcp = goal @ np.linalg.inv(robot.tool_T_object)
+            axis = goal[:3, 2]
             robot.hold(0.3, "TARE_FRAME_INSERTION")
             bias = robot.wrench()
             for distance in np.linspace(0.06, 0.0, 31)[1:]:
@@ -528,7 +698,8 @@ def main():
                 raise MotionFailure(f"Rack frame seating failed: {result}")
             # Locate the free assembled support after release, rather than
             # assuming its actual position equals the commanded seat pose.
-            observe("rack_frame", prior=goal)
+            if args.visual_feedback != "open_loop":
+                observe("rack_frame", prior=goal, feedback=True)
             robot.obstacle_clearances["rack_frame"] = 0.004
 
         if assembling and not complete:
@@ -536,8 +707,8 @@ def main():
 
         if args.task in ("all", "insert", "complete"):
             robot.select("hammer")
+            robot.event("task_phase", phase="park_hammer")
             if complete:
-                robot.event("task_phase", phase="park_hammer")
                 pose = robot.known["hammer"]
                 approach = pose @ objects["hammer"].acquisition_grasp(pose)
                 approach[:3, 3] -= approach[:3, 2] * 0.10
@@ -566,8 +737,7 @@ def main():
                     raise MotionFailure(f"Hammer parking failed: {result}")
 
             robot.select("screwdriver")
-            if complete:
-                robot.event("task_phase", phase="moving_driver_insertion")
+            robot.event("task_phase", phase="moving_driver_insertion")
             if args.stationary_feed:
                 pose, _ = observe("screwdriver")
             else:
@@ -611,12 +781,13 @@ def main():
             d.ctrl[m.actuator("belt_drive").id] = 0.0
             held_refinement()
             tool = objects["screwdriver"]
+            def driver_goal(distance=0.0):
+                socket = robot.fixture_estimate @ SOCKET_POSE
+                rotation = socket[:3, :3] @ Rotation.from_euler("y", -90, degrees=True).as_matrix() @ tool.shaft_basis.T
+                tip = (socket @ np.array([0.0, 0.0, -SOCKET_DEPTH + 0.003 + distance, 1.0]))[:3]
+                return transform(tip - rotation @ tool.tip, rotation)
             socket = robot.fixture_estimate @ SOCKET_POSE
-            rotation = (
-                socket[:3, :3] @ Rotation.from_euler("y", -90, degrees=True).as_matrix() @ tool.shaft_basis.T
-            )
-            tip = (socket @ np.array([0.0, 0.0, -SOCKET_DEPTH + 0.003, 1.0]))[:3]
-            object_goal = transform(tip - rotation @ tool.tip, rotation)
+            object_goal = driver_goal()
             tcp = object_goal @ np.linalg.inv(robot.tool_T_object)
             axis = socket[:3, 2]
             pre = tcp.copy()
@@ -626,13 +797,17 @@ def main():
             robot.move(high, "ORIENT_DRIVER")
             robot.hold(0.4, "SETTLE_ORIENTED_DRIVER")
             prior = robot.tcp_pose() @ robot.tool_T_object
-            if args.method != "no_wrist":
-                held, _ = observe("screwdriver", WRIST_CAMERA, prior=prior)
-                robot.tool_T_object = np.linalg.inv(robot.tcp_pose()) @ held
+            if feedback_enabled:
+                held, _ = observe("screwdriver", WRIST_CAMERA, prior=prior, feedback=True)
+                robot.tool_T_object = np.linalg.inv(np.asarray(report["perception"][-1]["tcp_at_capture"])) @ held
             tcp = object_goal @ np.linalg.inv(robot.tool_T_object)
             pre = tcp.copy()
             pre[:3, 3] += axis * (SOCKET_DEPTH + 0.020)
             robot.move(pre, "ALIGN_DRIVER")
+            visual_align("screwdriver", lambda: driver_goal(SOCKET_DEPTH + 0.020))
+            object_goal = driver_goal()
+            tcp = object_goal @ np.linalg.inv(robot.tool_T_object)
+            axis = (robot.fixture_estimate @ SOCKET_POSE)[:3, 2]
             robot.hold(0.3, "TARE_INSERTION_FORCE")
             bias = robot.wrench()
             inserted = True
@@ -662,9 +837,10 @@ def main():
 
         if args.task in ("all", "hang", "rack", "complete"):
             robot.select("spanner")
-            if complete:
-                robot.event("task_phase", phase="regrasp_and_hang_spanner")
-            pose, _ = observe("spanner")
+            robot.event("task_phase", phase="regrasp_and_hang_spanner")
+            pose = robot.known["spanner"].copy()
+            if args.visual_feedback != "open_loop":
+                pose, _ = observe("spanner")
             acquisition = objects["spanner"].acquisition_grasp(pose)
             if assembling:
                 # Use the other antipodal grasp through both pickups so that
@@ -684,7 +860,9 @@ def main():
             robot.move(target, "PLACE_REGRASP", allow_support=True)
             robot.release()
             robot.known["spanner"] = flat
-            pose, _ = observe("spanner", region="cradle")
+            pose = flat.copy()
+            if args.visual_feedback != "open_loop":
+                pose, _ = observe("spanner", region="cradle", feedback=True)
             regrasp = objects["spanner"].top_grasp(regrasp=True)
             if assembling:
                 regrasp[:3, :3] = regrasp[:3, :3] @ np.diag([-1.0, -1.0, 1.0])
@@ -697,6 +875,8 @@ def main():
             rotation = mount[:3, :3] @ SPANNER_HANG_ROTATION
 
             def eye_goal(y, z):
+                mount = robot.known["rack_frame"] if assembling else robot.fixture_estimate
+                rotation = mount[:3, :3] @ SPANNER_HANG_ROTATION
                 hole = (mount @ np.r_[hook + [0.0, y, z], 1.0])[:3]
                 return transform(hole - rotation @ tool.eye, rotation)
 
@@ -704,6 +884,7 @@ def main():
             approach_object = eye_goal(-standoff, 0.0)
             approach = approach_object @ np.linalg.inv(robot.tool_T_object)
             robot.move(approach, "REORIENT_AND_APPROACH_RACK", joint_space=True)
+            visual_align("spanner", lambda: eye_goal(-standoff, 0.0))
             robot.hold(0.3, "TARE_HANG_FORCE")
             bias = robot.wrench()
             for y in np.linspace(-standoff, thread_depth, 25)[1:]:

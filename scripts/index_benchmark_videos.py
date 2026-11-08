@@ -21,6 +21,9 @@ def main():
     report_root = Path(os.path.relpath(args.results.resolve(), args.videos.resolve())).as_posix()
     result = json.loads((args.results / "summary.json").read_text())
     evidence = json.loads((args.results / "evidence_manifest.json").read_text())
+    protocol = json.loads((args.results / "protocol.json").read_text())
+    feedback = "method_arguments" in protocol["config"]
+    reference_label = "迭代视觉闭环" if feedback else "完整方法"
     entries = {}
     for trial in evidence["replay_inputs"]:
         meta = json.loads((args.replays / trial / "replay.json").read_text())
@@ -70,7 +73,7 @@ def main():
         "# 统一评测：原始轨迹视频",
         "",
         "这些视频来自正式试验保存的 25 Hz 物理状态，没有重新跑一次后替换结果。"
-        "每段都保留原始仿真时长，左侧全景、右侧腕部；工具架成功运行另外提供独立腕部视频。"
+        "每段都保留原始仿真时长，左侧全景、右侧腕部；选中的成功运行另外提供独立腕部视频。"
         "静态推理与离线规划等待不计入仿真视频时长。",
         "",
         f"[完整评测报告]({report_root}/README.md) · " "[视频、原始轨迹与摘要校验值](manifest.json)",
@@ -79,9 +82,9 @@ def main():
     hero = evidence["rack_success_demo"]
     if hero:
         lines += [
-            "## 工具架自装配与承重",
+            "## 四阶段完整视觉闭环" if hero.startswith("complete__") else "## 工具架自装配与承重",
             "",
-            f"采用无扰动完整方法中最低成功种子：`{hero}`。",
+            f"采用无扰动{reference_label}中最低成功种子：`{hero}`。",
             "",
             f"[完整全景＋腕部]({hero}.mp4) · [独立腕部]({hero}__wrist.mp4)",
             "",
@@ -100,11 +103,11 @@ def main():
         )
     lines += [
         "",
-        "## 同种子的完整方法对照",
+        f"## 同种子的{reference_label}对照",
         "",
-        "每个选中消融案例均附相同任务、扰动和种子的完整方法；无论成功还是失败都保留。",
+        f"每个选中对照案例均附相同任务、扰动和种子的{reference_label}；无论成功还是失败都保留。",
         "",
-        "| 消融失败视频 | 完整方法视频 | 完整方法结果 |",
+        f"| 对照失败视频 | {reference_label}视频 | {reference_label}结果 |",
         "|---|---|---|",
     ]
     for baseline, full in evidence["paired_full_method_replays"].items():
