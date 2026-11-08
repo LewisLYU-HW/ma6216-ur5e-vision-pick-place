@@ -1,9 +1,11 @@
 """Check archived results, original source hashes and full video decodability."""
 
 import argparse
+import csv
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -54,7 +56,51 @@ def main():
             ):
                 archived = args.results / "replay_inputs" / name / key
                 assert sha(archived) == records[key]["sha256"], str(archived)
+    feedback_observations_verified = None
+    feedback_csv = args.results / "visual_feedback_observations.csv"
+    if feedback_csv.exists():
+        expected_observations = {}
+        for path in (args.results / "trials").glob("*.json"):
+            for stage in json.loads(path.read_text()).get("visual_servo", []):
+                for observation in stage["observations"]:
+                    key = (path.stem, stage["object_id"], observation["iteration"])
+                    assert key not in expected_observations, f"Duplicate source observation: {key}"
+                    expected_observations[key] = observation
+        with feedback_csv.open(newline="") as stream:
+            observations = list(csv.DictReader(stream))
+        assert len(observations) == len(expected_observations)
+        for row in observations:
+            key = (row["trial"], row["object_id"], int(row["iteration"]))
+            original = expected_observations.pop(key)
+            fields = {
+                "visual_translation_error_mm": original.get("translation_error_mm"),
+                "visual_rotation_error_deg": original.get("rotation_error_deg"),
+                "true_alignment_translation_error_mm": original.get("alignment_evaluation_only", {}).get("translation_error_mm"),
+                "true_alignment_rotation_error_deg": original.get("alignment_evaluation_only", {}).get("rotation_error_deg"),
+                "proposed_tcp_translation_mm": original.get("command_translation_mm"),
+                "proposed_tcp_rotation_deg": original.get("command_rotation_deg"),
+            }
+            for field, value in fields.items():
+                assert (row[field] == "" if value is None else math.isclose(float(row[field]), value, rel_tol=1e-12, abs_tol=1e-12)), (key, field)
+        assert not expected_observations
+        feedback_observations_verified = len(observations)
     assert videos["protocol_sha256"] == sha(args.results / "protocol.json")
+    hero_audit = None
+    audit_path = args.results / "hero_motion_audit.json"
+    if audit_path.exists():
+        audit = json.loads(audit_path.read_text())
+        hero = evidence["success_demo"]
+        assert audit["trial"] == hero
+        assert audit["trajectory_sha256"] == evidence["trials"][hero]["motion/trajectory_evaluation_only.npz"]["sha256"]
+        assert audit["final_state_sha256"] == evidence["trials"][hero]["final_state_evaluation_only.npz"]["sha256"]
+        hero_audit = {
+            "original_state_hashes_verified": True,
+            "unexpected_contact_candidates": len(audit["unexpected_robot_contacts_above_0_01mm"]),
+            "loaded_gripper_contacts_after_release": len(audit["loaded_gripper_contacts_after_final_release"]),
+            "extension_30s_all_checkpoints_passed": all(
+                all(step[name]["success"] for name in audit["recorded_final_state"])
+                for step in audit["passive_extension_30s_diagnostic_only"]),
+        }
     checked_videos = []
     for name, record in videos["videos"].items():
         video = args.videos / name
@@ -91,10 +137,14 @@ def main():
         "checked_utc": datetime.now(timezone.utc).isoformat(),
         "automated_regression_checks": {**checks, "total": sum(checks.values()), "logs": "validation/"},
         "original_data_hashes_verified_trials": expected,
+        "configurations_verified": len(result["groups"]),
+        "trials_per_configuration": len(config["seeds"]),
         "configurations_with_10_trials": len(result["groups"]) if len(config["seeds"]) == 10 else None,
         "paired_initial_scene_hashes_verified": True,
         "frozen_control_source_files_verified": len(protocol["sources_sha256"]),
         "original_replay_inputs_verified": len(evidence["replay_inputs"]),
+        "feedback_observations_verified": feedback_observations_verified,
+        "hero_motion_audit": hero_audit,
         "local_document_links_verified": links,
         "videos": checked_videos,
     }

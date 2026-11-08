@@ -1,0 +1,39 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "hammer", "camera": "vision_camera", "pixels": 1283}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1763}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 4277}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 1490}
+{"event": "task_phase", "simulation_time_s": 2.5999999999999353, "phase": "park_hammer"}
+{"event": "joint_route_planned", "simulation_time_s": 2.5999999999999353, "stage": "ROUTE_TO_HAMMER", "collision_checks": 68, "waypoints": 66, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 10.136000000000054, "stage": "ROUTE_TO_HAMMER", "nominal_steps": 3642, "recovery_steps": 0, "reference": "collision-checked joint path"}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 719, in main
+    robot.grasp(robot.known["hammer"], lift_distance=0.08 if complete else None)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 596, in grasp
+    self.move(grasp, "GRASP", min_duration=2.)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 518, in move
+    else self.plan_move(destination, stage, allow_support=allow_support)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 328, in plan_move
+    q_next, _ = planner.solve(tcp[:3, 3], tcp[:3, :3], q)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/motion.py", line 111, in solve
+    raise MotionFailure(f'No collision-free offline IK at {pos.tolist()}; best={min(diagnostics,key=lambda d:d["p_error"])}')
+ma6216.motion.MotionFailure: No collision-free offline IK at [0.6061839732217108, -0.08912629936547284, 0.4159940285874027]; best={'p_error': 3.0356926114439265e-12, 'r_error': 8.504642339505989e-12, 'contacts': [{'geom1': 'gripper_left_pad1', 'geom2': 'target_spanner_geom_73', 'body1': 'gripper_left_pad', 'body2': 'target_spanner', 'penetration_m': 0.0010693689881197952}, {'geom1': 'gripper_left_pad1', 'geom2': 'target_spanner_geom_73', 'body1': 'gripper_left_pad', 'body2': 'target_spanner', 'penetration_m': 0.0010665054673429022}], 'q': [0.07027363365799554, -1.8741696634867797, -0.9949765737807389, -1.86689184618765, 1.5806869586809267, -1.4993518701957644]}
+{"success": false, "task": "complete", "error": "MotionFailure: No collision-free offline IK at [0.6061839732217108, -0.08912629936547284, 0.4159940285874027]; best={'p_error': 3.0356926114439265e-12, 'r_error': 8.504642339505989e-12, 'contacts': [{'geom1': 'gripper_left_pad1', 'geom2': 'target_spanner_geom_73', 'body1': 'gripper_left_pad', 'body2': 'target_spanner', 'penetration_m': 0.0010693689881197952}, {'geom1': 'gripper_left_pad1', 'geom2': 'target_spanner_geom_73', 'body1': 'gripper_left_pad', 'body2': 'target_spanner', 'penetration_m': 0.0010665054673429022}], 'q': [0.07027363365799554, -1.8741696634867797, -0.9949765737807389, -1.86689184618765, 1.5806869586809267, -1.4993518701957644]}", "wall_seconds": 59.81538822299626}

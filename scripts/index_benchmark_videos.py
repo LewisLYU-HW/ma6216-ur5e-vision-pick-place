@@ -79,6 +79,13 @@ def main():
         f"[完整评测报告]({report_root}/README.md) · " "[视频、原始轨迹与摘要校验值](manifest.json)",
         "",
     ]
+    if feedback:
+        lines += [
+            "反馈阶段叠加的 `VISION residual` 是视觉估计与目标之间的残差，"
+            "不是独立真值测得的定位精度。达到 1.5 mm／1.5° 视觉阈值不保证真实误差也低于该值；"
+            f"两种误差及被拒绝的观察分别保存在 [逐次闭环观测 CSV]({report_root}/visual_feedback_observations.csv)。",
+            "",
+        ]
     hero = evidence["rack_success_demo"]
     if hero:
         lines += [

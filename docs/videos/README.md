@@ -4,7 +4,15 @@
 点击文件链接可在 GitHub 查看或下载；下载到本地后可用 VLC 打开。
 录像按仿真时间采样；静态任务的推理和离线规划等待不等于录像时长。
 
-## 完整连续任务：四个物体、四个阶段
+## 当前：6D 迭代视觉闭环与 48 次评测
+
+**[完整全景＋腕部](visual-feedback-v1/complete__iterative__none__400.mp4)** · **[独立腕部](visual-feedback-v1/complete__iterative__none__400__wrist.mp4)** · [3 条失败与同种子对照](visual-feedback-v1/README.md) · [全部指标及置信区间](../results/visual-feedback-v1/README.md)
+
+主视频是正式试验中的最低成功种子 400：锤子归位 → 运动螺丝刀抓取、倾斜插架 → 独立支架安装 → 扳手松爪换抓、视觉对准、穿孔挂放。对准阶段显示原运行的视觉残差和观测序号，不能将其当成真实几何误差。三个失败案例与配对对照保留原始结果，包括迭代模式自身的失败。
+
+48 次评测比较无执行期视觉纠偏、关键阶段反馈、迭代反馈，各配置 8 次；迭代模式无／有扰动成功数为 2/8、3/8，未证明优于阶段反馈。视频是其中的具体案例，不代替总体成功率。
+
+## 历史完整演示：四个物体、关键阶段反馈
 
 **[全景＋腕部](complete-workshop/overview-wrist.mp4)** · **[独立腕部](complete-workshop/wrist.mp4)** · [视频来源与时间点](complete-workshop/README.md)
 

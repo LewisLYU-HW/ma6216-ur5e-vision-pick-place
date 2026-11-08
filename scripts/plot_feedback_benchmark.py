@@ -39,6 +39,7 @@ def main():
     if not result["complete"]:
         raise RuntimeError("Only plot the complete, frozen evaluation")
     tasks = list(protocol["config"]["tasks"])
+    trials_per_configuration = len(protocol["config"]["seeds"])
     expected = len(tasks) * len(METHODS) * 2
     if len(result["groups"]) != expected:
         raise RuntimeError("Missing/extra feedback configurations")
@@ -92,6 +93,8 @@ def main():
     axes[0].set_ylabel("Task success (%)")
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.53, 0.015), ncol=3)
+    fig.text(0.53, 0.12, f"n = {trials_per_configuration} per mode and condition; Wilson 95% intervals",
+             ha="center", fontsize=7.5)
     save(fig, "success_rates")
     write_csv(output / "success_rates.source-data.csv", rows)
 
@@ -124,11 +127,14 @@ def main():
     ax.set_xlabel("Iterative minus comparator (percentage points)")
     ax.spines["left"].set_visible(False)
     ax.tick_params(axis="y", length=0, pad=6)
+    fig.text(0.67, 0.02, f"n = {trials_per_configuration} paired seeds; conservative 95% intervals",
+             ha="center", fontsize=7.5)
     save(fig, "paired_differences")
     write_csv(output / "paired_differences.source-data.csv", rows)
     (output / "provenance.json").write_text(json.dumps({
         "summary_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "groups_plotted": expected, "paired_comparisons_plotted": len(pairs),
+        "trials_per_configuration": trials_per_configuration,
         "excluded_configurations": [], "backend": "Python/matplotlib",
         "dimensions_mm": {"success_rates": [183, 86], "paired_differences": [183, pair_height_mm]},
         "uncertainty": "Wilson 95% for task rates; conservative exact marginal bounds for paired success differences",

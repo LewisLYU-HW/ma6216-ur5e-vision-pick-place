@@ -1,0 +1,43 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "hammer", "camera": "vision_camera", "pixels": 1264}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1764}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 4067}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 1473}
+{"event": "task_phase", "simulation_time_s": 2.5999999999999353, "phase": "park_hammer"}
+{"event": "joint_route_planned", "simulation_time_s": 2.5999999999999353, "stage": "ROUTE_TO_HAMMER", "collision_checks": 68, "waypoints": 66, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 10.166000000000064, "stage": "ROUTE_TO_HAMMER", "nominal_steps": 3657, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "physical_grasp", "simulation_time_s": 14.320000000001452, "object_id": "hammer", "forces_n": {"left": 45.828286267557814, "right": 41.19400644762378}}
+{"event": "joint_route_planned", "simulation_time_s": 15.84000000000196, "stage": "CLEAR_TOOL_ACCESS", "collision_checks": 52, "waypoints": 50, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 21.64799999999888, "stage": "CLEAR_TOOL_ACCESS", "nominal_steps": 2778, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "released", "simulation_time_s": 24.385999999997363, "object_id": "hammer"}
+{"event": "task_phase", "simulation_time_s": 28.43599999999512, "phase": "moving_driver_insertion"}
+{"event": "object_localized", "simulation_time_s": 29.835999999994343, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1760}
+{"event": "object_localized", "simulation_time_s": 31.185999999993594, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1751}
+{"event": "object_localized", "simulation_time_s": 32.5359999999938, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1747}
+{"event": "physical_grasp", "simulation_time_s": 43.41200000000709, "object_id": "screwdriver", "forces_n": {"left": 41.3584057440512, "right": 42.30763540169832}}
+{"event": "wrist_refinement_disabled", "simulation_time_s": 45.81200000001002, "object_id": "screwdriver"}
+{"event": "external_alignment_impulse_started", "simulation_time_s": 53.72200000001969, "object_id": "screwdriver", "world_wrench": [1.5, 0.0, 0.0, 0.0, 0.03, 0.0], "duration_s": 0.12, "controller_receives_object_pose": false}
+{"event": "external_alignment_impulse_finished", "simulation_time_s": 53.84200000001984, "object_id": "screwdriver"}
+{"event": "visual_feedback_stage_finished", "simulation_time_s": 53.972000000019996, "object_id": "screwdriver", "mode": "open_loop", "converged": null, "corrections": 0}
+{"event": "force_guard_triggered", "simulation_time_s": 57.988000000024904, "stage": "INSERT_DRIVER", "force_delta_n": 7.039193218929717}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 826, in main
+    raise MotionFailure("Driver insertion contact guard stopped the task")
+ma6216.motion.MotionFailure: Driver insertion contact guard stopped the task
+{"success": false, "task": "complete", "error": "MotionFailure: Driver insertion contact guard stopped the task", "wall_seconds": 266.7677169289964}

@@ -6,13 +6,31 @@
 先从标定 RGB-D 参考图重建工具，再用官方 FoundationPose 估计 **6D pose（三维位置＋三维朝向）**，驱动实际接触下的夹持、转向、插入和悬挂。新工作站采用深度背景分割，无需给工具涂分割色。
 原有的视觉装配恢复、遮挡换抓和运动目标抓取任务继续保留。
 
-[视觉闭环与三组对照](docs/VISUAL_FEEDBACK.md) · [完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
+[48 次闭环评测](docs/results/visual-feedback-v1/README.md) · [视觉反馈方法](docs/VISUAL_FEEDBACK.md) · [完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
 ## 6D 视觉反馈
 
-新增独立的 `--visual-feedback open_loop/staged/iterative` 开关，对比无执行期视觉纠偏、关键阶段纠偏、以及接近插口／挂钩时的重复观察和限幅修正。保留相同的关节控制与接触保护，单独记录视觉残差、实际几何误差和反馈耗时；对遮挡造成的支架估计跳变执行质量检查。[反馈流程、统计协议与复现](docs/VISUAL_FEEDBACK.md)。下方既有完整视频属于此前的阶段反馈演示。
+新增独立的 `--visual-feedback open_loop/staged/iterative` 开关，对比无执行期视觉纠偏、关键阶段纠偏、以及接近插口／挂钩时的重复观察和限幅修正。保留相同的关节控制与接触保护，单独记录视觉残差、实际几何误差和反馈耗时；对遮挡造成的支架估计跳变执行质量检查。[反馈流程、统计协议与复现](docs/VISUAL_FEEDBACK.md)。
 
-## 完整任务：四阶段连续视频
+按约 50 次的规模完成 **48 次正式评测**：完整四阶段任务 × 三种模式 × 有／无对准扰动 × 每配置 8 次，种子 400–407 配对，失败全部留在分母。
+
+| 模式 | 无扰动：成功数及 Wilson 95% CI | 对准扰动：成功数及 Wilson 95% CI |
+|---|---|---|
+| 无执行期视觉纠偏 | 0/8；0.0%–32.4% | 0/8；0.0%–32.4% |
+| 关键阶段反馈 | 3/8；13.7%–69.4% | 3/8；13.7%–69.4% |
+| 迭代视觉闭环 | 2/8；7.1%–59.1% | 3/8；13.7%–69.4% |
+
+**新增迭代闭环没有显示出高于关键阶段反馈的整链成功率**，四项方法比较的 Holm 校正 p 均为 1.0；小样本不能证明优越或等效。每配置均有 4 次运动螺丝刀抓取接触保护失败和 1 次锤子取件规划失败，这些发生在新增对准闭环之前。迭代模式另有一次挂放后速度未达稳定阈值的失败，未放宽验收。
+
+**[正式试验的完整全景＋腕部](docs/videos/visual-feedback-v1/complete__iterative__none__400.mp4)** · **[同次独立腕部](docs/videos/visual-feedback-v1/complete__iterative__none__400__wrist.mp4)** · [3 条失败与同种子对照](docs/videos/visual-feedback-v1/README.md)
+
+完整视频来自最低成功种子 400 的原始连续轨迹，包含锤子归位、运动螺丝刀抓取与倾斜插架、独立支架安装和扳手松爪换抓／穿孔挂放。画面中的 `VISION residual` 是视觉残差，不能当作真实定位精度。
+
+[独立复核](docs/results/visual-feedback-v1/hero_motion_audit.json)在保存的 25 Hz 快照中未发现非预期机器人穿透或最终松爪后夹爪继续承重；额外静置 30 秒，四个物体仍全部通过验收。该复核不改变正式试验判定。
+
+[全部指标与置信区间](docs/results/visual-feedback-v1/README.md)包括阶段到达／成功率、6D 位姿、标定、执行误差、真实对准误差、观测频率及扰动恢复；[逐次闭环 CSV](docs/results/visual-feedback-v1/visual_feedback_observations.csv)可核对视觉与真实误差。原先中止计划中的 16 次试验单独存档，不混入本轮，历史报告也保持原版本。
+
+## 历史完整演示：阶段反馈、固定布局
 
 **[完整全景＋腕部视频](docs/videos/complete-workshop/overview-wrist.mp4)** · **[同次运行的独立腕部](docs/videos/complete-workshop/wrist.mp4)** · [运行与验收记录](docs/results/complete-workshop/README.md)
 
