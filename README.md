@@ -8,7 +8,23 @@
 
 [48 次闭环评测](docs/results/visual-feedback-v1/README.md) · [视觉反馈方法](docs/VISUAL_FEEDBACK.md) · [完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
-## 最新：腕部估计标定与定位专项评估
+## Final Project：估计标定版本的 48 次复测与英文汇报
+
+**[课程 Task 1–6 与 Bonus 交付总览](docs/FINAL_PROJECT.md)** · **[全英文 PPT／PDF／讲稿](docs/presentation/README.md)** · [英文文献与技术选型](docs/LITERATURE_AND_SELECTION.md) · [新版本完整指标报告](docs/results/visual-feedback-calibrated-v1/README.md) · [新版本完整及失败录像](docs/videos/visual-feedback-calibrated-v1/README.md)
+
+使用图像估计的腕部内参与手眼变换，重新完成 **48 次**四阶段完整流程：三种反馈模式 × 有／无对准扰动 × 每配置 8 次。沿用种子 400–407，属于配对复测，不称为新的留出测试；全部失败保留。
+
+| 模式 | 无扰动 | 有对准扰动 |
+|---|---:|---:|
+| 无执行期视觉纠偏 | 0/8 | 0/8 |
+| 关键阶段反馈 | 3/8 | 2/8 |
+| 迭代视觉闭环 | 3/8 | 3/8 |
+
+四项方法比较的 Holm 校正 p 均为 1.0；当前小样本不能证明优越或等效。报告包含置信区间、阶段到达与验收、6D 位姿、标定、执行误差、观测频率和扰动恢复。主要瓶颈仍为初始抓取与规划；有扰动阶段反馈另有一次扳手接近挂架时失去双侧夹持的失败。完整演示与统计分开解释。
+
+英文汇报为 19 页可编辑 PPT，附 PDF 和英文讲稿，按约 12–15 分钟组织。文献候选与项目实际运行的内部对照明确区分，未声称做过外部位姿算法排名。以下旧版报告和视频保持其原始条件，不与这次数据混合。
+
+## 腕部估计标定与定位专项评估
 
 已补齐课程 Task 2/3 的腕部图像标定：内参独立验证重投影 **0.02177 px**，手眼误差 **0.852 mm／0.0227°**，冻结整条坐标链的验证重投影 **0.05497 px**。正常工具任务默认加载估计参数并通过机器人 FK 传播，不再直接读取仿真腕部相机内参或安装变换。
 

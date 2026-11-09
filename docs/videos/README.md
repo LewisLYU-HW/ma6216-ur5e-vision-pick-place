@@ -4,7 +4,13 @@
 点击文件链接可在 GitHub 查看或下载；下载到本地后可用 VLC 打开。
 录像按仿真时间采样；静态任务的推理和离线规划等待不等于录像时长。
 
-## 当前：使用估计腕部标定的完整任务
+## 当前：估计标定接入后的正式 48 次评测
+
+**[完整全景＋腕部](visual-feedback-calibrated-v1/complete__iterative__none__400.mp4)** · **[独立腕部](visual-feedback-calibrated-v1/complete__iterative__none__400__wrist.mp4)** · [失败与配对录像](visual-feedback-calibrated-v1/README.md) · [英文指标报告](../results/visual-feedback-calibrated-v1/README.md)
+
+195.88 秒完整任务，来自新一轮正式试验的原始状态。每配置 8 次，无／有扰动成功数分别为：开环 0/8、0/8；阶段反馈 3/8、2/8；迭代反馈 3/8、3/8。所有方法配对比较经 Holm 校正后 p=1.0，不能据此声称显著优越。沿用历史随机种子，属于配对复测。全部失败保留。
+
+## 此前：估计腕部标定的两次接入验证
 
 **[完整全景＋腕部](calibrated-workshop-v1/overview-wrist.mp4)** · **[独立腕部](calibrated-workshop-v1/wrist.mp4)** · [新标定接入验证](../results/calibrated-workshop-v1/README.md)
 
