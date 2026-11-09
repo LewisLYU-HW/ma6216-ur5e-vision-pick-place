@@ -1,0 +1,195 @@
+{
+  "id": 24,
+  "success": true,
+  "operation": "track",
+  "capture_time_s": 160.3400000000375,
+  "camera_T_object": [
+    [
+      0.01275575440376997,
+      0.9998879432678223,
+      0.007846694439649582,
+      0.0005035497015342116
+    ],
+    [
+      0.825442373752594,
+      -0.014958614483475685,
+      0.5642880797386169,
+      0.0058149173855781555
+    ],
+    [
+      0.5643420815467834,
+      -0.000720925279892981,
+      -0.8255406618118286,
+      0.14202183485031128
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "inference_seconds": 0.08682808201410808,
+  "wall_seconds": 0.13168324099387974,
+  "original_image_size": [
+    1280,
+    960
+  ],
+  "inference_image_size": [
+    800,
+    600
+  ],
+  "model_sha256": "81ab79331641e58914c5cfb0e4c782993e5b1862de614bdb01ef058e80fcf789",
+  "model_free": true,
+  "cad_used_for_reconstruction": false,
+  "visual_kinematic_prior_used": true,
+  "object_pose_ground_truth_input": false,
+  "shared_gpu_worker": true,
+  "world_T_object": [
+    [
+      0.9999506583453647,
+      -0.009918279779833991,
+      0.0003395361839826742,
+      0.3444359564127407
+    ],
+    [
+      0.009904833988591896,
+      0.9995565378664406,
+      0.02808559699249069,
+      0.016046441423112384
+    ],
+    [
+      -0.0006178993538578673,
+      -0.028080853041571645,
+      0.9996054600742188,
+      0.5812460263614496
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "control_world_T_object": [
+    [
+      0.9999506583453647,
+      -0.009918279779833991,
+      0.0003395361839826742,
+      0.3444359564127407
+    ],
+    [
+      0.009904833988591896,
+      0.9995565378664406,
+      0.02808559699249069,
+      0.016046441423112384
+    ],
+    [
+      -0.0006178993538578673,
+      -0.028080853041571645,
+      0.9996054600742188,
+      0.5812460263614496
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "capture_truth_evaluation_only": [
+    [
+      0.999979323233144,
+      0.0030325419892990708,
+      0.005670696188850168,
+      0.3427830555990759
+    ],
+    [
+      -0.0031478140885036984,
+      0.9997863206950866,
+      0.020430472766078362,
+      0.015424100483787217
+    ],
+    [
+      -0.005607528211905796,
+      -0.020447900627311107,
+      0.9997751942248256,
+      0.5802600122644627
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "localization_evaluation_only": {
+    "true_positive_pixels": 82385,
+    "false_positive_pixels": 8155,
+    "false_negative_pixels": 0,
+    "visible_truth_pixels": 82385,
+    "predicted_pixels": 90540,
+    "iou": 0.9099293130108239,
+    "precision": 0.9099293130108239,
+    "recall": 1.0,
+    "mask_returned": true,
+    "localized_iou50": true,
+    "false_positive_on_invisible": false
+  },
+  "raw_estimator_metrics_evaluation_only": {
+    "translation_error_mm": 2.0227736264918366,
+    "rotation_error_deg": 0.9134761857136704,
+    "within_5mm_5deg": true,
+    "add_mm": 2.086004508503916,
+    "adds_mm": 1.816231603806569,
+    "reference_bbox_diagonal_m": 0.17698966340875644,
+    "adds_below_10pct_bbox_diagonal": true,
+    "surface": "fixed sampled reference reconstruction; not simulator CAD"
+  },
+  "control_pose_metrics_evaluation_only": {
+    "translation_error_mm": 2.0227736264918366,
+    "rotation_error_deg": 0.9134761857136704,
+    "within_5mm_5deg": true,
+    "add_mm": 2.086004508503916,
+    "adds_mm": 1.816231603806569,
+    "reference_bbox_diagonal_m": 0.17698966340875644,
+    "adds_below_10pct_bbox_diagonal": true,
+    "surface": "fixed sampled reference reconstruction; not simulator CAD"
+  },
+  "object_id": "spanner",
+  "camera": "wrist_camera",
+  "foreground_pixels": 90540,
+  "segmentation": "observed depth inside previous visual/kinematic tool region",
+  "translation_error_mm_evaluation_only": 2.0227736264918366,
+  "rotation_error_deg_evaluation_only": 0.9134761857136704,
+  "tcp_at_capture": [
+    [
+      -0.9999951955014957,
+      0.0030362340566690554,
+      0.0006247052720558091,
+      0.33499026525299774
+    ],
+    [
+      0.0030227901906895926,
+      0.9997852832944895,
+      -0.020500001151682185,
+      0.015540721815965807
+    ],
+    [
+      -0.0006868139390563711,
+      -0.020498014306488885,
+      -0.9997896577261153,
+      0.584545330410654
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "feedback_virtual_latency_s": 0.15,
+  "available_time_s": 160.4900000000382,
+  "observation_wall_seconds": 2.25400133500807,
+  "used_for_control_update": true
+}

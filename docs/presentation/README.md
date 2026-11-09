@@ -1,39 +1,43 @@
-# Compact academic research presentation — English
+# Image-led academic presentation
 
-![Selected pages from the academic presentation](preview.jpg)
+- [PowerPoint with embedded videos](vision_guided_manipulation.pptx)
+- [PDF with static video posters](vision_guided_manipulation.pdf)
+- [Preview](preview.jpg) · [English speaker notes](speaker_notes.md)
+- [Offline demonstration player](demo_player.html)
+- [Figure sources](plates/README.md) · [Validation](validation.json)
 
-- [Editable PowerPoint](vision_guided_manipulation.pptx)
-- [PDF viewing copy](vision_guided_manipulation.pdf)
-- [English speaker notes](speaker_notes.md), also embedded in PowerPoint
-- [Slide content](slides.json) · [Provenance](provenance.json) · [Validation](validation.json)
-- [Processed scientific image plates](plates/README.md) · [Figure contract](FIGURE_CONTRACT.md)
-- [Original frame manifest](frames/manifest.json): video hashes, frame indices, timestamps and camera-panel crops
-- [Course evidence map](../FINAL_PROJECT.md) · [Literature review](../LITERATURE_AND_SELECTION.md)
-- [Complete quantitative report](../results/visual-feedback-calibrated-v1/README.md) · [Original videos](../videos/visual-feedback-calibrated-v1/README.md)
+The deck contains **21 English slides: 20 main slides and one reference appendix**, for approximately 15–17 minutes including demonstrations. Nineteen slides contain real simulation or calibration imagery, with 42 image-panel placements, two embedded videos and one statistical chart. Titles use 20 pt; supporting text is mostly 11–14 pt. The sole coordinate-chain equation is a 14 pt annotation below the pose figures.
 
-This academic revision replaces the previous files at the same paths. It contains **19 English slides: 18 main slides and one reference appendix**, designed for approximately 12–15 minutes. Seventeen slides contain real simulation or calibration imagery, with 37 runtime/calibration panel placements and one statistical chart. Titles are 20 pt; supporting text is mainly 11–14 pt. The sole displayed coordinate-chain equation is 14 pt. Large takeaway banners have been removed. Key manipulation and control-comparison figures occupy dedicated pages, with enlarged task-region views and readable projected XYZ axes.
+## Demonstrations and processing evidence
 
-The argument follows the research question, technical selection, calibrated observation-to-control method, physical operation evidence, paired experimental design, quantitative results, failure analysis and limitations. Coordinate transforms and pose residuals use editable equation text; the architecture is composed of editable PowerPoint shapes. Detailed interpretation is in the English notes. [content.json](content.json) retains the source narrative used by the compact-deck builder.
+Slide 1 embeds [53.76-second task highlights](media/complete_task_highlights.mp4), with synchronized workcell/wrist views, chronological cuts, source timestamps and explicit speed labels. Key grasp, regrasp and release excerpts are retained at normal speed.
 
-The source package retains thirteen processed image plates with consistent cropping, matched temporal views, lowercase panel identifiers, explanatory region outlines and a magnified false-positive region. Original frames and outcomes are unchanged. Each plate is supplied as PNG plus editable-text PDF/SVG with a crop/source manifest and rendered quality checks. The PNGs are embedded in PowerPoint; text within a plate is edited through its source SVG or plotting script, while slide titles, equations and explanatory text are native PowerPoint objects.
+Slides 3–4 show a [traceable processing chain](pipeline_source/README.md): one wrist capture's RGB, metric depth, predicted mask and matching estimated pose. The actual reference reconstruction comes from 24 prior views; the displayed hanging result is a later state of the same trial. The distinction is explicit.
 
-The main manipulation plates follow iterative/no-disturbance seed 400. Qualitative controls show the matched open-loop failure in seed 400 and both staged/iterative pickup failures in seed 401. The correction example is a **separate integration run**; the background diagnosis is a **separate localization experiment**. Neither changes the denominator of the final 48 attempts. The result does not establish architectural superiority, equivalence or real-robot reliability.
+Slide 9 embeds a [20-second synchronized feedback diagnostic](media/visual_feedback_synchronized.mp4), slowed to 0.125×. Three observations and one corrective move are shown. Residuals update only when each logged observation becomes available. This is a separate perturbed integration run, not part of the 48-attempt denominator. See [media provenance and playback guidance](media/README.md).
 
-No image-generative enhancement, scene retouching, contrast adjustment or invented metric scale is used. Source videos provide finite raster resolution; high-DPI exports improve annotations but do not invent image detail. Rectangles identify visual regions, not measured coordinate axes or contact forces. Full-length movies remain separate from the presentation.
+In PowerPoint slideshow mode, click the video. The MP4 files and offline HTML player are alternatives if the presentation application does not support embedded playback. PDF contains static posters and links.
+
+## Scientific boundaries
+
+The final quantitative analysis remains the 48-attempt calibrated replication: three feedback modes, two disturbance conditions, eight reused paired seeds per cell. Selected successes illustrate feasibility; they do not establish statistical superiority or real-robot reliability. Early failures remain included.
+
+Fifteen figure plates are supplied as PNG/PDF/SVG. Enlarged XYZ overlays use the recorded estimated poses, with 60 mm display axes; [pose provenance](pose_axes.json) records the projection inputs. Original videos, raw frames, measurements and outcomes remain unchanged. [Figure contract](FIGURE_CONTRACT.md) and [inspected paper-figure references](FIGURE_DESIGN_REFERENCES.md) document the design decisions.
+
+## Rebuild
+
+Run from the repository root. Existing source observations and reconstruction assets are retained; rebuilding presentation media does not rerun manipulation trials.
 
 ```bash
-python3 scripts/extract_presentation_frames.py
 python3 scripts/build_presentation_plates.py --qa-tools /path/to/nature-figure/scripts
+MUJOCO_GL=egl .venv/bin/python scripts/project_presentation_pose_axes.py
 python3 scripts/refine_presentation_evidence.py --qa-tools /path/to/nature-figure/scripts
+python3 scripts/build_processing_chain_figure.py
+MUJOCO_GL=egl .venv/bin/python scripts/build_presentation_demos.py
 python3 scripts/build_project_presentation.py \
   --results docs/results/visual-feedback-calibrated-v1 \
-  --output artifacts/presentation_rebuilt
+  --output docs/presentation
+python3 scripts/export_presentation_pdf.py
 ```
 
-Rebuilding requires ffmpeg, Pillow, matplotlib and python-pptx; figure alignment uses the supplied skill audit interface. LibreOffice exports the PDF. The final files are included for immediate use without rebuilding. Add actual group names and course identifiers if required by the class.
-
-Figure-design sources and inspected paper figures: [design references](FIGURE_DESIGN_REFERENCES.md). Six evidence composites now include matched source-pixel insets, correspondence leaders and explicit visible-versus-logged interpretations.
-
-Latest figure revision: seven large task-region plates with 60 mm estimated-pose axes, 2.6 pt strokes, dark outlines and 14 pt XYZ labels. Duplicate small context/detail layouts were replaced to prioritize the manipulation geometry. Projection provenance: [pose_axes.json](pose_axes.json). Generate the projection file with `MUJOCO_GL=egl .venv/bin/python scripts/project_presentation_pose_axes.py` before refining plates.
-
-Image-led layout revision: workcell images dominate the introduction, evaluation setup and conclusion; the coordinate-transformation page uses full-width pose figures with a single compact equation below. The feedback page uses a large visual pair with a narrow method sidebar. Detailed technical selection and methodological explanations remain in the English speaker notes and linked evidence.
+The PDF exporter creates a temporary static-poster copy for conversion; it preserves the videos in the original PPTX. Verification covers PDF text bounds/collisions, figure alignment, source hashes, full MP4 decoding and embedded-video package hashes. Interactive playback in a native PowerPoint application has not been tested.

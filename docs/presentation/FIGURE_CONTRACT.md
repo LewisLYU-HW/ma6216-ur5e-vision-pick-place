@@ -42,3 +42,7 @@ Seven plates now prioritize large matched task-region views, replacing duplicate
 ## Image-led slide composition
 
 Large scene images or full-width evidence plates are the primary content. Equations are supporting annotations at 14 pt (10 pt subscripts), not focal elements. Method and protocol text is condensed into narrow sidebars or compact bottom tables; fuller explanations remain in speaker notes. Titles use 20 pt, a thin teal top rule, aligned margins and restrained white/blue-grey styling. Original images, measured projections and experimental outcomes are unchanged by this layout revision.
+
+## Recorded demonstration and processing-chain extension
+
+Two embedded videos provide temporal evidence: a 53.76 s chronological task reel with cuts/speed labels and a 20 s slowed visual-feedback diagnostic with measurement availability timestamps. Raw videos and trial outcomes remain unchanged. Every displayed residual must be held from its logged decision time to the next available observation. Reference reconstruction is explicitly prior to the runtime observation; execution outcome is explicitly later. The new processing plates show one shared RGB/depth/mask capture and its matching pose, then the actual reconstructed mesh and later release. Full processing-chain provenance and media provenance are separately retained.
