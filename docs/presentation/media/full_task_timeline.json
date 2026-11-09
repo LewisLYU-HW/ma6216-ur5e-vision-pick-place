@@ -1,0 +1,65 @@
+{
+  "source": "docs/videos/visual-feedback-calibrated-v1/complete__iterative__none__400.mp4",
+  "sha256": "6932f630e8d9b0160f54f244ed8bf77ef104b61a6386ca5dc28733ae39e75492",
+  "duration_s": 195.88,
+  "default_playback_rate": 1,
+  "editing": "None: original continuous replay, no cuts or speed changes",
+  "simulation_time_offset_s": 2.002000000000001,
+  "chapter_source": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/events.json",
+  "chapter_source_sha256": "ded4c6e20444b33e45474464757b254150af1db15054aeba5a343406a26b0f5b",
+  "stage_source": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+  "stage_source_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+  "chapters": [
+    {
+      "start": 0,
+      "title": "Hammer return",
+      "detail": "Initial observation, pickup and released tray placement",
+      "basis": "Video start; park_hammer starts at 0.598 s",
+      "end": 26.37
+    },
+    {
+      "start": 26.37,
+      "title": "Moving screwdriver",
+      "detail": "Moving pickup, reorientation and tilted insertion",
+      "basis": "task_phase: moving_driver_insertion",
+      "end": 71.38
+    },
+    {
+      "start": 71.38,
+      "title": "Rack installation",
+      "detail": "Independent frame pickup, seating and release",
+      "basis": "task_phase: install_frame",
+      "end": 134.624
+    },
+    {
+      "start": 134.624,
+      "title": "Spanner regrasp",
+      "detail": "Supported placement, finger clearance and new grasp",
+      "basis": "task_phase: regrasp_and_hang_spanner",
+      "end": 158.518
+    },
+    {
+      "start": 158.518,
+      "title": "Hole-over-pin hanging",
+      "detail": "Alignment, threading, release and stability check",
+      "basis": "First recorded REORIENT_AND_APPROACH_RACK snapshot",
+      "end": 195.88
+    }
+  ],
+  "milestones": [
+    {
+      "time": 147.198,
+      "label": "Open fingers"
+    },
+    {
+      "time": 171.638,
+      "label": "Begin threading"
+    },
+    {
+      "time": 184.838,
+      "label": "Stability check"
+    }
+  ],
+  "poster_sha256": "157d06ef3980def29e22de4bc4571613cd65bc048db1e1fb88a366410ffe8e41",
+  "player_sha256": "1f9dc872e0959f60d4609fd3882bbdd1757b78cc23fcc38fb725629a4a0af55c"
+}

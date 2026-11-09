@@ -3,7 +3,7 @@
 - [PowerPoint with embedded videos](vision_guided_manipulation.pptx)
 - [PDF with static video posters](vision_guided_manipulation.pdf)
 - [Preview](preview.jpg) · [English speaker notes](speaker_notes.md)
-- [Offline demonstration player](demo_player.html)
+- [Complete continuous replay and task timeline](demo_player.html)
 - [Figure sources](plates/README.md) · [Validation](validation.json)
 
 The deck contains **21 English slides: 20 main slides and one reference appendix**, for approximately 15–17 minutes including demonstrations. Nineteen slides contain real simulation or calibration imagery, with 42 image-panel placements, two embedded videos and one statistical chart. Titles use 20 pt; supporting text is mostly 11–14 pt. The sole coordinate-chain equation is a 14 pt annotation below the pose figures.
@@ -15,6 +15,8 @@ Slide 1 embeds [53.76-second task highlights](media/complete_task_highlights.mp4
 Slides 3–4 show a [traceable processing chain](pipeline_source/README.md): one wrist capture's RGB, metric depth, predicted mask and matching estimated pose. The actual reference reconstruction comes from 24 prior views; the displayed hanging result is a later state of the same trial. The distinction is explicit.
 
 Slide 9 embeds a [20-second synchronized feedback diagnostic](media/visual_feedback_synchronized.mp4), slowed to 0.125×. Three observations and one corrective move are shown. Residuals update only when each logged observation becomes available. This is a separate perturbed integration run, not part of the 48-attempt denominator. See [media provenance and playback guidance](media/README.md).
+
+The offline player now opens the original continuous 195.88-second replay at 1× speed, with a clickable, automatically highlighted task timeline. The separate slowed feedback diagnostic is collapsed below it. The PowerPoint retains its short opening reel.
 
 In PowerPoint slideshow mode, click the video. The MP4 files and offline HTML player are alternatives if the presentation application does not support embedded playback. PDF contains static posters and links.
 

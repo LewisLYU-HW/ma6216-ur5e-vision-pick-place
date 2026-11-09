@@ -1,6 +1,8 @@
 # Recorded presentation demonstrations
 
-Open [the offline player](../demo_player.html) locally, or play these MP4 files directly. Both videos are also embedded in the PowerPoint; use slideshow mode and click the video. If the presentation application does not support embedded H.264 playback, use the standalone files. PDF contains poster images and links, not playable video.
+Open [the offline player](../demo_player.html) for the complete continuous 195.88-second original replay at 1× speed. Its task timeline follows the phase and stage logs; selecting a timestamp seeks only on explicit user input. Normal playback never cuts or jumps at task boundaries. The slowed feedback diagnostic is an optional collapsed section. See [full-replay timeline provenance](full_task_timeline.json).
+
+The two short videos listed below are also embedded in the PowerPoint; use slideshow mode and click the video. If the presentation application does not support embedded H.264 playback, use the standalone files. PDF contains poster images and links, not playable video.
 
 | Video | Duration | Evidence |
 |---|---:|---|
