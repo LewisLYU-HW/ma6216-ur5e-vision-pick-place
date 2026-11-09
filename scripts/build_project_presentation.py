@@ -1,5 +1,5 @@
 """Build compact academic slides from traceable archived content and image plates."""
-import argparse,json,hashlib
+import argparse,json,hashlib,os
 from pathlib import Path
 from PIL import Image
 from pptx import Presentation
@@ -36,18 +36,20 @@ def build(results,out):
         p=Path(p);iw,ih=Image.open(p).size;k=min(w/iw,h/ih);dw,dh=iw*k,ih*k
         s.shapes.add_picture(str(p),Inches(x+(w-dw)/2),Inches(y+(h-dh)/2),width=Inches(dw),height=Inches(dh));rel=str(p.relative_to(ROOT));assets[rel]=sha(p);notes[-1]['images'].append(rel)
     def plate(s,n,x,y,w,h):image(s,plates/(n+'.png'),x,y,w,h)
-    def movie(s,name,poster):
-        video=out/'media'/name;still=out/'media'/poster
-        s.shapes.add_movie(str(video),Inches(1.7065),Inches(1.03),Inches(9.92),Inches(5.58),poster_frame_image=str(still),mime_type='video/mp4')
+    def movie(s,name,poster,full_task=False):
+        video=(ROOT/'docs/videos/visual-feedback-calibrated-v1'/name) if full_task else out/'media'/name;still=out/'media'/poster
+        x,y,w,h=(.45,1.03,12.4,4.65) if full_task else (1.7065,1.03,9.92,5.58)
+        s.shapes.add_movie(str(video),Inches(x),Inches(y),Inches(w),Inches(h),poster_frame_image=str(still),mime_type='video/mp4')
         for path in [video,still]:assets[str(path.relative_to(ROOT))]=sha(path)
         notes[-1]['images'].append(str(still.relative_to(ROOT)))
         notes[-1]['video']=str(video.relative_to(ROOT))
-        cue=('Play the 53.76-second edited task reel. Point out the four task phases, synchronized camera views and explicit playback-speed labels. This is a selected successful trajectory, not a success-rate estimate.' if 'complete_task' in name else 'Play the 20-second slowed feedback replay. Explain the three observations and single corrective move. Measurements update only at logged decision time. This separate integration diagnostic is not pooled into the final 48 attempts.')
+        notes[-1]['video_poster']=str(still.relative_to(ROOT))
+        cue=('Play the full 195.88-second continuous original replay at normal speed. The timeline below identifies hammer return, moving screwdriver insertion, rack installation, spanner regrasp and hanging. Timeline labels are static in PowerPoint; interactive seeking is available in the offline player. This is a selected successful trajectory, not a success-rate estimate.' if full_task else 'Play the 20-second slowed feedback replay. Explain the three observations and single corrective move. Measurements update only at logged decision time. This separate integration diagnostic is not pooled into the final 48 attempts.')
         notes[-1]['notes']+='\n\nDemonstration cue: '+cue
         s.notes_slide.notes_text_frame.text=notes[-1]['notes']+'\n\nEvidence: '+notes[-1]['source']
 
         button=text(s,'Play standalone MP4 ↗',.55,6.76,3.3,.25,11,True,BLUE)
-        button.text_frame.paragraphs[0].runs[0].hyperlink.address='media/'+name
+        button.text_frame.paragraphs[0].runs[0].hyperlink.address=os.path.relpath(video,out)
 
     def sequence(s,keys,labels,y):
         width=12.2/len(keys)
@@ -71,8 +73,14 @@ def build(results,out):
             if base:r._r.get_or_add_rPr().set('baseline',str(base))
 
     s=slide('Calibrated 6D vision for sequential tool manipulation',[1,2],'Task demonstration')
-    movie(s,'complete_task_highlights.mp4','complete_task_poster.jpg')
-    text(s,'Edited successful run · speed changes and source timestamps labeled',4.1,6.76,8.4,.25,11,False,GREY)
+    movie(s,'complete__iterative__none__400.mp4','full_task_poster.jpg',full_task=True)
+    timeline=json.loads((out/'media/full_task_timeline.json').read_text())
+    for i,chapter in enumerate(timeline['chapters']):
+        x=.55+i*2.45;rect(s,x,5.92,2.32,.65,'EDF3F5')
+        start=int(chapter['start']);stamp=f'{start//60:02}:{start%60:02}'
+        text(s,stamp,x+.10,6.00,.59,.22,11,True,BLUE)
+        text(s,chapter['title'],x+.76,5.99,1.48,.53,11,True)
+    text(s,'Complete continuous replay · 03:16 · 1× original speed',4.1,6.76,8.4,.25,11,False,GREY)
 
     s=slide('From visual observation to physical manipulation',[3,4],'Methods')
     steps=[('RGB-D','Estimated intrinsics'),('Localization','Depth foreground'),('6D pose','FoundationPose'),('Robot target','Calibrated chain'),('Execution','IK + control')]
@@ -194,8 +202,8 @@ def build(results,out):
 
     prs.save(out/'vision_guided_manipulation.pptx')
     (out/'slides.json').write_text(json.dumps(notes,indent=2)+'\n')
-    (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n20 main slides + 1 reference appendix. Target: approximately 15–17 minutes, including demonstrations.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
-    meta={'revision':'Image-led academic deck with embedded task/feedback videos and traceable processing chain','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':20,'body_font_pt_range':[11,14],'equation_font_pt':14,'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'embedded_videos':2,'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
+    (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n20 main slides + 1 reference appendix. Target: approximately 18–20 minutes, including demonstrations.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
+    meta={'revision':'Image-led academic deck with embedded task/feedback videos and traceable processing chain','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':20,'body_font_pt_range':[11,14],'equation_font_pt':14,'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'embedded_videos':2,'main_video_duration_s':195.88,'main_video_editing':'Original continuous replay; no cuts or speed changes','statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
     (out/'provenance.json').write_text(json.dumps(meta,indent=2)+'\n');print({k:meta[k] for k in ['slides','runtime_image_panel_placements','slides_with_runtime_or_calibration_images']})
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();build(a.results.resolve(),a.output.resolve())

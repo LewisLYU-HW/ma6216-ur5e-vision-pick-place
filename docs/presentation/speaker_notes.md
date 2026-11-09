@@ -1,6 +1,6 @@
 # English speaker notes — compact academic version
 
-20 main slides + 1 reference appendix. Target: approximately 15–17 minutes, including demonstrations.
+20 main slides + 1 reference appendix. Target: approximately 18–20 minutes, including demonstrations.
 
 ## 1. Calibrated 6D vision for sequential tool manipulation
 
@@ -8,7 +8,7 @@ We study vision-guided manipulation in a simulated maintenance workcell. The sys
 
 The central question is whether more visual feedback improves a sequential task when calibration, pose estimation and contact all contribute errors. Translation alone is insufficient: shaft-to-socket and hole-to-pin relationships constrain orientation. Rack installation changes the next task fixture, while spanner regrasp changes the object-to-gripper relationship. We therefore distinguish local pose alignment from released whole-sequence success. One successful replay illustrates feasibility; all attempted trials are required for evaluation.
 
-Demonstration cue: Play the 53.76-second edited task reel. Point out the four task phases, synchronized camera views and explicit playback-speed labels. This is a selected successful trajectory, not a success-rate estimate.
+Demonstration cue: Play the full 195.88-second continuous original replay at normal speed. The timeline below identifies hammer return, moving screwdriver insertion, rack installation, spanner regrasp and hanging. Timeline labels are static in PowerPoint; interactive seeking is available in the offline player. This is a selected successful trajectory, not a success-rate estimate.
 
 Source: UR5e + Robotiq 2F-85 | MuJoCo | Model-free reference reconstruction + FoundationPose | Final calibrated evaluation | 48 paired attempts | original simulation evidence
 

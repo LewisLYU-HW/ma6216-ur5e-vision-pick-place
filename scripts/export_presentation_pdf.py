@@ -7,11 +7,11 @@ p=argparse.ArgumentParser();p.add_argument('--directory',type=Path,default=Path(
 prs=Presentation(out/'vision_guided_manipulation.pptx');slides=json.loads((out/'slides.json').read_text())
 for slide,note in zip(prs.slides,slides):
  if 'video' not in note:continue
- poster='complete_task_poster.jpg' if 'complete_task' in note['video'] else 'visual_feedback_poster.jpg'
+ poster=out.parents[1]/note['video_poster']
  for shape in list(slide.shapes):
   if shape.shape_type==MSO_SHAPE_TYPE.MEDIA:
    left,top,width,height=shape.left,shape.top,shape.width,shape.height;shape._element.getparent().remove(shape._element)
-   slide.shapes.add_picture(str(out/'media'/poster),left,top,width=width,height=height)
+   slide.shapes.add_picture(str(poster),left,top,width=width,height=height)
 with tempfile.TemporaryDirectory(prefix='ma6216-static-pdf-') as td:
  tmp=Path(td);source=tmp/'vision_guided_manipulation.pptx';prs.save(source)
  env=dict(os.environ,GSETTINGS_BACKEND='memory',SAL_USE_VCLPLUGIN='svp')

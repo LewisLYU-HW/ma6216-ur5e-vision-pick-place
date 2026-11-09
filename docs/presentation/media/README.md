@@ -2,11 +2,12 @@
 
 Open [the offline player](../demo_player.html) for the complete continuous 195.88-second original replay at 1× speed. Its task timeline follows the phase and stage logs; selecting a timestamp seeks only on explicit user input. Normal playback never cuts or jumps at task boundaries. The slowed feedback diagnostic is an optional collapsed section. See [full-replay timeline provenance](full_task_timeline.json).
 
-The two short videos listed below are also embedded in the PowerPoint; use slideshow mode and click the video. If the presentation application does not support embedded H.264 playback, use the standalone files. PDF contains poster images and links, not playable video.
+PowerPoint now embeds the full original replay and the separate feedback diagnostic. The short highlights below are retained only as an optional archive; use slideshow mode and click the video. If the presentation application does not support embedded H.264 playback, use the standalone files. PDF contains poster images and links, not playable video.
 
 | Video | Duration | Evidence |
 |---|---:|---|
-| [Complete task highlights](complete_task_highlights.mp4) | 53.76 s | Selected original successful trial, iterative / none / seed 400 |
+| [Full task replay](../../videos/visual-feedback-calibrated-v1/complete__iterative__none__400.mp4) | 195.88 s | Embedded in PPT; continuous original replay with task timeline |
+| [Archived highlights](complete_task_highlights.mp4) | 53.76 s | Optional standalone archive; not embedded in the current PPT |
 | [Synchronized visual feedback](visual_feedback_synchronized.mp4) | 20.00 s | Separate perturbed integration run; three observations and one correction |
 
 The highlights retain chronological order with explicit cuts, timestamps and playback-speed labels. Contact-critical excerpts are retained at 1×; the initial moving-feed preview and transport segments may be accelerated. The full original [195.88-second replay](../../videos/visual-feedback-calibrated-v1/complete__iterative__none__400.mp4) remains available.
