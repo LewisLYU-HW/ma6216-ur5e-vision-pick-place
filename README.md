@@ -24,7 +24,7 @@
 
 英文汇报已重做为学术汇报版：21 页图像优先的学术 PPT（20 页正文＋1 页参考文献），按研究问题、方法、实验设计、结果和局限组织；保留 15 组科学证据图源文件，幻灯片含 42 处实际图像子图和 1 幅统计图；去掉大字结论横幅，采用大幅关键操作局部图、加粗 XYZ 位姿轴、时序子图和技术表格。附 PDF、英文讲稿及可编辑 PDF／SVG 图版，含完整演示约 18–20 分钟，新版直接覆盖原文件。文献候选与项目实际运行的内部对照明确区分，未声称做过外部位姿算法排名。以下旧版报告和视频保持其原始条件，不与这次数据混合。
 
-**[首页完整任务演示：9.8 秒，连续 20 倍速＋同步任务时间轴](docs/presentation/media/complete_task_with_timeline.mp4)** · [演示播放器](docs/presentation/demo_player.html)
+**[首页完整任务演示：24.48 秒，连续 8 倍速＋同步任务时间轴](docs/presentation/media/complete_task_with_timeline.mp4)** · [演示播放器](docs/presentation/demo_player.html)
 
 ## 腕部估计标定与定位专项评估
 
@@ -290,4 +290,4 @@ python scripts/check_model_free_tasks.py
 
 代码与演示位于小组原仓库的 `feat/model-free-manipulation` 分支，对应 [草稿 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)。
 
-汇报新增：[完整任务精华视频（54 秒）](docs/presentation/media/complete_task_highlights.mp4) · [闭环日志同步演示（20 秒）](docs/presentation/media/visual_feedback_synchronized.mp4) · [完整连续录像＋任务时间轴](docs/presentation/demo_player.html)。PPT 首页已内嵌完整连续任务的 20 倍速录像（9.8 秒，原片 195.88 秒）和闭环演示，首页视频下方任务时间轴随播放自动高亮当前阶段；另补同一观测的 RGB／深度／预测分割／位姿处理链，所有新增展示均来自已保存的实验数据。
+汇报新增：[完整任务精华视频（54 秒）](docs/presentation/media/complete_task_highlights.mp4) · [闭环日志同步演示（20 秒）](docs/presentation/media/visual_feedback_synchronized.mp4) · [完整连续录像＋任务时间轴](docs/presentation/demo_player.html)。PPT 首页已内嵌完整连续任务的 8 倍速录像（24.48 秒，原片 195.88 秒）和闭环演示，首页视频下方任务时间轴随播放自动高亮当前阶段；另补同一观测的 RGB／深度／预测分割／位姿处理链，所有新增展示均来自已保存的实验数据。
