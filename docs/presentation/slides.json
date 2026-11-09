@@ -5,21 +5,22 @@
     "notes": "We study vision-guided manipulation in a simulated maintenance workcell. The system integrates independently estimated camera calibration, image-based localization, reconstructed object references, FoundationPose, and physical robot control. Four dependent operations are executed in one continuous scene. The research question is whether additional execution-period pose feedback improves complete-sequence success, rather than merely improving a local alignment residual. The contribution is independent engineering integration and critical evaluation, not a new neural algorithm.\n\nThe central question is whether more visual feedback improves a sequential task when calibration, pose estimation and contact all contribute errors. Translation alone is insufficient: shaft-to-socket and hole-to-pin relationships constrain orientation. Rack installation changes the next task fixture, while spanner regrasp changes the object-to-gripper relationship. We therefore distinguish local pose alignment from released whole-sequence success. One successful replay illustrates feasibility; all attempted trials are required for evaluation.",
     "source": "UR5e + Robotiq 2F-85 | MuJoCo | Model-free reference reconstruction + FoundationPose | Final calibrated evaluation | 48 paired attempts | original simulation evidence",
     "images": [
-      "docs/presentation/plates/overview.png"
+      "docs/presentation/frames/initial_overview.jpg"
     ]
   },
   {
     "slide": 2,
-    "title": "System architecture and technical selection",
+    "title": "From visual observation to physical manipulation",
     "notes": "The control path starts with RGB-D and estimated calibration. Depth foreground segmentation generates the mask; FoundationPose estimates the object in the camera frame from reconstructed references. Calibrated transforms and robot FK map the pose into a robot target. Checked IK and trajectories, joint control and contact guards execute the operation. Reobservations close a discrete precontact loop. Simulator object truth is downstream evaluation only. Robot FK and contact sensing are legitimate inputs but are not substitutes for visual object localization.\n\nFoundationPose was selected for its few-shot model-free reference route and object-pose output. The tool CAD is not supplied to the pose estimator; calibrated RGB-D scans are reconstructed into an object-specific representation. This still requires references and pretrained networks. MegaPose and GraspNet were reviewed alternatives: the former estimates model-based object pose, while the latter predicts grasp candidates. They were not executed as external experimental baselines. MuJoCo retains the original robot and contact model; OpenCV provides calibration and image operations.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence | Wen et al., CVPR 2024; Labb\u00e9 et al., 2022; Fang et al., CVPR 2020; Todorov et al., IROS 2012",
     "images": [
+      "docs/presentation/frames/initial_overview.jpg",
       "docs/presentation/frames/regrasp_lift_wrist.jpg"
     ]
   },
   {
     "slide": 3,
-    "title": "Camera calibration: estimation and independent validation",
+    "title": "Image-based calibration and held-out validation",
     "notes": "Wrist intrinsics use twenty-four accepted training views and eight held-out views. Hand-eye estimation uses image PnP and robot FK, followed by AX equals XB and training-only refinement, with twenty-four training and ten validation views. Validation freezes K, the hand-eye transform and board pose. The simulator provides reference values only after estimation. The very low reprojection residuals reflect synthetic distortion-free images; they are not evidence of equivalent real-camera precision.",
     "source": "Actual checkerboard captures | Zhang 2000; OpenCV hand\u2013eye conventions | wrist-calibration-v1",
     "images": [
@@ -37,7 +38,7 @@
   },
   {
     "slide": 5,
-    "title": "6D pose estimation and coordinate transformation",
+    "title": "Estimated object frames guide task-specific targets",
     "notes": "For the wrist camera, the camera-to-base transform is obtained from robot FK and the independently estimated camera-to-gripper transform. Multiplying by the camera-frame object estimate produces the object pose in the base frame. The notation T sub A B maps coordinates in frame B into frame A. Task-specific geometric offsets then define the desired grasp or insertion target. After a physical regrasp, the object-to-gripper relationship must be observed again; a previous rigid relationship cannot simply be reused.\n\nFoundationPose was selected for its few-shot model-free reference route and object-pose output. The tool CAD is not supplied to the pose estimator; calibrated RGB-D scans are reconstructed into an object-specific representation. This still requires references and pretrained networks. MegaPose and GraspNet were reviewed alternatives: the former estimates model-based object pose, while the latter predicts grasp candidates. They were not executed as external experimental baselines. MuJoCo retains the original robot and contact model; OpenCV provides calibration and image operations.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence | Wen et al., CVPR 2024; Labb\u00e9 et al., 2022; Fang et al., CVPR 2020; Todorov et al., IROS 2012",
     "images": [
@@ -46,7 +47,7 @@
   },
   {
     "slide": 6,
-    "title": "Visual feedback: modes, residuals and correction policy",
+    "title": "Visual feedback modes and bounded correction",
     "notes": "The implemented controller uses discrete pose-based alignment. Open-loop mode uses initial acquisition and prediction but no execution-period visual correction. Staged mode adds selected reobservations. Iterative mode adds repeated estimates and bounded corrections before contact. Position and orientation residuals are measured from vision, with default correction caps of four millimeters and two degrees. Two consecutive observations within one-point-five millimeters and one-point-five degrees establish convergence. This is not continuous contact impedance control or a claim of formal closed-loop stability.\n\nThis example is from a separately archived calibration integration run with an alignment impulse. One spanner correction is logged. The estimated angular residual decreases from 1.60 to 0.74 degrees; those numbers come from original visual observations, not measurements drawn on the images. The visual change is small, so the figure should not be used to estimate a geometric displacement. This run is not an additional attempt in the final forty-eight-trial comparison.",
     "source": "Chaumette & Hutchinson, IEEE RAM 2006 | project-specific discrete pose alignment | VISUAL_FEEDBACK.md | Calibrated integration | iterative / alignment impulse / seed 400 | original log + original frames",
     "images": [
@@ -64,7 +65,7 @@
   },
   {
     "slide": 8,
-    "title": "Experimental design and metric definitions",
+    "title": "Paired evaluation in the complete workcell",
     "notes": "The experiment uses three feedback modes, two disturbance conditions and eight seeds per cell: forty-eight complete attempts. Initial physical states are paired by seed. Estimated wrist calibration, pose estimator, control thresholds and physical acceptance remain fixed. The seeds were used previously, making this a paired replication rather than a fresh holdout. Failures before alignment or disturbance delivery stay in the denominator. We report Wilson success intervals, trial-level bootstrap intervals, paired exact tests and Holm correction.\n\nThe complete-sequence success rates are low, and uncertainty is wide. Open-loop succeeds zero of eight with and without disturbance. Staged feedback succeeds three of eight without and two of eight with disturbance. Iterative feedback succeeds three of eight in both conditions. All four method comparisons have Holm-adjusted p equal to one. This establishes neither superiority nor equivalence. The images demonstrate feasible behavior but do not override the full attempted-trial results.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence | n = 8 per mode \u00d7 condition | Wilson 95% confidence intervals | exact paired tests with Holm correction",
     "images": [
@@ -73,12 +74,12 @@
   },
   {
     "slide": 9,
-    "title": "Execution evidence: hammer return and rack installation",
+    "title": "Physical return and independent rack installation",
     "notes": "The hammer operation clears tool access before the feed operation. These matched crops show a held tool and the released tray state from the same continuous run. Image-estimated object pose determines the target; checked motion and joint control execute it. Support, geometry and stability determine acceptance. Hammer approach planning failures are retained in the full comparison, rather than treating only reached placements as attempted trials.\n\nThe independent frame is picked up and physically seated on its base. Because seating can change the fixture pose, the rack is checked and observed again before the spanner approaches it. The three panels have complementary roles: initial independent object, contact-mediated installation, and released assembled fixture. All prior tools remain in the same scene. The fixture observation is part of the staged and iterative control modes.",
     "source": "Representative original run | iterative / no disturbance / seed 400 | playback time",
     "images": [
-      "docs/presentation/plates/hammer.png",
-      "docs/presentation/plates/rack.png"
+      "docs/presentation/frames/hammer_released_overview.jpg",
+      "docs/presentation/frames/rack_done_overview.jpg"
     ]
   },
   {
@@ -137,7 +138,7 @@
   },
   {
     "slide": 16,
-    "title": "Diagnostic results: pose accuracy and physical failures",
+    "title": "Pose accuracy and the physical failure boundary",
     "notes": "The initial fixed-camera pose errors average 2.60 millimeters and 1.44 degrees; ADD and ADD-S are 3.17 and 2.29 millimeters. Those common initial observations do not directly predict whole-sequence success. Of thirty-seven failures, twenty-four stop at moving-pickup closure, six at hammer approach settling, six during open-loop insertion retraction and one after loss of bilateral spanner grasp. This separates perception accuracy, stage reachability and physical reliability. Execution error and visual timing remain in the full report with sample counts.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence",
     "images": [
@@ -157,11 +158,11 @@
   },
   {
     "slide": 18,
-    "title": "Conclusions and priorities for further experiments",
+    "title": "What the integrated system demonstrates",
     "notes": "The project demonstrates a complete calibrated vision-to-action pipeline and a physically released four-operation sequence. The evidence supports feasibility and inspectability, not superior architecture or real-world reliability. The controlled replication has no statistically established feedback gain. Immediate priorities are pickup/contact reliability, background robustness and then feedback scheduling or pose bias. Future validation requires unseen seeds, broader clutter and occlusion, external pose estimators under matched conditions, and eventually hardware. Reference scanning, rigid mounts, FK and basic depth rendering retain ideal assumptions.\n\nWe study vision-guided manipulation in a simulated maintenance workcell. The system integrates independently estimated camera calibration, image-based localization, reconstructed object references, FoundationPose, and physical robot control. Four dependent operations are executed in one continuous scene. The research question is whether additional execution-period pose feedback improves complete-sequence success, rather than merely improving a local alignment residual. The contribution is independent engineering integration and critical evaluation, not a new neural algorithm.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence | UR5e + Robotiq 2F-85 | MuJoCo | Model-free reference reconstruction + FoundationPose",
     "images": [
-      "docs/presentation/frames/final_wrist.jpg"
+      "docs/presentation/frames/final_overview.jpg"
     ]
   },
   {

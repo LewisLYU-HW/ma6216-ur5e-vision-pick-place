@@ -26,8 +26,8 @@ def build(results,out):
             if e.tag.endswith('}effectRef'):e.set('idx','0')
     def slide(title,ids,section):
         s=prs.slides.add_slide(prs.slide_layouts[6]);s.background.fill.solid();s.background.fill.fore_color.rgb=RGBColor(255,255,255)
-        text(s,title,.45,.26,11.9,.45,21,True);text(s,section,10.5,.85,2.3,.24,10,False,GREY)
-        rect(s,.45,.81,12.4,.012,'BCC9D0');text(s,f'{len(prs.slides):02}',12.35,.32,.45,.25,11,False,GREY)
+        rect(s,.0,.0,13.333,.055,BLUE);text(s,title,.45,.28,11.9,.45,20,True);text(s,section,10.5,.85,2.3,.24,10,False,GREY)
+        rect(s,.45,.81,12.4,.008,'DBE3E7');text(s,f'{len(prs.slides):02}',12.35,.32,.45,.25,11,False,GREY)
         note='\n\n'.join(source[i-1]['notes'] for i in ids);refs=' | '.join(dict.fromkeys(source[i-1]['source'] for i in ids))
         notes.append({'slide':len(prs.slides),'title':title,'notes':note,'source':refs,'images':[]});s.notes_slide.notes_text_frame.text=note+'\n\nEvidence: '+refs
         text(s,'MA6216 · Vision-guided robotic manipulation · simulation evidence',.45,7.13,11.8,.22,9,False,GREY)
@@ -42,7 +42,7 @@ def build(results,out):
             x=.55+i*width
             image(s,frames/(key+'.jpg'),x,y+.30,width-.18,2.00)
             text(s,chr(97+i)+'  '+label,x+.12,y,width-.35,.25,12,False,INK)
-    def heading(s,t,x,y,w=5.8):text(s,t,x,y,w,.3,16,True,BLUE)
+    def heading(s,t,x,y,w=5.8):text(s,t,x,y,w,.3,14,True,BLUE)
     def table(s,headers,rows,x,y,w,h,size=14):
         tb=s.shapes.add_table(len(rows)+1,len(headers),Inches(x),Inches(y),Inches(w),Inches(h)).table
         for i,row in enumerate([headers,*rows]):
@@ -52,69 +52,74 @@ def build(results,out):
                 for p in c.text_frame.paragraphs:p.font.name='Aptos';p.font.size=Pt(size);p.font.bold=i==0;p.font.color.rgb=RGBColor.from_string(INK)
     def caption(s,t,y=6.55):text(s,t,.55,y,12.2,.48,12,False,GREY)
     def equation(s,parts,x,y,w):
-        z=text(s,'',x,y,w,.5,23);p=z.text_frame.paragraphs[0]
+        z=text(s,'',x,y,w,.32,14);p=z.text_frame.paragraphs[0]
         for value,base in parts:
-            r=p.add_run();r.text=value;r.font.name='Cambria Math';r.font.size=Pt(16 if base else 23);r.font.color.rgb=RGBColor.from_string(INK)
+            r=p.add_run();r.text=value;r.font.name='Cambria Math';r.font.size=Pt(10 if base else 14);r.font.color.rgb=RGBColor.from_string(INK)
             if base:r._r.get_or_add_rPr().set('baseline',str(base))
 
     s=slide('Calibrated 6D vision for sequential tool manipulation',[1,2],'Problem & scope')
-    plate(s,'overview',.4,1.08,8.3,3.6)
-    heading(s,'Study objective',9,1.22,3.8)
-    text(s,'UR5e + Robotiq 2F-85 in MuJoCo\nRGB-D reconstruction + FoundationPose\n\nDoes execution-period pose feedback improve complete-task reliability?',9,1.68,3.8,2.5,16)
-    table(s,['Operation','Required relationship','Acceptance'],[['Hammer return','Tool-to-tray pose','Released support'],['Moving screwdriver','Shaft-to-tilted-socket axis','Insertion + release'],['Independent rack','Frame-to-base seating','Stable fixture'],['Spanner regrasp / hang','New grasp; hole-to-pin alignment','Released hanging']],.55,4.65,12.2,1.95,14)
-    caption(s,'Scope: one continuous four-operation scene. Contribution: independent integration and evaluation of existing methods.',6.72)
+    image(s,frames/'initial_overview.jpg',.45,1.13,8.6,5.65)
+    rect(s,9.3,1.18,.025,5.45,'D9E5EA')
+    heading(s,'One continuous tool-service task',9.55,1.35,3.25)
+    text(s,'01  Hammer return\n02  Moving screwdriver insertion\n03  Independent rack installation\n04  Spanner regrasp and hanging',9.55,1.98,3.25,1.85,14)
+    heading(s,'Study question',9.55,4.12,3.2)
+    text(s,'Can execution-period pose feedback improve complete-task reliability?',9.55,4.57,3.2,1.0,14)
+    text(s,'MuJoCo · UR5e · Robotiq 2F-85\nRGB-D + reconstructed references',9.55,5.99,3.2,.6,11,False,GREY)
 
-    s=slide('System architecture and technical selection',[3,4],'Methods')
-    steps=[('RGB-D','Estimated K'),('Localization','Depth foreground'),('6D pose','FoundationPose'),('Robot target','Calibrated chain'),('Execution','IK + control')]
+    s=slide('From visual observation to physical manipulation',[3,4],'Methods')
+    steps=[('RGB-D','Estimated intrinsics'),('Localization','Depth foreground'),('6D pose','FoundationPose'),('Robot target','Calibrated chain'),('Execution','IK + control')]
     for i,(a,b) in enumerate(steps):
-        x=.55+i*2.47;rect(s,x,1.25,2.2,.78,'EDF2F5');text(s,a,x+.1,1.36,2,.26,16,True);text(s,b,x+.1,1.71,2,.24,12,False,GREY)
-        if i<4:text(s,'→',x+2.23,1.49,.25,.3,17)
-    text(s,'Reobserve → update pose → bounded correction; simulation truth enters downstream scoring only.',.65,2.21,12,.44,15)
-    table(s,['Method / component','Output / role','Selection boundary'],[['FoundationPose','Object-frame 6D pose','Selected; reconstructed RGB-D references'],['MegaPose','Model-based 6D pose','Reviewed; no external benchmark'],['GraspNet','Grasp candidates','Does not alone specify assembly pose'],['MuJoCo / OpenCV','Contact simulation / calibration','Reuse platform; inspectable interfaces']],.55,2.9,8.2,2.7,14)
-    image(s,frames/'regrasp_lift_wrist.jpg',9.05,2.9,3.75,2.7)
-    text(s,'Model-free route: 24 calibrated RGB-D reference views → object-specific reconstruction → registration / tracking.\nReferences and pretrained networks are still required; synthetic reference calibration remains an assumption.',.65,5.94,12,.85,15)
+        x=.55+i*2.47;rect(s,x,1.22,2.2,.68,'F0F5F6');text(s,a,x+.1,1.3,2,.25,14,True);text(s,b,x+.1,1.64,2,.23,11,False,GREY)
+        if i<4:text(s,'→',x+2.23,1.42,.25,.3,14)
+    image(s,frames/'initial_overview.jpg',.55,2.18,6.05,4.05)
+    image(s,frames/'regrasp_lift_wrist.jpg',6.8,2.18,6.0,4.05)
+    text(s,'Workcell observation',.65,6.3,5.9,.28,12,True,BLUE)
+    text(s,'Pose-guided grasp and reobservation',6.9,6.3,5.8,.28,12,True,BLUE)
+    caption(s,'24 RGB-D reference views → reconstruction → registration / tracking. MegaPose and GraspNet were reviewed, not benchmarked.',6.72)
 
-    s=slide('Camera calibration: estimation and independent validation',[5],'Methods')
-    plate(s,'calibration',.45,1.1,8.25,3.65)
-    table(s,['Procedure','Train / validation','Validation result'],[['Wrist intrinsics','24 / 8 views','0.02177 px RMSE'],['Wrist hand–eye','24 / 10 views','0.852 mm / 0.0227°'],['Frozen chain','K, X and Y fixed','0.05497 px']],8.85,1.4,3.95,2.65,12)
-    heading(s,'Estimation protocol',.65,5.05)
-    text(s,'Checkerboard pixels → intrinsic calibration → image PnP + robot FK → AX = XB → training-only refinement.',.65,5.48,12,.52,16)
-    text(s,'Simulator K and camera pose are validation references only. Rejected images and held-out views are retained.\nThe known distortion-free pinhole model explains the small residuals; these are not real-camera accuracy claims.',.65,6.06,12,.78,14)
+    s=slide('Image-based calibration and held-out validation',[5],'Methods')
+    plate(s,'calibration',.4,1.1,12.4,4.75)
+    table(s,['Wrist intrinsics','Hand–eye transform','Frozen-chain reprojection'],[['24 / 8 train–validation views','24 / 10 train–validation views','K and transformations fixed'],['0.02177 px RMSE','0.852 mm / 0.0227°','0.05497 px']],.55,5.7,12.2,.91,12)
+    caption(s,'Checkerboard detection + image PnP + robot FK. Simulator parameters are validation references; ideal pinhole images limit transfer.',6.72)
 
     s=slide('Localization: image masks, evaluation unit and assumptions',[7],'Methods & validation')
     plate(s,'localization',.45,1.12,12.4,3.55)
     table(s,['Detector','Independent evaluation','Boundary'],[['Depth foreground subtraction\nKnown pickup regions','50 scenes / 200 queries\n10 scenes per tool–condition cell','Matched empty backgrounds\nRestricted occlusion / noise'],['Predictions saved first','160/160 positive queries: IoU ≥ 0.5\n0/40 absent-target false positives','Wilson and scene-bootstrap intervals\nNot 200 robot executions']],.55,4.93,12.2,1.58,14)
     caption(s,'Nominal seed 500. Green: overlap; blue: missed visible target; red: extra foreground. Crops preserve original overlays.',6.72)
 
-    s=slide('6D pose estimation and coordinate transformation',[6,4],'Methods')
-    equation(s,[('T',0),('BO',-25000),(' = T',0),('BG',-25000),(' · T',0),('GC',-25000),(' · T',0),('CO',-25000)],.65,1.25,7)
-    text(s,'B: robot base   G: gripper   C: wrist camera   O: object',.65,1.95,8,.35,14)
-    text(s,'T_AB maps coordinates from B into A.\nFK supplies T_BG; calibration estimates T_GC.\nFoundationPose supplies T_CO from visual observations.',8.65,1.3,4.1,1.25,14)
-    plate(s,'pose',.45,2.5,12.4,3.65)
-    text(s,'Task target: estimated object pose + task-specific geometric offset.\nRegrasp changes the object-to-gripper relationship; observe again before generating the next target.',.65,6.17,12,.7,15)
+    s=slide('Estimated object frames guide task-specific targets',[6,4],'Methods')
+    plate(s,'pose',.4,1.08,12.4,5.3)
+    equation(s,[('T',0),('BO',-25000),(' = T',0),('BG',-25000),(' · T',0),('GC',-25000),(' · T',0),('CO',-25000)],.65,6.49,3.45)
+    text(s,'FK × hand–eye calibration × visual object pose',4.15,6.49,4.9,.32,12,False,GREY)
+    text(s,'Reobserve after regrasp.',9.43,6.49,3.2,.32,12,False,GREY)
 
-    s=slide('Visual feedback: modes, residuals and correction policy',[8,15],'Methods')
-    table(s,['Mode','Execution-period observation','Common components'],[['Open loop','Initial acquisition / feed prediction only','Same estimator, calibration and guards'],['Staged','Selected task-transition reobservations','Same physical acceptance'],['Iterative','Repeated precontact pose correction','Staged observations retained']],.55,1.2,12.2,1.85,14)
-    plate(s,'correction',.4,3.24,7.5,3.0)
-    equation(s,[('e',0),('p',-25000),(' = p',0),('des',-25000),(' − p',0),('est',-25000)],8.3,3.5,4.5)
-    equation(s,[('ΔR = R',0),('des',-25000),(' R',0),('est',-25000),('T',30000)],8.3,4.16,4.5)
-    text(s,'Cap: 4 mm / 2° per step\nConverged: two observations within\n1.5 mm / 1.5°\nDiscrete precontact control; no stability proof.',8.3,4.91,4.45,1.3,14)
-    caption(s,'Correction images: separate perturbed integration run, one logged correction; 1.60° → 0.74° are visual residuals, not true geometric errors.',6.63)
+    s=slide('Visual feedback modes and bounded correction',[8,15],'Methods')
+    plate(s,'correction',.35,1.3,9.0,4.9)
+    rect(s,9.5,1.3,.025,5.2,'D9E5EA')
+    heading(s,'Observation schedule',9.72,1.42,3.0)
+    text(s,'Open loop\nInitial acquisition only\n\nStaged\nTask-transition observations\n\nIterative\nRepeated precontact correction',9.72,1.88,3.0,2.65,13)
+    heading(s,'Common control limits',9.72,4.88,3.0)
+    text(s,'Step cap: 4 mm / 2°\nConverged: two observations\nwithin 1.5 mm / 1.5°',9.72,5.31,3.0,.94,12)
+    caption(s,'Estimated pose residual → bounded correction → reobserve. Same calibration, estimator and guards; discrete precontact control.',6.69)
 
     s=slide('Visual correction: matched detail views before and after action',[15],'Separate integration diagnosis')
     plate(s,'correction',.4,1.08,12.4,5.3)
     caption(s,'One logged correction in a separate perturbed run. 1.60° and 0.74° are estimated angular residuals, not ground-truth errors.',6.65)
 
-    s=slide('Experimental design and metric definitions',[9,18],'Evaluation protocol')
-    table(s,['Factor','Levels / unit','Control'],[['Feedback','Open loop / staged / iterative','Same pose estimator and camera calibration'],['Disturbance','None / alignment force–torque pulse','Delivery logged; early failures retained'],['Randomization','8 seeds per cell; 48 attempts','Initial states paired within seed'],['Primary outcome','All four final physical checks','Geometry + support + release + stability']],.55,1.2,12.2,2.5,14)
-    image(s,frames/'initial_overview.jpg',.65,4.05,4.1,2.7)
-    heading(s,'Statistical reporting',5.15,4.15)
-    text(s,'Success: Wilson 95% confidence intervals.\nPaired comparisons: exact tests with Holm adjustment.\nContinuous metrics: trial-level summaries and bootstrap intervals.\nSeeds 400–407 are reused: paired replication, not a new holdout.\nNo task failures are removed or pooled with historical studies.',5.15,4.62,7.5,2.0,15)
+    s=slide('Paired evaluation in the complete workcell',[9,18],'Evaluation protocol')
+    image(s,frames/'initial_overview.jpg',.45,1.15,8.6,5.65)
+    heading(s,'48 complete-task attempts',9.45,1.35,3.35)
+    text(s,'3 feedback modes\n× 2 disturbance conditions\n× 8 paired seeds',9.45,1.83,3.35,1.12,14)
+    heading(s,'Outcome and uncertainty',9.45,3.23,3.35)
+    text(s,'All four physical checks must pass.\n\nWilson 95% intervals\nExact paired tests + Holm\nTrial-level continuous summaries',9.45,3.7,3.35,1.7,13)
+    text(s,'Seeds 400–407 reused.\nPaired replication, not a new holdout.\nEarly failures remain included.',9.45,5.82,3.35,.9,11,False,GREY)
 
-    s=slide('Execution evidence: hammer return and rack installation',[10,12],'Representative successful run')
-    plate(s,'hammer',.4,1.08,12.4,2.5)
-    plate(s,'rack',.4,3.78,12.4,2.5)
-    caption(s,'Continuous run: hammer release precedes independent rack installation. Time labels refer to the original replay.',6.65)
+    s=slide('Physical return and independent rack installation',[10,12],'Representative successful run')
+    image(s,frames/'hammer_released_overview.jpg',.45,1.42,6.1,4.8)
+    image(s,frames/'rack_done_overview.jpg',6.78,1.42,6.1,4.8)
+    text(s,'a  Released hammer placement · 25.00 s',.6,1.12,5.9,.3,13,True,BLUE)
+    text(s,'b  Released rack fixture · 134.40 s',6.93,1.12,5.9,.3,13,True,BLUE)
+    caption(s,'One continuous replay. The rack is installed as an independent object; released support and stability determine acceptance.',6.65)
 
     s=slide('Tilted insertion: orientation, contact and released placement',[11],'Representative successful run')
     plate(s,'insertion',.4,1.08,12.4,5.3)
@@ -143,11 +148,13 @@ def build(results,out):
     heading(s,'Interpretation',.65,5.6)
     text(s,'The selected successful trajectory demonstrates feasibility. Low complete-sequence reliability and wide intervals limit conclusions about feedback benefit. Early failures remain part of the system-level outcome.',.65,6.04,12.0,.78,15)
 
-    s=slide('Diagnostic results: pose accuracy and physical failures',[19],'Error decomposition')
-    table(s,['Initial pose metric','Mean'],[['Translation error','2.60 mm'],['Rotation error','1.44°'],['ADD / ADD-S','3.17 / 2.29 mm']],.55,1.3,5.3,2.02,15)
-    table(s,['Failure category','Attempts'],[['Moving-pickup contact guard','24'],['Hammer approach planning','6'],['Open-loop insertion guard','6'],['Bilateral spanner grasp loss','1']],6.2,1.3,6.55,2.02,14)
-    for i,key in enumerate(['driver_align_wrist','iter_failure_wrist','regrasp_lift_wrist']):image(s,frames/(key+'.jpg'),.65+4.15*i,3.72,3.75,2.65)
-    caption(s,'Different endpoints: initial pose error, TCP tracking error, final placement and task success. 500 Hz physics is not visual feedback frequency.',6.67)
+    s=slide('Pose accuracy and the physical failure boundary',[19],'Error decomposition')
+    for i,(key,label) in enumerate([('driver_align_wrist','Visual pose / initial acquisition'),('iter_failure_wrist','Pickup contact guard'),('regrasp_lift_wrist','Grasp reliability after reobservation')]):
+        image(s,frames/(key+'.jpg'),.48+4.17*i,1.45,4.03,3.6)
+        text(s,label,.6+4.17*i,1.12,3.85,.32,12,True,BLUE)
+    table(s,['Initial pose metric','Mean'],[['Translation / rotation','2.60 mm / 1.44°'],['ADD / ADD-S','3.17 / 2.29 mm']],.55,5.16,5.3,1.04,12)
+    table(s,['Failure category','Attempts'],[['Pickup contact / hammer planning','24 / 6'],['Insertion guard / spanner grasp loss','6 / 1']],6.2,5.16,6.55,1.04,12)
+    caption(s,'Initial pose error, TCP tracking and final placement are different endpoints. 500 Hz physics is not visual feedback frequency.',6.67)
 
     s=slide('Generalization boundary: background-dependent localization',[20,21],'Limitations')
     plate(s,'background',.4,1.1,8.3,3.8)
@@ -156,11 +163,13 @@ def build(results,out):
     table(s,['Assumption','Impact on interpretation'],[['Known pickup stations and paired backgrounds','Does not establish arbitrary-clutter recognition'],['Synthetic scans, ideal FK / depth, rigid mounts','Does not establish real-camera or hardware reliability'],['Small reused-seed sample','Broader unseen-scene trials remain necessary']],.55,5.22,12.2,1.5,14)
     caption(s,'Separate development diagnosis; not pooled into the 50-scene localization audit or the 48 robot attempts.',6.8)
 
-    s=slide('Conclusions and priorities for further experiments',[21,1],'Discussion')
-    table(s,['Supported by the evidence','Not established'],[['Independent calibration integrated into visual control','Real-robot accuracy and reliability'],['Physical four-operation sequence with regrasp','High success rate across arbitrary layouts'],['Auditable internal feedback comparison','Statistical superiority or external-algorithm ranking']],.55,1.2,12.2,2.0,15)
-    image(s,frames/'final_wrist.jpg',.65,3.7,4.7,2.95)
-    heading(s,'Next experiments',5.75,3.8)
-    text(s,'1. Improve pickup planning and bilateral-contact reliability.\n2. Test segmentation under changed backgrounds and clutter.\n3. Evaluate pose bias and observation scheduling.\n4. Use unseen seeds and matched external-estimator baselines.\n5. Validate the calibrated pipeline on physical hardware.',5.75,4.3,7,2.0,15)
+    s=slide('What the integrated system demonstrates',[21,1],'Discussion')
+    image(s,frames/'final_overview.jpg',.45,1.12,8.55,5.65)
+    heading(s,'Demonstrated',9.38,1.4,3.4)
+    text(s,'Independent calibration\nVisual 6D pose integration\nPhysical regrasp and assembly\nAuditable feedback comparison',9.38,1.85,3.4,1.55,14)
+    heading(s,'Next priorities',9.38,3.81,3.4)
+    text(s,'Improve pickup contacts.\nTest changed backgrounds.\nUse unseen seeds and external baselines.\nValidate on hardware.',9.38,4.25,3.4,1.7,13)
+    text(s,'High reliability and statistical superiority are not established.',9.38,6.25,3.4,.6,11,False,GREY)
 
     s=slide('References and reproducibility',[22],'Appendix')
     text(s,'Selected methods\nWen et al. FoundationPose. CVPR, 2024.\nZhang. A flexible new technique for camera calibration. TPAMI, 2000.\nOpenCV. Camera and hand–eye calibration documentation.\nChaumette & Hutchinson. Visual servo control, Part I. RAM, 2006.\nTodorov et al. MuJoCo. IROS, 2012.\n\nReviewed alternatives\nLabbé et al. MegaPose. arXiv:2212.06870, 2022.\nFang et al. GraspNet-1Billion. CVPR, 2020.',.65,1.4,6.6,4.7,15)
@@ -170,7 +179,7 @@ def build(results,out):
     prs.save(out/'vision_guided_manipulation.pptx')
     (out/'slides.json').write_text(json.dumps(notes,indent=2)+'\n')
     (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n18 main slides + 1 reference appendix. Target: approximately 15 minutes.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
-    meta={'revision':'Enlarged task-region figures with reprojected 60 mm estimated-pose axes','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':21,'body_font_pt_range':[12,16],'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
+    meta={'revision':'Image-led academic layout; compact equations and side annotations','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':20,'body_font_pt_range':[11,14],'equation_font_pt':14,'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
     (out/'provenance.json').write_text(json.dumps(meta,indent=2)+'\n');print({k:meta[k] for k in ['slides','runtime_image_panel_placements','slides_with_runtime_or_calibration_images']})
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();build(a.results.resolve(),a.output.resolve())
