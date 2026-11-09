@@ -1,6 +1,5 @@
-"""Build an editable English project deck and notes from published evidence."""
+"""Build the English, runtime-image-led project presentation from archived evidence."""
 import argparse
-from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -12,177 +11,272 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[1]
-NAVY, TEAL, INK, GREY = '142D42', '087F8C', '243746', '576B7C'
-METHOD_LABELS = {'open_loop':'Open loop','staged':'Staged','iterative':'Iterative'}
+BG, WHITE, MUTED, TEAL, AMBER, RED = '101C29', 'F4F7FA', 'B4C5D4', '52DBC3', 'FFD17C', 'FF9F91'
+
+
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
 def build(results, output, preview=False):
+    if preview:
+        raise ValueError('This evidence deck uses final published results only')
     summary = json.loads((results / 'summary.json').read_text())
-    if not summary['complete'] or summary['n_trials'] != 48:
-        raise ValueError('Complete results required')
-    if not preview and not summary['calibration']['wrist_hand_eye'].get('measured_error'):
-        raise ValueError('Final deck requires estimated-wrist results')
-    if preview and 'artifacts' not in output.resolve().parts:
-        raise ValueError('Layout previews must stay in artifacts')
+    assert summary['complete'] and summary['n_trials'] == 48
+    assert summary['calibration']['wrist_hand_eye']['measured_error']
     output.mkdir(parents=True, exist_ok=True)
+    frames = ROOT / 'docs/presentation/frames'
+    manifest = json.loads((frames / 'manifest.json').read_text())
     prs = Presentation(); prs.slide_width = Inches(13.333); prs.slide_height = Inches(7.5)
     notes, assets = [], {}
 
-    def text(slide, value, x, y, w, h, size=24, color=INK, bold=False):
-        shape = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-        tf = shape.text_frame; tf.word_wrap = True
-        tf.margin_left = tf.margin_right = Inches(.025)
-        for i, line in enumerate(str(value).split('\n')):
+    def text(s, value, x, y, w, h, size=22, color=WHITE, bold=False):
+        z = s.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+        tf = z.text_frame; tf.word_wrap = True
+        tf.margin_left = tf.margin_right = 0
+        tf.margin_top = tf.margin_bottom = 0
+        for i, line in enumerate(value.split('\n')):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             p.text = line; p.font.name = 'Aptos'; p.font.size = Pt(size)
             p.font.bold = bold; p.font.color.rgb = RGBColor.from_string(color)
-            p.space_after = Pt(12)
-        return shape
+            p.space_after = Pt(8)
+        return z
 
-    def slide(title, note, source='Project implementation and recorded evidence'):
-        s = prs.slides.add_slide(prs.slide_layouts[6])
-        s.background.fill.solid(); s.background.fill.fore_color.rgb = RGBColor(248,250,252)
-        band = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, Inches(.14))
-        band.fill.solid(); band.fill.fore_color.rgb = RGBColor.from_string(TEAL); band.line.fill.background()
-        text(s, title, .55, .35, 12.2, .8, 30, NAVY, True)
-        text(s, source, .6, 7.03, 11.5, .3, 10, GREY)
-        text(s, str(len(prs.slides)), 12.3, 7.03, .4, .3, 10, GREY)
-        if preview:
-            text(s, 'LAYOUT PREVIEW — HISTORICAL INPUT, NOT FINAL RESULTS', .6, 6.68, 12, .32, 12, 'A33B20', True)
+    def box(s, x, y, w, h, fill):
+        z = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+        z.fill.solid(); z.fill.fore_color.rgb = RGBColor.from_string(fill); z.line.fill.background()
+        return z
+
+    def slide(title, section, note, source='Final estimated-calibration evaluation | original trial frames'):
+        s = prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid()
+        s.background.fill.fore_color.rgb = RGBColor.from_string(BG)
+        box(s, .45, .38, .07, .68, TEAL)
+        text(s, section.upper(), .68, .32, 11.8, .25, 11, TEAL, True)
+        text(s, title, .68, .68, 12.05, .6, 29, WHITE, True)
+        text(s, source, .5, 7.08, 11.9, .25, 10, MUTED)
+        text(s, f'{len(prs.slides):02}', 12.4, 7.05, .5, .28, 12, TEAL, True)
         s.notes_slide.notes_text_frame.text = note + '\n\nEvidence: ' + source
-        notes.append({'slide':len(prs.slides),'title':title,'notes':note,'source':source})
+        notes.append({'slide': len(prs.slides), 'title': title, 'section': section,
+                      'notes': note, 'source': source, 'images': []})
         return s
 
-    def bullets(s, lines, x=.65, y=1.55, w=12, size=25):
-        text(s, '\n'.join('• ' + x for x in lines), x, y, w, 4.9, size)
+    def picture(s, path, x, y, w, h, crop=None):
+        path = Path(path); im = Image.open(path); iw, ih = im.size
+        # Crops use PowerPoint source-image crop properties; originals remain embedded.
+        if crop:
+            l,t,r,b = crop; ratio = (r-l)/(b-t)
+        else:
+            ratio = iw/ih
+        dw, dh = min(w, h*ratio), min(h, w/ratio)
+        z=s.shapes.add_picture(str(path), Inches(x+(w-dw)/2), Inches(y+(h-dh)/2),
+                              width=Inches(dw), height=Inches(dh))
+        if crop:
+            z.crop_left=l/iw; z.crop_top=t/ih; z.crop_right=1-r/iw; z.crop_bottom=1-b/ih
+        rel=str(path.relative_to(ROOT)); assets[rel]=sha(path)
+        notes[-1]['images'].append({'path':rel,'crop_xyxy':crop})
+        return z
 
-    def picture(s, path, x, y, w, h):
-        path = Path(path); iw, ih = Image.open(path).size
-        scale = min(w/iw, h/ih); dw, dh = iw*scale, ih*scale
-        s.shapes.add_picture(str(path), Inches(x+(w-dw)/2), Inches(y+(h-dh)/2), width=Inches(dw), height=Inches(dh))
-        assets[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    def frame(s, key, x, y, w, h, label=None):
+        picture(s, frames/(key+'.jpg'), x,y,w,h)
+        m=manifest[key]
+        if label:
+            text(s, label, x, y-.34,w,.28,15,TEAL,True)
+        text(s, f"{m['view'].upper()}  /  VIDEO {m['playback_seconds']:.2f} s",x,y+h+.07,w,.25,11,MUTED)
 
-    def table(s, headers, rows, y=1.55, height=3.7, size=19):
-        tb = s.shapes.add_table(len(rows)+1,len(headers),Inches(.65),Inches(y),Inches(12),Inches(height)).table
-        for i,row in enumerate([headers,*rows]):
-            for j,value in enumerate(row):
-                cell=tb.cell(i,j);cell.text=str(value)
-                cell.fill.solid();cell.fill.fore_color.rgb=RGBColor.from_string(NAVY if i==0 else ('EAF0F5' if i%2 else 'FFFFFF'))
-                for p in cell.text_frame.paragraphs:
-                    p.font.name='Aptos';p.font.size=Pt(size);p.font.bold=i==0
-                    p.font.color.rgb=RGBColor.from_string('FFFFFF' if i==0 else INK)
+    def takeaway(s, value, detail=None):
+        box(s,.5,6.28,12.33,.045,TEAL)
+        text(s,value,.65,6.42,12.05,.42,21,WHITE,True)
+        if detail:
+            text(s,detail,.65,5.88,12.05,.32,14,MUTED)
 
-    s=slide('Vision-Guided Tool Manipulation',
-        'Our application is a simulated maintenance workcell. A UR5e and Robotiq gripper return a hammer, intercept and insert a screwdriver, assemble a rack, and regrasp and hang a spanner. The project integrates the complete chain from image measurements to physical manipulation. We use existing pretrained methods and focus on engineering decisions, reproducibility and critical evaluation. The main question is whether additional execution-period visual feedback improves this complete sequence.',
-        'MA6216 Final Project 1 | UR5e + Robotiq 2F-85 | MuJoCo')
-    picture(s,ROOT/'docs/media/complete-workshop-overview.png',.6,1.4,8.2,5.1)
-    text(s,'Calibrate\nLocalize\nEstimate 6D pose\nManipulate\nEvaluate',9.15,1.85,3.5,4.3,27,TEAL,True)
+    def pair(title, section, keys, labels, claim, note, source=None):
+        s=slide(title,section,note,source or 'Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps')
+        for i,(key,label) in enumerate(zip(keys,labels)):
+            frame(s,key,.5+6.26*i,1.8,6.07,4.13,label)
+        takeaway(s,claim)
+        return s
 
-    s=slide('The task requires orientation, not only position',
-        'Each phase requires a different geometric relationship. The screwdriver must align its shaft with a tilted socket. The rack must seat on its base. After the rack moves, the spanner must be observed again, released and regrasped, then aligned by its hole with the hanging pin. These constraints explain why centroid detection or color sorting alone would not demonstrate the required 6D pose use. Our final success check revisits all objects after the whole sequence finishes.')
-    table(s,['1 / Return','2 / Insert','3 / Assemble','4 / Regrasp + hang'],[['Hammer tray pose','Moving screwdriver\nTilted socket','Independent rack\nRelocalize after seating','Actual finger release\nHole-over-pin placement']],height=2.15,size=23)
-    text(s,'Final acceptance: geometry + support contact + release + stability',.75,4.45,11.8,1.1,27,TEAL,True)
+    def gallery(s, items):
+        for i,(p,label,crop) in enumerate(items):
+            x=.5+(i%2)*6.26; y=1.52+(i//2)*2.34
+            picture(s,p,x,y,6.07,2.02,crop)
+            text(s,label,x,y+2.03,6.07,.26,13,TEAL,True)
 
-    s=slide('System architecture and evaluation boundary',
-        'The forward path starts with RGB-D images and estimated camera calibration. Segmentation supplies the object mask, and FoundationPose estimates the object pose relative to the camera using the reconstructed reference. Camera-to-robot transforms convert that estimate into grasp and insertion goals. IK, trajectory checks and joint control execute the motion. Reobservations close the pose-based loop. Simulator object and camera truth remain in downstream scoring; robot FK, contact guards and physical acceptance have separate roles.')
-    bullets(s,['RGB-D + estimated calibration → foreground mask','Reference reconstruction + FoundationPose → camera-frame 6D pose','Camera-to-robot transform → grasp / insertion target','IK + collision checks + joint control → physical manipulation','Reobserve → bounded pose correction; score with independent truth'],size=25)
+    s=slide('From visual observations to physical tool handling','MA6216 / Final Project 1',
+        'This is our simulated maintenance workcell, built on a UR5e and Robotiq gripper in MuJoCo. The images throughout this talk are captured from actual recorded simulation runs. We return a hammer, intercept and insert a screwdriver, install a rack, and regrasp and hang a spanner. The engineering contribution is the complete calibrated vision-to-action chain, with reproducible successes and failures. It is not a newly trained neural algorithm.')
+    frame(s,'final_overview',.5,1.55,8.15,4.25)
+    frame(s,'final_wrist',8.85,1.55,3.98,2.75)
+    text(s,'4 tools\n6D object poses\nPhysical release + support',8.9,4.65,3.8,1.35,20,TEAL,True)
+    takeaway(s,'Vision-Guided Robotic Manipulation')
 
-    s=slide('Technical selection: match outputs to the task',
-        'We reviewed pose estimation and grasp detection as different technical routes. FoundationPose supports a few-shot model-free setup and shares downstream estimation modules with its model-based setup. MegaPose is a relevant render-and-compare alternative requiring an object model at inference. GraspNet addresses general grasp detection, which could improve pickup but does not alone specify our assembly target. Only the selected pipeline and internal variants were executed. We make no empirical ranking against these external methods.',
-        'Wen et al., CVPR 2024; Labbé et al., arXiv:2212.06870; Fang et al., CVPR 2020')
-    table(s,['Candidate','Task fit','Project decision'],[['FoundationPose','Novel-object 6D pose + tracking','Selected; RGB-D reference route'],['MegaPose','CAD + object region → 6D pose','Reviewed; not experimentally compared'],['GraspNet','General grasp candidates','Reviewed; future pickup alternative'],['Depth / color geometry','Foreground and coarse geometry','Depth mask selected; not full pose']],height=4.25,size=20)
+    pair('One continuous scene: before and after','Application',
+         ['initial_overview','final_overview'],['START / tools at their pickup stations','FINISH / all four final checks pass'],
+         'The task ends after release and stability checks.',
+         'Both images come from the same successful original trial. The start image shows the tools at their pickup stations. The final image shows the completed workcell after the entire sequence, rather than four successes assembled from separate runs. The main replay lasts 195.88 seconds of simulation playback. That duration excludes wall-clock inference and planning waits and must not be interpreted as real-time robotic throughput.')
 
-    s=slide('Why MuJoCo and a Python integration?',
-        'MuJoCo lets us retain the existing articulated robot, gripper and contact model while adding camera observations and reproducible trajectories. PyBullet, Gazebo and Isaac Sim are reasonable alternatives with different integration ecosystems, but changing simulator would require revalidating the same gripper and release behavior. This is an integration decision, not a cross-simulator performance result. OpenCV handles image calibration and segmentation; NumPy and SciPy support coordinate estimation and motion calculations.',
-        'Todorov et al., IROS 2012; official MuJoCo, PyBullet, Gazebo and Isaac Sim documentation')
-    bullets(s,['Reuse the validated UR5e / Robotiq workcell and contact acceptance','Render RGB-D and replay saved physical states','Keep camera, vision and controller interfaces inspectable','Alternatives reviewed; no simulator accuracy or speed ranking','Limit: trajectory templates and checked IK, not global planning'])
+    s=slide('Four operations that depend on orientation','Task geometry',
+        'The operations have different geometric constraints. Hammer return requires a supported placement. The moving screwdriver must be caught and its shaft aligned with a tilted socket. The rack must seat on its base and then be localized again. The spanner must change grasp and align its hole with a pin. A position centroid alone does not specify these insertion and hanging relationships.')
+    gallery(s,[(frames/'hammer_park_wrist.jpg','01  Return the hammer',None),
+               (frames/'driver_insert_wrist.jpg','02  Insert the tilted screwdriver',None),
+               (frames/'rack_insert_wrist.jpg','03  Install the independent rack',None),
+               (frames/'hang_thread_wrist.jpg','04  Regrasp and thread the spanner',None)])
+    takeaway(s,'Position locates the tool. Orientation makes the operation possible.')
 
-    s=slide('Task 2 / Image-based camera intrinsics',
-        'We estimate the manipulation cameras from rendered checkerboard images. Simulator intrinsics are reference values used only after estimation. For the wrist camera, 24 valid training views estimate K and eight independent views validate reprojection. All rejected images are retained. Since this virtual camera is a known distortion-free pinhole sensor, distortion coefficients are fixed to zero. The very small pixel residual is specific to this synthetic setting and is not a claim about real camera calibration.',
-        'Zhang, IEEE TPAMI 2000; docs/results/wrist-calibration-v1')
-    picture(s,ROOT/'docs/results/wrist-calibration-v1/examples/intrinsic_train.jpg',.65,1.4,7.2,4.9)
-    text(s,'Wrist: 24 train / 8 validation\n0.02177 px validation RMSE\n113 acquired images retained\n66 accepted across all splits',8.15,1.8,4.45,4.3,23)
+    s=slide('An image-to-action chain you can inspect','System architecture',
+        'The runtime path begins with RGB-D images and estimated calibration. Depth foreground segmentation supplies the object mask. FoundationPose estimates camera-frame object pose from reconstructed references, and the calibrated transform converts this into robot targets. Motion planning and joint control execute the target; later images permit correction. Simulator object truth is used downstream for scoring, not as the commanded object pose. Robot FK and contact guards have distinct roles.')
+    for i,(key,label) in enumerate([('initial_overview','RGB-D observation'),('driver_align_wrist','6D pose in the wrist view'),('final_wrist','Released physical outcome')]):
+        frame(s,key,.5+i*4.18,1.85,3.97,2.71,label)
+    text(s,'RGB-D  →  mask  →  camera_T_object  →  robot target  →  control',.65,5.02,12,.5,24,TEAL,True)
+    text(s,'Reobserve → bounded correction     |     Simulation truth → evaluation only',.65,5.63,12,.4,19,MUTED)
+    takeaway(s,'Image estimates guide the robot; independent checks score the result.')
 
-    s=slide('Task 3 / Estimate the wrist-to-gripper transform',
-        'The board remains stationary while the robot takes multiple static configurations. Image PnP estimates camera-to-board pose, and FK provides gripper motion. We solve AX equals XB and refine only on training images. Validation freezes K, the hand-eye transform X, and board pose Y. It does not refit the board on each validation image. The translation error is about 0.852 millimeters and rotation error 0.0227 degrees against simulator truth, accessed after estimation.',
-        'OpenCV hand-eye conventions; docs/CALIBRATION_LOCALIZATION.md')
-    text(s,'Gᵢ X Cᵢ = Y    →    AX = XB',.85,1.5,11.6,.8,32,TEAL,True)
-    bullets(s,['24 valid training views; 10 independent hand-eye validation views','Estimated hand-eye error: 0.852 mm / 0.0227°','Frozen-chain validation: 0.05497 px','Runtime: world_T_gripper(FK) × gripper_T_camera(estimated)'],y=2.65,size=25)
+    s=slide('Technical choices follow the manipulation task','Task 1 / Selection',
+        'We selected FoundationPose because it supports object pose estimation from few-shot reconstructed references. MegaPose is a relevant model-based alternative; GraspNet predicts grasps rather than the object pose needed for assembly. These alternatives were reviewed, not experimentally ranked. MuJoCo preserves the existing articulated robot and contact model; OpenCV supports calibration and image processing. The model-free route still uses object-specific RGB-D references, a reconstructed representation and pretrained networks.',
+        'Wen et al. 2024; Labbé et al. 2022; Fang et al. 2020; Todorov et al. 2012 | literature review in repository')
+    frame(s,'regrasp_lift_wrist',.5,1.6,6.07,4.35)
+    text(s,'FoundationPose\n6D pose from reconstructed RGB-D references',7,1.65,5.7,1.1,23,TEAL,True)
+    text(s,'MegaPose / GraspNet\nReviewed pose and grasp alternatives; not external experimental baselines',7,3.05,5.7,1.55,21)
+    text(s,'MuJoCo + OpenCV\nReuse contact dynamics; estimate cameras from images',7,4.85,5.7,1.1,21)
+    takeaway(s,'Model-free here does not mean reference-free.')
 
-    s=slide('Task 4 / Independent localization evaluation',
-        'The localization audit has ten paired scene seeds and five conditions, with four object queries in each scene. That is fifty scene observations and two hundred queries, not fifty manipulation trials. Predictions are saved before simulator segmentation is rendered for scoring. Foreground regions are associated with known pickup stations, so this is not general object-class recognition. Every object-condition group has only ten observations; the report includes Wilson and scene-level bootstrap intervals.',
-        'docs/results/workshop-localization-v1')
-    loc=json.loads((ROOT/'docs/results/workshop-localization-v1/summary.json').read_text())
-    names={'nominal':'Nominal','position_orientation':'Position + orientation','partial_occlusion':'Partial occlusion','depth_noise':'Depth noise'}
-    table(s,['Condition','Mean visible-mask IoU','Scene-bootstrap 95% CI'],[[names[r['condition']],f"{r['mean_iou']:.3f}",f"{r['bootstrap95'][0]:.3f}–{r['bootstrap95'][1]:.3f}"] for r in loc['scene_level_aggregates']],height=3.4)
-    text(s,'160/160 positive queries passed IoU ≥ 0.5; 0/40 absent-target false positives.\nEach object / condition: n = 10. Background-mismatch failures archived separately.',.75,5.4,11.8,1,19)
+    s=slide('Calibrate from rendered checkerboard pixels','Task 2 / Camera intrinsics',
+        'The manipulation camera intrinsics are estimated from checkerboard detections. For the wrist camera, 24 valid training images estimate K and eight held-out images test reprojection. Simulator intrinsics are used only for validation. Distortion is fixed to zero for the known synthetic pinhole camera. The reported 0.02177-pixel value is the held-out mean RMSE; it is specific to this ideal image-formation model and is not a claim about a real camera.',
+        'Actual calibration captures | Zhang 2000 | docs/results/wrist-calibration-v1')
+    picture(s,ROOT/'docs/results/wrist-calibration-v1/examples/intrinsic_train.jpg',.5,1.5,6.07,4.58)
+    picture(s,ROOT/'docs/results/wrist-calibration-v1/data/images/0014.png',6.76,1.5,6.07,4.58)
+    takeaway(s,'24 training views + 8 held-out views  |  0.02177 px validation RMSE')
 
-    s=slide('Task 5 / What “model-free” means here',
-        'We do not give the object CAD mesh to the pose pipeline. Instead, twenty-four synthetic RGB-D reference views, masks and calibrated scan poses create an object-specific reconstruction with the official Neural Object Field implementation. FoundationPose then registers or tracks the object from task images. The scan calibration remains an ideal synthetic assumption. This route still uses references and pretrained networks, and it creates a geometric representation. It is not reference-free or training-from-scratch.',
-        'Wen et al., CVPR 2024; docs/MODEL_FREE_TASKS.md')
-    bullets(s,['24 reference RGB-D views + masks + scan calibration','Official Neural Object Field → reconstructed object surface','Official FoundationPose register / track → camera_T_object','Estimated task-camera transforms → robot-frame target','Ground-truth translation / rotation / ADD / ADD-S for evaluation'])
+    s=slide('Estimate the camera–gripper transform','Task 3 / Hand–eye calibration',
+        'The board remains fixed while the robot presents multiple wrist configurations. Image PnP gives camera-to-board pose and robot FK gives gripper motion. We solve AX equals XB and refine only on training images. The validation freezes the intrinsics, hand-eye transform and board pose. Against simulation truth, the estimated wrist transform has 0.852-millimeter translation error and 0.0227-degree rotation error. Runtime multiplies robot FK by the estimated hand-eye transform.',
+        'Actual calibration captures | OpenCV AX=XB conventions | 24 training / 10 held-out views')
+    picture(s,ROOT/'docs/results/wrist-calibration-v1/data/images/0079.png',.5,1.5,6.07,4.58)
+    picture(s,ROOT/'docs/results/wrist-calibration-v1/examples/hand_eye_validation.jpg',6.76,1.5,6.07,4.58)
+    takeaway(s,'AX = XB  |  Estimated hand–eye error: 0.852 mm / 0.0227°')
 
-    s=slide('Task 6 / Physical release and regrasp matter',
-        'The controller converts observed object geometry into task-specific grasp and placement targets. It checks planned motion, maintains joint control and monitors contact. For the spanner, we require actual finger opening and a changed grasp before hanging. Acceptance is based on released support and stable geometry, not merely the tool appearing close to its destination. The full video includes all four phases and the final wait. A successful demonstration is illustrative; the next slides evaluate all attempted trials.')
-    picture(s,ROOT/'docs/media/complete-workshop-regrasp.png',.65,1.4,8.1,4.9)
-    text(s,'Plan → grip → transfer\nObserve → release → regrasp\nAlign → insert / hang\nRelease → verify support',9.0,1.9,3.6,4.3,24)
+    s=slide('What the foreground detector actually sees','Task 4 / Localization',
+        'These are saved prediction-versus-label overlays for all four tools in one nominal scene. Green is correctly predicted foreground, red is extra foreground, and blue is missed visible target. The detector relies on depth background subtraction and known pickup regions, not tool color. The audit uses fifty scenes and two hundred queries. That is a perception experiment, not two hundred independent robot runs. Each tool-condition cell has ten examples.',
+        'Localization audit | nominal seed 500 | green: overlap; red: extra; blue: missed | cropped original overlays')
+    names=['hammer','screwdriver','rack_frame','spanner']
+    gallery(s,[(ROOT/f'docs/results/workshop-localization-v1/examples/nominal__{n}__sample__500.jpg',n.replace('_',' ').title(),(390,320,940,680)) for n in names])
+    takeaway(s,'50 scenes / 200 queries; predictions saved before ground-truth scoring.')
 
-    s=slide('Bonus / Three levels of visual feedback',
-        'Open loop here means no execution-period visual correction. It still uses initial images, moving-target prediction, joint feedback and safety guards. Staged mode adds selected reobservations. Iterative mode adds repeated pose measurements and bounded TCP corrections before contact. This is discrete pose-based alignment, inspired by the PBVS formulation, not continuous contact control or a stability-guaranteed reproduction of the classical velocity law. All modes share the same pose estimator and acceptance criteria.',
-        'Chaumette & Hutchinson, IEEE RAM 2006; docs/VISUAL_FEEDBACK.md')
-    table(s,['Mode','Visual correction during manipulation'],[['Open loop','Initial acquisition / feed prediction only'],['Staged','Reobserve at selected task transitions'],['Iterative','Staged + repeated bounded 6D alignment']],height=3.3,size=22)
-    text(s,'Default correction cap: 4 mm / 2° per step\nConvergence: two observations within 1.5 mm / 1.5°',.85,5.2,11.6,1.2,23,TEAL,True)
+    s=slide('Failure: background geometry becomes foreground','Localization failure diagnosis',
+        'This image is from the separate background-mismatch diagnosis. The target rack is absent, but the mismatched background geometry produces a false foreground region. The right panel enlarges the same original image; it does not add a synthetic failure. This development diagnosis is kept separate from the formal fifty-scene audit, which uses per-scene matched empty backgrounds. It illustrates a deployment limitation of background subtraction.',
+        'Separate development diagnosis | target absent / rack frame / seed 500 | not part of final 48 manipulation trials')
+    p=ROOT/'docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg'
+    picture(s,p,.5,1.55,6.07,4.5)
+    picture(s,p,6.76,1.55,6.07,4.5,(470,350,900,680))
+    takeaway(s,'The red region is a false positive, even though no rack target is present.')
 
-    s=slide('Experimental design: 48 paired attempts',
-        'We compare three feedback modes under two conditions, with eight seeds per configuration. Every run uses the same estimated wrist calibration, control thresholds and physical acceptance. The initial-state hashes verify pairing. These seeds were used in previous development and evaluation; this is explicitly a replication rather than a fresh holdout. Failures before feedback or before perturbation remain in the denominator. We use Wilson intervals, trial-level bootstrap intervals, and paired exact tests with Holm correction.')
-    bullets(s,['3 modes × 2 conditions × 8 seeds = 48 attempts','Estimated wrist calibration; fixed control and acceptance thresholds','Same initial states paired by seed; disturbance delivery logged','Wilson 95% CI; bootstrap trial means; paired exact tests + Holm','Seeds 400–407 reused; separate from historical ideal-wrist results'])
+    pair('6D pose must preserve the shaft and the hole axes','Task 5 / Pose estimation',
+         ['driver_align_wrist','hang_align_wrist'],['SHAFT → tilted socket','HOLE AXIS → hanging pin'],
+         'The wrist estimates connect tool geometry to the required final pose.',
+         'These original wrist views show the screwdriver and spanner near alignment. The archived pose overlays belong to the recorded estimate, not a new drawing of simulator truth. The object references are reconstructed from calibrated RGB-D scans rather than supplying tool CAD to the estimator. Translation, rotation, ADD and ADD-S are evaluated separately against simulation truth. Reference-scan calibration remains an ideal synthetic assumption.')
 
-    s=slide('Whole-sequence success with uncertainty',
-        'This is the main result: success means all four objects meet the final physical checks. Read both the counts and the wide confidence intervals. We include every valid attempt, including early pickup failures. The comparison does not simply measure whether the visual alignment routine can converge after it is reached; it measures the complete system. The paired differences on the next slide are more appropriate than inferring significance from overlapping marginal intervals.',
-        str(results.relative_to(ROOT))+'/summary.json; Wilson 95% intervals; n = 8 per configuration')
-    picture(s,results/'figures/success_rates.png',.65,1.35,12,5.1)
+    pair('Return the hammer before the next tool arrives','Operation 01 / Hammer',
+         ['hammer_lift_overview','hammer_released_overview'],['13.60 s / lift from the workbench','25.00 s / release into the tray'],
+         'Grasp → transfer → release → check stable support.',
+         'The first operation clears the workbench and returns the hammer. Compare the lifted tool on the left with the released placement on the right. The controller uses an image-estimated target, checked motion and joint control. The final acceptance requires released support, not simply reaching a Cartesian waypoint. Hammer approach planning is also one of the failure categories in the complete evaluation.')
 
-    no_significance=all(r['exact_mcnemar_p_holm_within_family']>=.05 for r in summary['paired_module_comparisons'])
-    s=slide('Paired differences bound the conclusion',
-        ('No feedback-method comparison passes the Holm-adjusted significance threshold in this experiment. This does not establish equivalence, and it does not prove that the additional loop is useless. It means the complete-sequence evidence is limited by the observed outcomes and small sample. We must report those results instead of choosing a favorable subset or treating one success video as a performance statistic.' if no_significance else 'The paired analysis compares success within the same seed. Interpret the exact adjusted tests together with the conservative confidence intervals and the narrow simulation setting. A statistically detectable comparison does not imply arbitrary-scene or real-robot generalization.'),
-        str(results.relative_to(ROOT))+'/summary.json; paired comparisons; all configurations retained')
-    picture(s,results/'figures/paired_differences.png',.65,1.35,12,5.1)
+    pair('Intercept a tool that is already moving','Operation 02 / Moving screwdriver',
+         ['feed_overview','driver_lift_wrist'],['29.00 s / observe the moving feed','43.40 s / tool lifted in the gripper'],
+         'Prediction and pickup contact both matter before alignment begins.',
+         'The screwdriver moves through the feed stage before the robot approaches it. Initial observation and moving-target prediction are present in every feedback mode, including the open-loop comparison. The wrist image on the right is captured after pickup. Many complete-task failures occur at this earlier contact stage, before the later insertion feedback can be exercised. Therefore we retain early failures in the final denominator.')
 
-    s=slide('Accuracy and cost are separate measurements',
-        'Pose error is evaluated at the first fixed-camera observation, providing a common comparison point. Execution error measures actual TCP tracking against the planned reference. We report inference and wall time separately, since shared resources and pauses influence throughput. This table is an overview of no-disturbance groups; the complete report contains both conditions, uncertainty and available sample counts. A shorter early-failure run is not a faster successful system.',
-        'Full conditions, confidence intervals and sample counts are in the accompanying report')
-    keys=['pose_initial_raw_translation_error_mm','pose_initial_raw_rotation_error_deg','tcp_tracking_translation_mm_rmse','pose_calls_per_wall_second_including_waits']
-    def mean(g,key):
-        v=g['metrics'].get(key);return 'N/A' if not v or v.get('mean') is None else f"{v['mean']:.2f} (n={v['n_trials']})"
-    table(s,['Mode (no pulse)','Pose / mm','Pose / deg','TCP RMSE / mm','Pose calls / wall s'],[[METHOD_LABELS[g['method']]]+[mean(g,k) for k in keys] for g in summary['groups'] if g['disturbance']=='none'],height=3.1,size=19)
-    text(s,'Physics: 500 Hz ≠ visual feedback frequency\nTrue alignment errors and visual residuals are recorded separately.',.85,5.15,11.7,1.15,24,TEAL,True)
+    pair('Rotate the shaft, then insert into a tilted socket','Operation 02 / Insertion',
+         ['driver_orient_wrist','driver_release_wrist'],['50.00 s / reorient the held screwdriver','67.00 s / release after insertion'],
+         'Align the tool axis before insertion.',
+         'The wrist sequence makes the orientation requirement visible. The robot first reorients the held screwdriver, aligns it with the socket, and inserts in guarded increments. It then opens the fingers and withdraws. The two snapshots are selected from the same successful continuous run. They are illustrative states; the archived motion and acceptance logs provide the evidence that the operation passed.')
 
-    reports=[json.loads(f.read_text()) for f in sorted((results/'trials').glob('*.json'))]
-    failure_counts=Counter(r.get('last_stage','Unknown') for r in reports if not r['success'])
-    s=slide('Failure analysis: where the complete system stops',
-        'The table includes every failed attempt, grouped by its last recorded controller stage. A stage name is a diagnostic location rather than a complete causal explanation; individual summaries preserve the actual contact or planning reason. Early pickup failures can prevent the later feedback loop from being tested. Additional reobservation cannot repair an approach that already failed. This motivates separating reachability, local alignment, and final task acceptance rather than reporting only reached-stage successes.')
-    table(s,['Last recorded stage','Failed attempts'],failure_counts.most_common(),height=min(4.6,.65*(len(failure_counts)+1)),size=20)
+    pair('Install the rack as a separate physical object','Operation 03 / Rack assembly',
+         ['rack_lift_overview','rack_insert_wrist'],['91.00 s / lift the independent frame','112.00 s / seat the frame on its base'],
+         'Install and release the rack before using it as a fixture.',
+         'The rack starts as an independent object in the workcell. The robot lifts it, rotates and aligns it, then inserts it into the base. This adds a dependency to the final spanner task: the hanging fixture may not remain exactly where an earlier observation predicted. The rack is released and its seating is checked before the controller proceeds.')
 
-    s=slide('Limits and the next engineering priorities',
-        'Our strongest conclusion is that the complete calibrated vision-to-action chain is implemented and auditable, with quantitatively documented limits. Known pickup regions, synthetic reference calibration, ideal FK and depth, and small reused-seed samples restrict generalization. The immediate engineering priorities are pickup planning and contact reliability, segmentation under changing backgrounds, and then observation scheduling and pose bias. Broader external-estimator comparisons and real hardware would be new experiments, not conclusions from this dataset.')
-    bullets(s,['Known stations and paired empty backgrounds; no arbitrary clutter claim','Ideal reference scans, FK and rigid mounts; simulation only','Small reused-seed sample; no architectural superiority assumption','Priority: pickup reliability → pose bias / occlusion → feedback timing','External pose baselines and real hardware remain future work'])
+    pair('Release the rack, then observe the assembled scene','Operation 03 / Relocalization',
+         ['rack_release_wrist','rack_done_overview'],['118.00 s / gripper withdrawal','134.40 s / assembled-rack check'],
+         'Reobserve the rack after physical seating.',
+         'The left image shows withdrawal after rack release; the right is the assembled workcell just before transition to the spanner. In staged and iterative feedback modes, a new observation updates the fixture relationship for the next operation. This step addresses changes caused by contact and seating. The final workcell still contains the previously returned hammer and inserted screwdriver.')
 
-    s=slide('Deliverables and course coverage',
-        'The repository contains the current technical-selection review, both camera-calibration procedures and their raw evidence, localization masks and statistics, pose and manipulation metrics, complete trial summaries, and original replay videos. The deck and speaker notes are generated from the published result files. This organization makes the six required tasks and the visual-feedback extension traceable without claiming a new algorithm. During the talk, use a short excerpt of the full video and leave the complete recording available for review.')
-    bullets(s,['Task 1: literature, alternatives and selection rationale','Tasks 2–3: image-estimated intrinsics and hand-eye calibration','Tasks 4–5: localization audit and 6D pose accuracy','Task 6 + Bonus: complete manipulation and paired feedback evaluation','Editable slides, English notes, data, code, videos and limitations'])
+    pair('Put the spanner down and actually open the fingers','Operation 04 / Physical regrasp',
+         ['regrasp_place_wrist','regrasp_clear_wrist'],['147.00 s / supported placement','150.40 s / gripper clear of the tool'],
+         'The change of grasp includes an explicit release and a new observation.',
+         'This pair shows the first half of the regrasp. The spanner is placed on its support and the gripper releases and retreats. The next grasp is based on a new observation rather than assuming the tool stayed exactly at its commanded pose. The images show the mechanism; the original trial also records the physical regrasp flag and contact-based acceptance. This is not a teleportation or a hidden attachment change.')
 
-    s=slide('References and reproducibility',
-        'These references underpin the selected techniques rather than serving as external experimental baselines. Full titles and verified primary links are in the literature review. The result protocol records source and calibration hashes, software versions, seeds and commands. Each replay links to its original trajectory. This final slide can remain visible during questions; the detailed metric definitions and all failure summaries are in the repository.',
-        'Full bibliographic details and primary links: docs/LITERATURE_AND_SELECTION.md')
-    bullets(s,['Wen et al. — FoundationPose, CVPR 2024','Labbé et al. — MegaPose, arXiv:2212.06870, 2022','Fang et al. — GraspNet-1Billion, CVPR 2020','Zhang — Camera calibration, IEEE TPAMI, 2000','Chaumette & Hutchinson — Visual servo control I, IEEE RAM, 2006','Todorov et al. — MuJoCo, IROS 2012'],size=23)
+    pair('Regrasp so the hole can reach the hanging pin','Operation 04 / New grasp',
+         ['regrasp_close_wrist','regrasp_lift_wrist'],['155.60 s / close at the new grasp','158.20 s / lift and inspect'],
+         'The second grasp makes the hole accessible for the final approach.',
+         'After the released spanner is observed again, the fingers approach and close at the new grasp. The robot lifts and inspects the tool before turning toward the rack. The hole must remain accessible while the gripper maintains bilateral contact. One separate evaluated failure loses bilateral grasp during the later approach; extra visual measurements do not automatically repair a physically unstable hold.')
+
+    pair('Thread the hole, release, and leave the tool hanging','Operation 04 / Final placement',
+         ['hang_thread_wrist','final_wrist'],['179.00 s / thread the eye onto the pin','195.00 s / released final state'],
+         'Success requires support by the rack after the gripper withdraws.',
+         'The large wrist views show the eye passing over the pin and the final released state. The controller seats the eye, opens the fingers, withdraws, and waits for stability. The selected trial passes the final checks for all four objects. A separate diagnostic audits saved motion states and adds thirty seconds of passive simulation; that diagnostic does not replace or improve the original trial score.')
+
+    pair('Visual feedback can trigger a real corrective motion','Bonus / Correction example',
+         ['pulse_before','pulse_after'],['BEFORE / visual angular residual 1.60°','AFTER / visual angular residual 0.74°'],
+         'One logged correction; a separate integration example.',
+         'This example comes from the separately archived estimated-calibration integration run with an alignment impulse. The spanner loop records one correction. The measured angular residual falls from 1.60 to 0.74 degrees over the observations. The visual change is small at this scale, so the residual values are taken from the original log, not inferred from pixels. These are estimated residuals, not true geometric errors. This integration example is not counted as an additional trial in the final forty-eight.',
+         'Separate calibration integration / iterative / alignment impulse / seed 400 | original log residuals')
+
+    pair('Same initial seed, different insertion outcomes','Paired evidence / Seed 400',
+         ['open_failure_wrist','driver_done_wrist'],['OPEN LOOP / insertion guard stops the run','ITERATIVE / driver released and stable'],
+         'A matched example, not a claim of overall superiority.',
+         'These trials share seed four hundred and the same initial physical scene. The open-loop run stops under the screwdriver insertion contact guard. The iterative run reaches a released screwdriver and eventually completes the whole task. The pictures are aligned by task outcome rather than identical playback time. The failure reason is taken from the recorded guard, not guessed from a rendered contact. A single favorable pair is not a statistical comparison.',
+         'Final 48 trials | open_loop vs iterative / no disturbance / seed 400 | different playback times')
+
+    pair('Early pickup failure defeats both feedback modes','Failure evidence / Seed 401',
+         ['staged_failure_wrist','iter_failure_wrist'],['STAGED / stops at gripper closure','ITERATIVE / also stops at gripper closure'],
+         'Both stop before the later visual alignment loop can help.',
+         'This matched pair deliberately retains a failure of the iterative method itself. Both runs stop during moving-screwdriver pickup when an unexpected robot contact is detected at gripper closure. This is a safety-guard failure, not necessarily a visually dramatic dropped object. The same visible pose can hide a contact violation; the cause therefore comes from the log. Early reachability limits the whole-sequence benefit of downstream feedback.',
+         'Final 48 trials | staged vs iterative / no disturbance / seed 401 | original contact-guard failures')
+
+    s=slide('All attempts count, including the failed pickups','Quantitative context / 48 attempts',
+        'We retain forty-eight attempts: three feedback modes, two disturbance conditions and eight reused seeds in each cell. Open loop succeeds zero of eight in both conditions; staged feedback three of eight without and two of eight with disturbance; iterative feedback three of eight in both. All four Holm-adjusted method comparisons have p equal to one. This does not establish superiority or equivalence. The seeds are reused, so this is a paired replication, not a fresh holdout.')
+    picture(s,results/'figures/success_rates.png',.5,1.55,7.2,4.55)
+    frame(s,'final_wrist',8,1.7,4.8,3.27)
+    text(s,'One success image cannot\nreplace all 48 outcomes.',8,5.25,4.8,.75,22,TEAL,True)
+    takeaway(s,'Wide uncertainty; no statistically established advantage in this sample.')
+
+    s=slide('What the failures tell us to improve next','Engineering conclusions',
+        'The complete calibrated chain is implemented and inspectable, but overall success remains limited. Twenty-four failures stop at moving-pickup gripper closure, six at hammer approach settling, six during open-loop driver retraction, and one after loss of bilateral spanner grasp. Priorities are pickup planning and contact reliability, then pose bias, visibility and feedback scheduling. Known pickup regions, ideal reference scanning and FK, and a small reused-seed sample limit generalization.',
+        'Final failure summaries + separate localization diagnosis | no external estimator performance ranking')
+    frame(s,'iter_failure_wrist',.5,1.7,6.07,4.13,'PICKUP / the dominant bottleneck')
+    text(s,'24 / pickup-contact stops\n6 / hammer approach stops\n6 / open-loop insertion stops\n1 / bilateral-grasp loss',7,1.9,5.6,2.5,24,AMBER,True)
+    text(s,'Next: reliable contact → robust visibility\n→ broader unseen-scene evaluation',7,4.85,5.6,1,21)
+    takeaway(s,'Reliable pickup is required before downstream feedback can help.')
+
+    pair('A complete, auditable vision-guided workcell','Conclusion / Discussion',
+         ['initial_overview','final_wrist'],['From calibrated observations','To released physical manipulation'],
+         'Repository evidence: code, calibration, masks, trials and original videos.',
+         'The project integrates all six course tasks and the visual-feedback extension. The evidence package links independent camera estimates, localization masks, object pose estimates, motion execution and physical acceptance. Our main lesson is that a successful visual alignment module is only one part of a reliable manipulation system. We present the full sequence and its failures, with realistic boundaries on what these simulation experiments demonstrate. The remaining slides are backup material for questions.')
+
+    s=slide('Accuracy, timing and experimental units','Appendix / Metrics',
+        'These values separate camera, pose, execution and timing measurements. The initial fixed-camera observations are shared across modes: mean pose translation and rotation errors are 2.60 millimeters and 1.44 degrees, with ADD 3.17 millimeters and ADD-S 2.29 millimeters. Execution and frequency metrics are reported with sample counts in the full report. Physics step rate is not visual inference frequency, and wall time includes shared-resource waits. Calibration images, perception queries and robot attempts are different experimental units.',
+        'Full uncertainty and sample counts: docs/results/visual-feedback-calibrated-v1/README.md')
+    frame(s,'driver_align_wrist',.5,1.65,6.07,4.13)
+    text(s,'Initial pose: 2.60 mm / 1.44°\nADD / ADD-S: 3.17 / 2.29 mm\nHand–eye: 0.852 mm / 0.0227°',7,1.7,5.65,2.1,23,TEAL,True)
+    text(s,'48 robot attempts ≠ 200 mask queries\n500 Hz physics ≠ visual update rate\nTracking error ≠ final placement error',7,4.15,5.65,1.6,21)
+    takeaway(s,'Do not mix measurement units, denominators or timing definitions.')
+
+    s=slide('Methods and primary references','Appendix / Reading',
+        'FoundationPose provides the selected object-pose method; Zhang and OpenCV support calibration; Chaumette and Hutchinson provide the visual-servoing framework. MuJoCo supplies the simulation platform. MegaPose and GraspNet are reviewed alternatives, not executed external baselines. Full citations and verified primary links are in the literature review and bibliography. Every screenshot also has a source-video hash, timestamp and crop record in the presentation image manifest.',
+        'docs/LITERATURE_AND_SELECTION.md | docs/references.bib | docs/presentation/frames/manifest.json')
+    frame(s,'final_overview',.5,1.65,5.65,3.85)
+    text(s,'Wen et al. — FoundationPose, CVPR 2024\nZhang — Camera calibration, TPAMI 2000\nOpenCV — Hand–eye calibration conventions\nChaumette & Hutchinson — Visual servoing, 2006\nTodorov et al. — MuJoCo, IROS 2012\nLabbé et al. — MegaPose, 2022\nFang et al. — GraspNet-1Billion, CVPR 2020',6.6,1.65,6.2,4.45,19)
+    takeaway(s,'Published methods + independent integration + traceable evidence.')
 
     prs.save(output/'vision_guided_manipulation.pptx')
-    (output/'speaker_notes.md').write_text('# English speaker notes\n\nTarget: approximately 12–15 minutes; play only a short video excerpt during the talk.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
+    (output/'speaker_notes.md').write_text('# English speaker notes\n\nImage-led revision. Target: 12–15 minutes for slides 1–24; slides 25–26 are backup.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
     (output/'slides.json').write_text(json.dumps(notes,indent=2)+'\n')
-    (output/'provenance.json').write_text(json.dumps({'layout_preview':preview,'results':str(results.relative_to(ROOT)),
-        'summary_sha256':hashlib.sha256((results/'summary.json').read_bytes()).hexdigest(),'image_assets_sha256':assets,
-        'slides':len(prs.slides),'language':'English slides and English speaker notes','image_transform':'Aspect-preserving placement only; no recoloring or content editing'},indent=2)+'\n')
-    print(json.dumps({'output':str(output),'slides':len(prs.slides),'preview':preview}))
+    counts={'slides':len(prs.slides),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in im['path'] for im in n['images']) for n in notes),
+            'image_placements':sum(len(n['images']) for n in notes),'unique_image_assets':len(assets),
+            'data_chart_placements':sum('/figures/' in im['path'] for n in notes for im in n['images'])}
+    (output/'provenance.json').write_text(json.dumps({'layout_preview':False,'revision':'Runtime-image-led replacement',
+        'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,
+        **counts,'language':'English slides and English speaker notes','image_transform':'Video camera-panel crops and explicitly recorded detail crops; no generated imagery, recoloring or altered physical outcomes',
+        'frame_manifest':'frames/manifest.json','frame_manifest_sha256':sha(frames/'manifest.json')},indent=2)+'\n')
+    print(json.dumps(counts))
 
 
 if __name__=='__main__':

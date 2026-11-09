@@ -1,116 +1,473 @@
 [
   {
     "slide": 1,
-    "title": "Vision-Guided Tool Manipulation",
-    "notes": "Our application is a simulated maintenance workcell. A UR5e and Robotiq gripper return a hammer, intercept and insert a screwdriver, assemble a rack, and regrasp and hang a spanner. The project integrates the complete chain from image measurements to physical manipulation. We use existing pretrained methods and focus on engineering decisions, reproducibility and critical evaluation. The main question is whether additional execution-period visual feedback improves this complete sequence.",
-    "source": "MA6216 Final Project 1 | UR5e + Robotiq 2F-85 | MuJoCo"
+    "title": "From visual observations to physical tool handling",
+    "section": "MA6216 / Final Project 1",
+    "notes": "This is our simulated maintenance workcell, built on a UR5e and Robotiq gripper in MuJoCo. The images throughout this talk are captured from actual recorded simulation runs. We return a hammer, intercept and insert a screwdriver, install a rack, and regrasp and hang a spanner. The engineering contribution is the complete calibrated vision-to-action chain, with reproducible successes and failures. It is not a newly trained neural algorithm.",
+    "source": "Final estimated-calibration evaluation | original trial frames",
+    "images": [
+      {
+        "path": "docs/presentation/frames/final_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 2,
-    "title": "The task requires orientation, not only position",
-    "notes": "Each phase requires a different geometric relationship. The screwdriver must align its shaft with a tilted socket. The rack must seat on its base. After the rack moves, the spanner must be observed again, released and regrasped, then aligned by its hole with the hanging pin. These constraints explain why centroid detection or color sorting alone would not demonstrate the required 6D pose use. Our final success check revisits all objects after the whole sequence finishes.",
-    "source": "Project implementation and recorded evidence"
+    "title": "One continuous scene: before and after",
+    "section": "Application",
+    "notes": "Both images come from the same successful original trial. The start image shows the tools at their pickup stations. The final image shows the completed workcell after the entire sequence, rather than four successes assembled from separate runs. The main replay lasts 195.88 seconds of simulation playback. That duration excludes wall-clock inference and planning waits and must not be interpreted as real-time robotic throughput.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/initial_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_overview.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 3,
-    "title": "System architecture and evaluation boundary",
-    "notes": "The forward path starts with RGB-D images and estimated camera calibration. Segmentation supplies the object mask, and FoundationPose estimates the object pose relative to the camera using the reconstructed reference. Camera-to-robot transforms convert that estimate into grasp and insertion goals. IK, trajectory checks and joint control execute the motion. Reobservations close the pose-based loop. Simulator object and camera truth remain in downstream scoring; robot FK, contact guards and physical acceptance have separate roles.",
-    "source": "Project implementation and recorded evidence"
+    "title": "Four operations that depend on orientation",
+    "section": "Task geometry",
+    "notes": "The operations have different geometric constraints. Hammer return requires a supported placement. The moving screwdriver must be caught and its shaft aligned with a tilted socket. The rack must seat on its base and then be localized again. The spanner must change grasp and align its hole with a pin. A position centroid alone does not specify these insertion and hanging relationships.",
+    "source": "Final estimated-calibration evaluation | original trial frames",
+    "images": [
+      {
+        "path": "docs/presentation/frames/hammer_park_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/driver_insert_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/rack_insert_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/hang_thread_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 4,
-    "title": "Technical selection: match outputs to the task",
-    "notes": "We reviewed pose estimation and grasp detection as different technical routes. FoundationPose supports a few-shot model-free setup and shares downstream estimation modules with its model-based setup. MegaPose is a relevant render-and-compare alternative requiring an object model at inference. GraspNet addresses general grasp detection, which could improve pickup but does not alone specify our assembly target. Only the selected pipeline and internal variants were executed. We make no empirical ranking against these external methods.",
-    "source": "Wen et al., CVPR 2024; Labb\u00e9 et al., arXiv:2212.06870; Fang et al., CVPR 2020"
+    "title": "An image-to-action chain you can inspect",
+    "section": "System architecture",
+    "notes": "The runtime path begins with RGB-D images and estimated calibration. Depth foreground segmentation supplies the object mask. FoundationPose estimates camera-frame object pose from reconstructed references, and the calibrated transform converts this into robot targets. Motion planning and joint control execute the target; later images permit correction. Simulator object truth is used downstream for scoring, not as the commanded object pose. Robot FK and contact guards have distinct roles.",
+    "source": "Final estimated-calibration evaluation | original trial frames",
+    "images": [
+      {
+        "path": "docs/presentation/frames/initial_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/driver_align_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 5,
-    "title": "Why MuJoCo and a Python integration?",
-    "notes": "MuJoCo lets us retain the existing articulated robot, gripper and contact model while adding camera observations and reproducible trajectories. PyBullet, Gazebo and Isaac Sim are reasonable alternatives with different integration ecosystems, but changing simulator would require revalidating the same gripper and release behavior. This is an integration decision, not a cross-simulator performance result. OpenCV handles image calibration and segmentation; NumPy and SciPy support coordinate estimation and motion calculations.",
-    "source": "Todorov et al., IROS 2012; official MuJoCo, PyBullet, Gazebo and Isaac Sim documentation"
+    "title": "Technical choices follow the manipulation task",
+    "section": "Task 1 / Selection",
+    "notes": "We selected FoundationPose because it supports object pose estimation from few-shot reconstructed references. MegaPose is a relevant model-based alternative; GraspNet predicts grasps rather than the object pose needed for assembly. These alternatives were reviewed, not experimentally ranked. MuJoCo preserves the existing articulated robot and contact model; OpenCV supports calibration and image processing. The model-free route still uses object-specific RGB-D references, a reconstructed representation and pretrained networks.",
+    "source": "Wen et al. 2024; Labb\u00e9 et al. 2022; Fang et al. 2020; Todorov et al. 2012 | literature review in repository",
+    "images": [
+      {
+        "path": "docs/presentation/frames/regrasp_lift_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 6,
-    "title": "Task 2 / Image-based camera intrinsics",
-    "notes": "We estimate the manipulation cameras from rendered checkerboard images. Simulator intrinsics are reference values used only after estimation. For the wrist camera, 24 valid training views estimate K and eight independent views validate reprojection. All rejected images are retained. Since this virtual camera is a known distortion-free pinhole sensor, distortion coefficients are fixed to zero. The very small pixel residual is specific to this synthetic setting and is not a claim about real camera calibration.",
-    "source": "Zhang, IEEE TPAMI 2000; docs/results/wrist-calibration-v1"
+    "title": "Calibrate from rendered checkerboard pixels",
+    "section": "Task 2 / Camera intrinsics",
+    "notes": "The manipulation camera intrinsics are estimated from checkerboard detections. For the wrist camera, 24 valid training images estimate K and eight held-out images test reprojection. Simulator intrinsics are used only for validation. Distortion is fixed to zero for the known synthetic pinhole camera. The reported 0.02177-pixel value is the held-out mean RMSE; it is specific to this ideal image-formation model and is not a claim about a real camera.",
+    "source": "Actual calibration captures | Zhang 2000 | docs/results/wrist-calibration-v1",
+    "images": [
+      {
+        "path": "docs/results/wrist-calibration-v1/examples/intrinsic_train.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/results/wrist-calibration-v1/data/images/0014.png",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 7,
-    "title": "Task 3 / Estimate the wrist-to-gripper transform",
-    "notes": "The board remains stationary while the robot takes multiple static configurations. Image PnP estimates camera-to-board pose, and FK provides gripper motion. We solve AX equals XB and refine only on training images. Validation freezes K, the hand-eye transform X, and board pose Y. It does not refit the board on each validation image. The translation error is about 0.852 millimeters and rotation error 0.0227 degrees against simulator truth, accessed after estimation.",
-    "source": "OpenCV hand-eye conventions; docs/CALIBRATION_LOCALIZATION.md"
+    "title": "Estimate the camera\u2013gripper transform",
+    "section": "Task 3 / Hand\u2013eye calibration",
+    "notes": "The board remains fixed while the robot presents multiple wrist configurations. Image PnP gives camera-to-board pose and robot FK gives gripper motion. We solve AX equals XB and refine only on training images. The validation freezes the intrinsics, hand-eye transform and board pose. Against simulation truth, the estimated wrist transform has 0.852-millimeter translation error and 0.0227-degree rotation error. Runtime multiplies robot FK by the estimated hand-eye transform.",
+    "source": "Actual calibration captures | OpenCV AX=XB conventions | 24 training / 10 held-out views",
+    "images": [
+      {
+        "path": "docs/results/wrist-calibration-v1/data/images/0079.png",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/results/wrist-calibration-v1/examples/hand_eye_validation.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 8,
-    "title": "Task 4 / Independent localization evaluation",
-    "notes": "The localization audit has ten paired scene seeds and five conditions, with four object queries in each scene. That is fifty scene observations and two hundred queries, not fifty manipulation trials. Predictions are saved before simulator segmentation is rendered for scoring. Foreground regions are associated with known pickup stations, so this is not general object-class recognition. Every object-condition group has only ten observations; the report includes Wilson and scene-level bootstrap intervals.",
-    "source": "docs/results/workshop-localization-v1"
+    "title": "What the foreground detector actually sees",
+    "section": "Task 4 / Localization",
+    "notes": "These are saved prediction-versus-label overlays for all four tools in one nominal scene. Green is correctly predicted foreground, red is extra foreground, and blue is missed visible target. The detector relies on depth background subtraction and known pickup regions, not tool color. The audit uses fifty scenes and two hundred queries. That is a perception experiment, not two hundred independent robot runs. Each tool-condition cell has ten examples.",
+    "source": "Localization audit | nominal seed 500 | green: overlap; red: extra; blue: missed | cropped original overlays",
+    "images": [
+      {
+        "path": "docs/results/workshop-localization-v1/examples/nominal__hammer__sample__500.jpg",
+        "crop_xyxy": [
+          390,
+          320,
+          940,
+          680
+        ]
+      },
+      {
+        "path": "docs/results/workshop-localization-v1/examples/nominal__screwdriver__sample__500.jpg",
+        "crop_xyxy": [
+          390,
+          320,
+          940,
+          680
+        ]
+      },
+      {
+        "path": "docs/results/workshop-localization-v1/examples/nominal__rack_frame__sample__500.jpg",
+        "crop_xyxy": [
+          390,
+          320,
+          940,
+          680
+        ]
+      },
+      {
+        "path": "docs/results/workshop-localization-v1/examples/nominal__spanner__sample__500.jpg",
+        "crop_xyxy": [
+          390,
+          320,
+          940,
+          680
+        ]
+      }
+    ]
   },
   {
     "slide": 9,
-    "title": "Task 5 / What \u201cmodel-free\u201d means here",
-    "notes": "We do not give the object CAD mesh to the pose pipeline. Instead, twenty-four synthetic RGB-D reference views, masks and calibrated scan poses create an object-specific reconstruction with the official Neural Object Field implementation. FoundationPose then registers or tracks the object from task images. The scan calibration remains an ideal synthetic assumption. This route still uses references and pretrained networks, and it creates a geometric representation. It is not reference-free or training-from-scratch.",
-    "source": "Wen et al., CVPR 2024; docs/MODEL_FREE_TASKS.md"
+    "title": "Failure: background geometry becomes foreground",
+    "section": "Localization failure diagnosis",
+    "notes": "This image is from the separate background-mismatch diagnosis. The target rack is absent, but the mismatched background geometry produces a false foreground region. The right panel enlarges the same original image; it does not add a synthetic failure. This development diagnosis is kept separate from the formal fifty-scene audit, which uses per-scene matched empty backgrounds. It illustrates a deployment limitation of background subtraction.",
+    "source": "Separate development diagnosis | target absent / rack frame / seed 500 | not part of final 48 manipulation trials",
+    "images": [
+      {
+        "path": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+        "crop_xyxy": [
+          470,
+          350,
+          900,
+          680
+        ]
+      }
+    ]
   },
   {
     "slide": 10,
-    "title": "Task 6 / Physical release and regrasp matter",
-    "notes": "The controller converts observed object geometry into task-specific grasp and placement targets. It checks planned motion, maintains joint control and monitors contact. For the spanner, we require actual finger opening and a changed grasp before hanging. Acceptance is based on released support and stable geometry, not merely the tool appearing close to its destination. The full video includes all four phases and the final wait. A successful demonstration is illustrative; the next slides evaluate all attempted trials.",
-    "source": "Project implementation and recorded evidence"
+    "title": "6D pose must preserve the shaft and the hole axes",
+    "section": "Task 5 / Pose estimation",
+    "notes": "These original wrist views show the screwdriver and spanner near alignment. The archived pose overlays belong to the recorded estimate, not a new drawing of simulator truth. The object references are reconstructed from calibrated RGB-D scans rather than supplying tool CAD to the estimator. Translation, rotation, ADD and ADD-S are evaluated separately against simulation truth. Reference-scan calibration remains an ideal synthetic assumption.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/driver_align_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/hang_align_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 11,
-    "title": "Bonus / Three levels of visual feedback",
-    "notes": "Open loop here means no execution-period visual correction. It still uses initial images, moving-target prediction, joint feedback and safety guards. Staged mode adds selected reobservations. Iterative mode adds repeated pose measurements and bounded TCP corrections before contact. This is discrete pose-based alignment, inspired by the PBVS formulation, not continuous contact control or a stability-guaranteed reproduction of the classical velocity law. All modes share the same pose estimator and acceptance criteria.",
-    "source": "Chaumette & Hutchinson, IEEE RAM 2006; docs/VISUAL_FEEDBACK.md"
+    "title": "Return the hammer before the next tool arrives",
+    "section": "Operation 01 / Hammer",
+    "notes": "The first operation clears the workbench and returns the hammer. Compare the lifted tool on the left with the released placement on the right. The controller uses an image-estimated target, checked motion and joint control. The final acceptance requires released support, not simply reaching a Cartesian waypoint. Hammer approach planning is also one of the failure categories in the complete evaluation.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/hammer_lift_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/hammer_released_overview.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 12,
-    "title": "Experimental design: 48 paired attempts",
-    "notes": "We compare three feedback modes under two conditions, with eight seeds per configuration. Every run uses the same estimated wrist calibration, control thresholds and physical acceptance. The initial-state hashes verify pairing. These seeds were used in previous development and evaluation; this is explicitly a replication rather than a fresh holdout. Failures before feedback or before perturbation remain in the denominator. We use Wilson intervals, trial-level bootstrap intervals, and paired exact tests with Holm correction.",
-    "source": "Project implementation and recorded evidence"
+    "title": "Intercept a tool that is already moving",
+    "section": "Operation 02 / Moving screwdriver",
+    "notes": "The screwdriver moves through the feed stage before the robot approaches it. Initial observation and moving-target prediction are present in every feedback mode, including the open-loop comparison. The wrist image on the right is captured after pickup. Many complete-task failures occur at this earlier contact stage, before the later insertion feedback can be exercised. Therefore we retain early failures in the final denominator.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/feed_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/driver_lift_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 13,
-    "title": "Whole-sequence success with uncertainty",
-    "notes": "This is the main result: success means all four objects meet the final physical checks. Read both the counts and the wide confidence intervals. We include every valid attempt, including early pickup failures. The comparison does not simply measure whether the visual alignment routine can converge after it is reached; it measures the complete system. The paired differences on the next slide are more appropriate than inferring significance from overlapping marginal intervals.",
-    "source": "docs/results/visual-feedback-calibrated-v1/summary.json; Wilson 95% intervals; n = 8 per configuration"
+    "title": "Rotate the shaft, then insert into a tilted socket",
+    "section": "Operation 02 / Insertion",
+    "notes": "The wrist sequence makes the orientation requirement visible. The robot first reorients the held screwdriver, aligns it with the socket, and inserts in guarded increments. It then opens the fingers and withdraws. The two snapshots are selected from the same successful continuous run. They are illustrative states; the archived motion and acceptance logs provide the evidence that the operation passed.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/driver_orient_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/driver_release_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 14,
-    "title": "Paired differences bound the conclusion",
-    "notes": "No feedback-method comparison passes the Holm-adjusted significance threshold in this experiment. This does not establish equivalence, and it does not prove that the additional loop is useless. It means the complete-sequence evidence is limited by the observed outcomes and small sample. We must report those results instead of choosing a favorable subset or treating one success video as a performance statistic.",
-    "source": "docs/results/visual-feedback-calibrated-v1/summary.json; paired comparisons; all configurations retained"
+    "title": "Install the rack as a separate physical object",
+    "section": "Operation 03 / Rack assembly",
+    "notes": "The rack starts as an independent object in the workcell. The robot lifts it, rotates and aligns it, then inserts it into the base. This adds a dependency to the final spanner task: the hanging fixture may not remain exactly where an earlier observation predicted. The rack is released and its seating is checked before the controller proceeds.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/rack_lift_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/rack_insert_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 15,
-    "title": "Accuracy and cost are separate measurements",
-    "notes": "Pose error is evaluated at the first fixed-camera observation, providing a common comparison point. Execution error measures actual TCP tracking against the planned reference. We report inference and wall time separately, since shared resources and pauses influence throughput. This table is an overview of no-disturbance groups; the complete report contains both conditions, uncertainty and available sample counts. A shorter early-failure run is not a faster successful system.",
-    "source": "Full conditions, confidence intervals and sample counts are in the accompanying report"
+    "title": "Release the rack, then observe the assembled scene",
+    "section": "Operation 03 / Relocalization",
+    "notes": "The left image shows withdrawal after rack release; the right is the assembled workcell just before transition to the spanner. In staged and iterative feedback modes, a new observation updates the fixture relationship for the next operation. This step addresses changes caused by contact and seating. The final workcell still contains the previously returned hammer and inserted screwdriver.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/rack_release_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/rack_done_overview.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 16,
-    "title": "Failure analysis: where the complete system stops",
-    "notes": "The table includes every failed attempt, grouped by its last recorded controller stage. A stage name is a diagnostic location rather than a complete causal explanation; individual summaries preserve the actual contact or planning reason. Early pickup failures can prevent the later feedback loop from being tested. Additional reobservation cannot repair an approach that already failed. This motivates separating reachability, local alignment, and final task acceptance rather than reporting only reached-stage successes.",
-    "source": "Project implementation and recorded evidence"
+    "title": "Put the spanner down and actually open the fingers",
+    "section": "Operation 04 / Physical regrasp",
+    "notes": "This pair shows the first half of the regrasp. The spanner is placed on its support and the gripper releases and retreats. The next grasp is based on a new observation rather than assuming the tool stayed exactly at its commanded pose. The images show the mechanism; the original trial also records the physical regrasp flag and contact-based acceptance. This is not a teleportation or a hidden attachment change.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/regrasp_place_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/regrasp_clear_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 17,
-    "title": "Limits and the next engineering priorities",
-    "notes": "Our strongest conclusion is that the complete calibrated vision-to-action chain is implemented and auditable, with quantitatively documented limits. Known pickup regions, synthetic reference calibration, ideal FK and depth, and small reused-seed samples restrict generalization. The immediate engineering priorities are pickup planning and contact reliability, segmentation under changing backgrounds, and then observation scheduling and pose bias. Broader external-estimator comparisons and real hardware would be new experiments, not conclusions from this dataset.",
-    "source": "Project implementation and recorded evidence"
+    "title": "Regrasp so the hole can reach the hanging pin",
+    "section": "Operation 04 / New grasp",
+    "notes": "After the released spanner is observed again, the fingers approach and close at the new grasp. The robot lifts and inspects the tool before turning toward the rack. The hole must remain accessible while the gripper maintains bilateral contact. One separate evaluated failure loses bilateral grasp during the later approach; extra visual measurements do not automatically repair a physically unstable hold.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/regrasp_close_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/regrasp_lift_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 18,
-    "title": "Deliverables and course coverage",
-    "notes": "The repository contains the current technical-selection review, both camera-calibration procedures and their raw evidence, localization masks and statistics, pose and manipulation metrics, complete trial summaries, and original replay videos. The deck and speaker notes are generated from the published result files. This organization makes the six required tasks and the visual-feedback extension traceable without claiming a new algorithm. During the talk, use a short excerpt of the full video and leave the complete recording available for review.",
-    "source": "Project implementation and recorded evidence"
+    "title": "Thread the hole, release, and leave the tool hanging",
+    "section": "Operation 04 / Final placement",
+    "notes": "The large wrist views show the eye passing over the pin and the final released state. The controller seats the eye, opens the fingers, withdraws, and waits for stability. The selected trial passes the final checks for all four objects. A separate diagnostic audits saved motion states and adds thirty seconds of passive simulation; that diagnostic does not replace or improve the original trial score.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/hang_thread_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
   },
   {
     "slide": 19,
-    "title": "References and reproducibility",
-    "notes": "These references underpin the selected techniques rather than serving as external experimental baselines. Full titles and verified primary links are in the literature review. The result protocol records source and calibration hashes, software versions, seeds and commands. Each replay links to its original trajectory. This final slide can remain visible during questions; the detailed metric definitions and all failure summaries are in the repository.",
-    "source": "Full bibliographic details and primary links: docs/LITERATURE_AND_SELECTION.md"
+    "title": "Visual feedback can trigger a real corrective motion",
+    "section": "Bonus / Correction example",
+    "notes": "This example comes from the separately archived estimated-calibration integration run with an alignment impulse. The spanner loop records one correction. The measured angular residual falls from 1.60 to 0.74 degrees over the observations. The visual change is small at this scale, so the residual values are taken from the original log, not inferred from pixels. These are estimated residuals, not true geometric errors. This integration example is not counted as an additional trial in the final forty-eight.",
+    "source": "Separate calibration integration / iterative / alignment impulse / seed 400 | original log residuals",
+    "images": [
+      {
+        "path": "docs/presentation/frames/pulse_before.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/pulse_after.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 20,
+    "title": "Same initial seed, different insertion outcomes",
+    "section": "Paired evidence / Seed 400",
+    "notes": "These trials share seed four hundred and the same initial physical scene. The open-loop run stops under the screwdriver insertion contact guard. The iterative run reaches a released screwdriver and eventually completes the whole task. The pictures are aligned by task outcome rather than identical playback time. The failure reason is taken from the recorded guard, not guessed from a rendered contact. A single favorable pair is not a statistical comparison.",
+    "source": "Final 48 trials | open_loop vs iterative / no disturbance / seed 400 | different playback times",
+    "images": [
+      {
+        "path": "docs/presentation/frames/open_failure_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/driver_done_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 21,
+    "title": "Early pickup failure defeats both feedback modes",
+    "section": "Failure evidence / Seed 401",
+    "notes": "This matched pair deliberately retains a failure of the iterative method itself. Both runs stop during moving-screwdriver pickup when an unexpected robot contact is detected at gripper closure. This is a safety-guard failure, not necessarily a visually dramatic dropped object. The same visible pose can hide a contact violation; the cause therefore comes from the log. Early reachability limits the whole-sequence benefit of downstream feedback.",
+    "source": "Final 48 trials | staged vs iterative / no disturbance / seed 401 | original contact-guard failures",
+    "images": [
+      {
+        "path": "docs/presentation/frames/staged_failure_wrist.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/iter_failure_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 22,
+    "title": "All attempts count, including the failed pickups",
+    "section": "Quantitative context / 48 attempts",
+    "notes": "We retain forty-eight attempts: three feedback modes, two disturbance conditions and eight reused seeds in each cell. Open loop succeeds zero of eight in both conditions; staged feedback three of eight without and two of eight with disturbance; iterative feedback three of eight in both. All four Holm-adjusted method comparisons have p equal to one. This does not establish superiority or equivalence. The seeds are reused, so this is a paired replication, not a fresh holdout.",
+    "source": "Final estimated-calibration evaluation | original trial frames",
+    "images": [
+      {
+        "path": "docs/results/visual-feedback-calibrated-v1/figures/success_rates.png",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 23,
+    "title": "What the failures tell us to improve next",
+    "section": "Engineering conclusions",
+    "notes": "The complete calibrated chain is implemented and inspectable, but overall success remains limited. Twenty-four failures stop at moving-pickup gripper closure, six at hammer approach settling, six during open-loop driver retraction, and one after loss of bilateral spanner grasp. Priorities are pickup planning and contact reliability, then pose bias, visibility and feedback scheduling. Known pickup regions, ideal reference scanning and FK, and a small reused-seed sample limit generalization.",
+    "source": "Final failure summaries + separate localization diagnosis | no external estimator performance ranking",
+    "images": [
+      {
+        "path": "docs/presentation/frames/iter_failure_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 24,
+    "title": "A complete, auditable vision-guided workcell",
+    "section": "Conclusion / Discussion",
+    "notes": "The project integrates all six course tasks and the visual-feedback extension. The evidence package links independent camera estimates, localization masks, object pose estimates, motion execution and physical acceptance. Our main lesson is that a successful visual alignment module is only one part of a reliable manipulation system. We present the full sequence and its failures, with realistic boundaries on what these simulation experiments demonstrate. The remaining slides are backup material for questions.",
+    "source": "Final 48 trials | iterative / no disturbance / seed 400 | playback timestamps",
+    "images": [
+      {
+        "path": "docs/presentation/frames/initial_overview.jpg",
+        "crop_xyxy": null
+      },
+      {
+        "path": "docs/presentation/frames/final_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 25,
+    "title": "Accuracy, timing and experimental units",
+    "section": "Appendix / Metrics",
+    "notes": "These values separate camera, pose, execution and timing measurements. The initial fixed-camera observations are shared across modes: mean pose translation and rotation errors are 2.60 millimeters and 1.44 degrees, with ADD 3.17 millimeters and ADD-S 2.29 millimeters. Execution and frequency metrics are reported with sample counts in the full report. Physics step rate is not visual inference frequency, and wall time includes shared-resource waits. Calibration images, perception queries and robot attempts are different experimental units.",
+    "source": "Full uncertainty and sample counts: docs/results/visual-feedback-calibrated-v1/README.md",
+    "images": [
+      {
+        "path": "docs/presentation/frames/driver_align_wrist.jpg",
+        "crop_xyxy": null
+      }
+    ]
+  },
+  {
+    "slide": 26,
+    "title": "Methods and primary references",
+    "section": "Appendix / Reading",
+    "notes": "FoundationPose provides the selected object-pose method; Zhang and OpenCV support calibration; Chaumette and Hutchinson provide the visual-servoing framework. MuJoCo supplies the simulation platform. MegaPose and GraspNet are reviewed alternatives, not executed external baselines. Full citations and verified primary links are in the literature review and bibliography. Every screenshot also has a source-video hash, timestamp and crop record in the presentation image manifest.",
+    "source": "docs/LITERATURE_AND_SELECTION.md | docs/references.bib | docs/presentation/frames/manifest.json",
+    "images": [
+      {
+        "path": "docs/presentation/frames/final_overview.jpg",
+        "crop_xyxy": null
+      }
+    ]
   }
 ]
