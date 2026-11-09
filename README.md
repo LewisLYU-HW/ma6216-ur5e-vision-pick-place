@@ -288,4 +288,4 @@ python scripts/check_model_free_tasks.py
 
 代码与演示位于小组原仓库的 `feat/model-free-manipulation` 分支，对应 [草稿 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)。
 
-汇报新增：[完整任务精华视频（54 秒）](docs/presentation/media/complete_task_highlights.mp4) · [闭环日志同步演示（20 秒）](docs/presentation/media/visual_feedback_synchronized.mp4) · [完整连续录像＋任务时间轴](docs/presentation/demo_player.html)。PPT 已内嵌完整连续任务录像（195.88 秒）和闭环演示，首页视频下方附任务时间轴；另补同一观测的 RGB／深度／预测分割／位姿处理链，所有新增展示均来自已保存的实验数据。
+汇报新增：[完整任务精华视频（54 秒）](docs/presentation/media/complete_task_highlights.mp4) · [闭环日志同步演示（20 秒）](docs/presentation/media/visual_feedback_synchronized.mp4) · [完整连续录像＋任务时间轴](docs/presentation/demo_player.html)。PPT 已内嵌完整连续任务录像（195.88 秒）和闭环演示，首页视频下方任务时间轴随播放自动高亮当前阶段；另补同一观测的 RGB／深度／预测分割／位姿处理链，所有新增展示均来自已保存的实验数据。

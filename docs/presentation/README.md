@@ -10,7 +10,7 @@ The deck contains **21 English slides: 20 main slides and one reference appendix
 
 ## Demonstrations and processing evidence
 
-Slide 1 embeds the [full 195.88-second original task replay](../videos/visual-feedback-calibrated-v1/complete__iterative__none__400.mp4) at normal speed, with a five-stage task timeline below the video. It contains no highlight cuts or speed changes. The labels in PowerPoint are static; the offline player provides interactive seeking. The full video bytes are embedded, not merely linked.
+Slide 1 embeds the [full 195.88-second original task replay](../videos/visual-feedback-calibrated-v1/complete__iterative__none__400.mp4) at normal speed, with a five-stage task timeline below the video. It contains no highlight cuts or speed changes. The task strip is rendered into the full video and automatically highlights the active task during playback, pausing and seeking in PowerPoint. The complete annotated video is embedded, not merely linked. The original viewport, frame sequence and playback speed are preserved.
 
 Slides 3–4 show a [traceable processing chain](pipeline_source/README.md): one wrist capture's RGB, metric depth, predicted mask and matching estimated pose. The actual reference reconstruction comes from 24 prior views; the displayed hanging result is a later state of the same trial. The distinction is explicit.
 
@@ -36,6 +36,7 @@ MUJOCO_GL=egl .venv/bin/python scripts/project_presentation_pose_axes.py
 python3 scripts/refine_presentation_evidence.py --qa-tools /path/to/nature-figure/scripts
 python3 scripts/build_processing_chain_figure.py
 MUJOCO_GL=egl .venv/bin/python scripts/build_presentation_demos.py
+python3 scripts/build_full_task_timeline_video.py
 python3 scripts/build_project_presentation.py \
   --results docs/results/visual-feedback-calibrated-v1 \
   --output docs/presentation

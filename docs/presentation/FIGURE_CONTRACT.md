@@ -46,3 +46,7 @@ Large scene images or full-width evidence plates are the primary content. Equati
 ## Recorded demonstration and processing-chain extension
 
 Two embedded videos provide temporal evidence: a 53.76 s chronological task reel with cuts/speed labels and a 20 s slowed visual-feedback diagnostic with measurement availability timestamps. Raw videos and trial outcomes remain unchanged. Every displayed residual must be held from its logged decision time to the next available observation. Reference reconstruction is explicitly prior to the runtime observation; execution outcome is explicitly later. The new processing plates show one shared RGB/depth/mask capture and its matching pose, then the actual reconstructed mesh and later release. Full processing-chain provenance and media provenance are separately retained.
+
+## Synchronized timeline in PowerPoint
+
+The complete replay embedded on slide 1 now appends a 140-pixel task strip under the unchanged 1920×720 source viewport. The current task is highlighted within each encoded video frame, so playback, pause and seeking stay synchronized without separate slide animations. All 4,897 source frames remain at 25 fps. Phase boundaries are taken from the archived timeline and tested on the frames immediately before and after each transition.
