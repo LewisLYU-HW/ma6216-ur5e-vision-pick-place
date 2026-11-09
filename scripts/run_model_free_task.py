@@ -72,6 +72,8 @@ def main():
     parser.add_argument("--foundationpose-python", type=Path, default=Path(sys.executable))
     parser.add_argument("--foundationpose-repository", type=Path, default=ROOT / "third_party/FoundationPose")
     parser.add_argument("--calibration", type=Path, default=ROOT / "demo_data/calibration/estimated")
+    parser.add_argument("--wrist-calibration", type=Path, default=ROOT / "demo_data/calibration/wrist/estimated")
+    parser.add_argument("--ideal-wrist-diagnostic", action="store_true")
     parser.add_argument("--record", action="store_true")
     parser.add_argument("--trace", action="store_true")
     parser.add_argument("--sensor-delay", type=float, default=None)
@@ -103,11 +105,11 @@ def main():
                "fixed_virtual_sensor_delay_s": args.sensor_delay,
                "control_source": "ground_truth_diagnostic" if args.ground_truth else "FoundationPose official reconstructed-model inference",
                "model_free": not args.ground_truth, "reconstruction_input": "reference RGB-D, masks, calibrated scan poses; no CAD",
-               "wrist_calibration": "ideal synthetic hand-eye mount and robot kinematics",
+               "wrist_calibration": "ideal historical diagnostic" if args.ideal_wrist_diagnostic else "estimated intrinsics and AX=XB hand-eye",
                "fixture_perception": "RGB-D ArUco marker plane and surveyed marker mounting",
                "recovery_enabled": not args.disable_recovery, "perception": [], "fixture_perception_samples": [],
                "assembly_attempts": [], "command": " ".join(sys.argv),
-               "scope": "Synthetic calibrated references, deterministic workcells, ideal depth and wrist hand-eye calibration"}
+               "scope": "Synthetic reference scan calibration and ideal depth; estimated task-camera calibration"}
     try:
         objects = {"plug": ObservedObject(args.plug_model)}
         if args.task == "clutter":
@@ -119,7 +121,8 @@ def main():
         summary["initial_scene_state_sha256"] = state_fingerprint(data)
         recorder = TaskRecorder(model, output / "video", args.task, args.record,
                                 source="Ground-truth diagnostic" if args.ground_truth else "RGB-D references -> Neural Object Field -> FoundationPose")
-        observer = ImageObserver(model, output / "observations", args.calibration)
+        observer = ImageObserver(model, output / "observations", args.calibration,
+                                 wrist_calibration=args.wrist_calibration, ideal_wrist=args.ideal_wrist_diagnostic)
         summary["calibration_evaluation_only"] = camera_metrics(model, data, observer, args.calibration)
         robot = TaskRobot(scene, objects, recorder, output / "motion")
         robot.trace_enabled = args.trace

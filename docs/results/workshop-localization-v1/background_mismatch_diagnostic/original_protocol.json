@@ -1,0 +1,43 @@
+{
+  "seeds": [
+    500,
+    501,
+    502,
+    503,
+    504,
+    505,
+    506,
+    507,
+    508,
+    509
+  ],
+  "conditions": [
+    "nominal",
+    "position_orientation",
+    "partial_occlusion",
+    "depth_noise",
+    "target_absent"
+  ],
+  "objects": [
+    "hammer",
+    "screwdriver",
+    "rack_frame",
+    "spanner"
+  ],
+  "localization_success": "visible GT >=40 pixels and prediction >=40 pixels and visible-mask IoU >=0.5",
+  "position_orientation": "independent world XY +/-10 mm and yaw +/-20 degrees per object, then 0.5 s physical settling",
+  "partial_occlusion": "four 50x50 mm opaque non-contact screens, 12% along each object-to-camera ray with 10 mm lateral offset; true geometry used only to construct the test condition",
+  "depth_noise": "zero-mean Gaussian sigma 2 mm plus 2% independently missing depth pixels; background unchanged",
+  "target_absent": "all four tools removed; fixture/support geometry remains; count false positives",
+  "ground_truth_boundary": "predict every mask before rendering simulator segmentation; GT and IDs never enter localization",
+  "uncertainty": "Wilson intervals per object (10 independent scenes); bootstrap 10000 of seed-level four-object means for aggregate IoU",
+  "failure_selection": "first failure in seed order per condition/object; all rows retained",
+  "source_sha256": {
+    "scripts/evaluate_workshop_localization.py": "f2d08ccb45d6717824c998dc3ac0badfeb431aca5ef1ace60f73294522be8e5b",
+    "src/ma6216/localization_evaluation.py": "8786aa457996723078ea396c9624d9a032995c300e5bbe1da9d3bd7fa479073f",
+    "src/ma6216/workshop_perception.py": "fb43b02beb18e03158dbe46e2e1253503d9f6c514382401545a8da6aee03e510",
+    "src/ma6216/workshop_scene.py": "05e27bdcbe533553cf23799470c6122663da30f78289b2834438b7e1e2747951",
+    "demo_data/calibration/estimated/cam_K.txt": "260e5b3be6d308f55dfc3f0211b6179d3506f77f99c2816770a55b7b48c36676",
+    "demo_data/calibration/estimated/world_T_camera.txt": "3a97ec9b05546c68e97e88f4439f4507fd1df8ec862558ffc704612feb617735"
+  }
+}

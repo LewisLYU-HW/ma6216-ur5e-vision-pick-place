@@ -298,7 +298,8 @@ def add_bench(spec):
 
 
 def build_workshop_scene(
-    seed=0, *, planning_parts=None, empty=False, belt_speed=0.003, rack_assembly=False, complete_task=False
+    seed=0, *, planning_parts=None, empty=False, belt_speed=0.003, rack_assembly=False, complete_task=False,
+    configure_extra=None,
 ):
     rack_assembly = rack_assembly or complete_task
     physical_tools = COMPLETE_TOOLS if complete_task else RACK_TOOLS if rack_assembly else TOOLS
@@ -448,6 +449,9 @@ def build_workshop_scene(
                 [0.007, 0.035, (PARK[2] - 0.010 - TABLE_Z) / 2],
                 [0.20, 0.26, 0.29, 1.0],
             )
+
+        if configure_extra is not None:
+            configure_extra(spec)
 
     m, d = build_scene((0.635, -0.205), calibration_board=False, configure_spec=configure, object_z=0.401)
     for name, tool in physical_tools.items():

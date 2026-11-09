@@ -255,7 +255,13 @@ def main():
             for k, v in c["checkerboard_reprojection"].items()
         ],
     )
-    add("腕部手眼使用理想仿真安装，独立标定误差 **N/A**。当前结果不含深度传感器真实噪声和真机手眼误差。")
+    wrist = c.get("wrist_hand_eye", {})
+    if wrist.get("measured_error") is not None:
+        error = wrist["measured_error"]
+        add(f"腕部内参和手眼由棋盘图像与机器人 FK 估计，独立评价误差 **{error['translation_error_mm']:.3f} mm／{error['rotation_error_deg']:.4f}°**。")
+    else:
+        add("本轮腕部手眼使用理想仿真安装，独立标定误差 **N/A**。")
+    add("当前结果不含深度传感器真实噪声和真机手眼误差。")
     add("## 执行精度")
     add(
         "TCP 跟踪误差比较实际关节 FK 与计划关节参考 FK；加入速度前馈时，执行器输入与计划参考分别记录。"
@@ -407,7 +413,7 @@ def main():
         "Model-free 指 24 张标定参考 RGB-D 经官方 Neural Object Field 重建，不是无需参考图的零样本方法。"
         "夹具几何和标记安装关系已知。仿真几何、接触和速度真值用于阶段验收与安全停机，"
         "可以结束失败试验，但不向网络或运动目标生成反馈真值位姿。"
-        "腕部手眼与参考扫描为理想合成标定；真机效果与对应的验收传感器需要另行实验。"
+        "参考扫描为理想合成标定，腕部标定来源见上文；真机效果与对应的验收传感器需要另行实验。"
     )
     (args.results / "README.md").write_text("\n".join(lines), encoding="utf-8")
 

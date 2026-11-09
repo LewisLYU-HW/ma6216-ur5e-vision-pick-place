@@ -28,6 +28,9 @@ CONTROL_FILES = [
     *[str(p.relative_to(ROOT)) for p in sorted((ROOT / "assets/reconstructed").rglob("model_free.json"))],
     "demo_data/calibration/estimated/cam_K.txt",
     "demo_data/calibration/estimated/world_T_camera.txt",
+    "demo_data/calibration/wrist/estimated/cam_K.txt",
+    "demo_data/calibration/wrist/estimated/gripper_T_camera.txt",
+    "demo_data/calibration/wrist/estimated/calibration.json",
 ]
 
 

@@ -136,7 +136,13 @@ def main():
     calibration = summary["calibration"]
     ext = calibration["fixed_extrinsic"]
     add(f"固定相机使用同一套冻结标定：外参平移 **{ext['translation_error_mm']:.3f} mm**，旋转 **{ext['rotation_error_deg']:.3f}°**。"
-        f"焦距相对误差 fx/fy 为 {100*calibration['focal_relative_error'][0]:.3f}%／{100*calibration['focal_relative_error'][1]:.3f}%。腕部手眼为理想仿真安装，独立实测误差为 **N/A**。重复使用这一标定不算多次独立标定实验。")
+        f"焦距相对误差 fx/fy 为 {100*calibration['focal_relative_error'][0]:.3f}%／{100*calibration['focal_relative_error'][1]:.3f}%。重复使用这一标定不算多次独立标定实验。")
+    wrist = calibration.get("wrist_hand_eye", {})
+    if wrist.get("measured_error") is not None:
+        error = wrist["measured_error"]
+        add(f"腕部采用图像估计内参与手眼变换，独立评价误差 **{error['translation_error_mm']:.3f} mm／{error['rotation_error_deg']:.4f}°**；验证图集见原始标定记录。")
+    else:
+        add("本轮腕部手眼为理想仿真安装，独立实测误差为 **N/A**。")
     table(["标定图集", "图像数", "平均重投影 RMSE/px", "最大 RMSE/px"], [
         [name, values["count"], f"{values['mean_rmse_px']:.4f}", f"{values['max_rmse_px']:.4f}"]
         for name, values in calibration["checkerboard_reprojection"].items()])
@@ -200,7 +206,7 @@ def main():
                 f"额外静置 30 秒复核{'全部通过' if extended else '存在未通过项'}。"
                 "快照检查不代表重新检查每个 500 Hz 物理步；额外静置属于独立诊断，不改动原试验结果。")
     add("## 数据与适用范围")
-    add(f"每个配置只包含有限布局扰动的 {len(config['seeds'])} 个仿真种子，不是同样数量的真实环境。物体参考来自 RGB-D 重建；固定夹具属于已测量工位，深度与腕部手眼仍为理想仿真。几何、接触和速度真值用于独立统计、验收和安全停机，不生成视觉纠偏目标。完整任务保留 10 秒悬挂稳定窗口；不跨任务合并成功率。")
+    add(f"每个配置只包含有限布局扰动的 {len(config['seeds'])} 个仿真种子，不是同样数量的真实环境。物体参考来自 RGB-D 重建；固定夹具属于已测量工位，深度为理想仿真，腕部标定来源见上文。几何、接触和速度真值用于独立统计、验收和安全停机，不生成视觉纠偏目标。完整任务保留 10 秒悬挂稳定窗口；不跨任务合并成功率。")
     if config.get("supersession"):
         add("原 240 次视觉反馈计划开始后，按组员要求缩减为约 50 次。本轮另用新种子冻结 48 次完整流程，控制器保持不变；[旧计划已启动的 16 次试验](superseded-plan/README.md)单独留存，不混入统计。")
     add("[证据清单](evidence_manifest.json)包含所有摘要、日志与轨迹的校验值，所选原轨迹在 `replay_inputs/`；完整 RGB-D 在本机源目录的无损归档中。历史报告保持不变。")

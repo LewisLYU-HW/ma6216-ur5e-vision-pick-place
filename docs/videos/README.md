@@ -4,7 +4,13 @@
 点击文件链接可在 GitHub 查看或下载；下载到本地后可用 VLC 打开。
 录像按仿真时间采样；静态任务的推理和离线规划等待不等于录像时长。
 
-## 当前：6D 迭代视觉闭环与 48 次评测
+## 当前：使用估计腕部标定的完整任务
+
+**[完整全景＋腕部](calibrated-workshop-v1/overview-wrist.mp4)** · **[独立腕部](calibrated-workshop-v1/wrist.mp4)** · [新标定接入验证](../results/calibrated-workshop-v1/README.md)
+
+197.28秒完整流程，腕部内参和手眼变换来自棋盘图像估计。有对准扰动，扳手阶段执行一次实际迭代修正；最终四物体验收和额外30秒静置均通过。该视频是两次接入回归之一，不属于下面的48次成功率统计。
+
+## 此前：6D 迭代视觉闭环与 48 次评测
 
 **[完整全景＋腕部](visual-feedback-v1/complete__iterative__none__400.mp4)** · **[独立腕部](visual-feedback-v1/complete__iterative__none__400__wrist.mp4)** · [3 条失败与同种子对照](visual-feedback-v1/README.md) · [全部指标及置信区间](../results/visual-feedback-v1/README.md)
 

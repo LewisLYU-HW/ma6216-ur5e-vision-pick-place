@@ -19,6 +19,7 @@ from ma6216.pose_insertion import transform
 from ma6216.scene import CAMERA_NAME, mujoco
 from ma6216.task_control import TaskRobot
 from ma6216.evaluation import pose_errors, camera_metrics, timing_metrics, state_fingerprint
+from ma6216.localization_evaluation import evaluate_rendered_mask
 from ma6216.experiments import METHODS, control_pose, GraspImpulse, AlignmentImpulse
 from ma6216.visual_feedback import FEEDBACK_MODES, ServoSettings, bounded_command, stationary_target_update
 from ma6216.workshop_control import FeedPoseHistory, ReconstructedTool, WorkshopRecorder
@@ -219,6 +220,9 @@ def main():
     p.add_argument("--foundationpose-python", type=Path, default=Path(sys.executable))
     p.add_argument("--foundationpose-repository", type=Path, default=ROOT / "third_party/FoundationPose")
     p.add_argument("--calibration", type=Path, default=ROOT / "demo_data/calibration/estimated")
+    p.add_argument("--wrist-calibration", type=Path, default=ROOT / "demo_data/calibration/wrist/estimated")
+    p.add_argument("--ideal-wrist-diagnostic", action="store_true",
+                   help="Explicit historical ideal-camera assumption; not estimated calibration evidence")
     args = p.parse_args()
     if args.sensor_delay is not None and args.sensor_delay < 0:
         p.error("sensor-delay must be nonnegative")
@@ -311,6 +315,8 @@ def main():
             args.calibration,
             background_depth=background,
             fixture_T_marker=ASSEMBLY_T_MARKER if assembling else WORKSHOP_T_MARKER,
+            wrist_calibration=args.wrist_calibration,
+            ideal_wrist=args.ideal_wrist_diagnostic,
         )
         report["calibration_evaluation_only"] = camera_metrics(m, d, observer, args.calibration)
         robot = TaskRobot(
@@ -370,6 +376,11 @@ def main():
             cap = observer.capture(
                 d, camera=camera, object_id=name, region=region, prior=prior, vertices=objects[name].vertices
             )
+            try:
+                localization_metrics = evaluate_rendered_mask(m, d, camera, objects[name].body, cap["mask"])
+            except Exception as exc:
+                # A downstream diagnostic failure must not affect control.
+                localization_metrics = {"status": "unavailable", "error": f"{type(exc).__name__}: {exc}"}
             truth = evaluation_pose(m, d, objects[name].body)
             if args.ground_truth:
                 pose = truth.copy()
@@ -420,6 +431,7 @@ def main():
             pose = control_pose(pose, args.method)
             info["control_world_T_object"] = pose.tolist()
             info["capture_truth_evaluation_only"] = truth.tolist()
+            info["localization_evaluation_only"] = localization_metrics
             info["raw_estimator_metrics_evaluation_only"] = pose_errors(
                 raw_pose, truth, objects[name].vertices
             )

@@ -1,7 +1,7 @@
 """Image-only task perception and surveyed marker coordinates.
 
-The wrist camera uses a declared ideal synthetic hand-eye calibration. Robot
-forward kinematics provides camera motion; object body poses are never read.
+The wrist camera uses independently estimated intrinsics and hand-eye calibration.
+Robot forward kinematics provides camera motion; object body poses are never read.
 """
 import json
 from pathlib import Path
@@ -12,6 +12,8 @@ import numpy as np
 from .advanced_scene import FIXTURE_T_MARKER, MARKER_ID, MARKER_SIZE, WRIST_CAMERA
 from .pose_insertion import transform
 from .scene import CAMERA_NAME, HEIGHT, WIDTH, mujoco
+from .config import project_root
+from .visual_feedback import checked_pose
 
 COLOR_RANGES = {"plug": ((46, 75, 38), (95, 255, 255)),
                 "blocker": ((5, 100, 50), (29, 255, 255))}
@@ -28,7 +30,7 @@ def foreground(rgb, name):
 
 
 class ImageObserver:
-    def __init__(self, model, output, calibration):
+    def __init__(self, model, output, calibration, *, wrist_calibration=None, ideal_wrist=False):
         self.model = model
         self.output = Path(output)
         self.output.mkdir(parents=True, exist_ok=False)
@@ -36,6 +38,27 @@ class ImageObserver:
         calibration = Path(calibration)
         self.fixed_K = np.loadtxt(calibration / "cam_K.txt")
         self.fixed_extrinsic = np.loadtxt(calibration / "world_T_camera.txt")
+        self.ideal_wrist = bool(ideal_wrist)
+        self.wrist_calibration_dir = Path(wrist_calibration) if wrist_calibration else (
+            project_root() / "demo_data/calibration/wrist/estimated")
+        self.wrist_metadata = None
+        if not self.ideal_wrist:
+            folder = self.wrist_calibration_dir
+            self.wrist_metadata = json.loads((folder / "calibration.json").read_text())
+            if (self.wrist_metadata.get("status") != "estimated"
+                    or self.wrist_metadata.get("input_gt_camera_used") is not False
+                    or self.wrist_metadata.get("image_size") != [WIDTH, HEIGHT]):
+                raise ValueError("Wrist calibration must be image-estimated at the current resolution")
+            validation = self.wrist_metadata["splits"]["hand_eye_validation"]
+            if (validation["detected"] < 6 or validation["mean_rmse_px"] > .5
+                    or validation["max_rmse_px"] > 1.):
+                raise ValueError("Wrist calibration failed independent frozen-chain validation")
+            self.wrist_K = np.loadtxt(folder / "cam_K.txt")
+            self.gripper_T_camera = checked_pose(np.loadtxt(folder / "gripper_T_camera.txt"))
+            if (self.wrist_K.shape != (3, 3) or not np.isfinite(self.wrist_K).all()
+                    or min(self.wrist_K[0, 0], self.wrist_K[1, 1]) <= 0):
+                raise ValueError("Invalid estimated wrist intrinsics")
+            self.wrist_gripper_body = self.wrist_metadata["gripper_body"]
         self.count = 0
         dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         parameters = cv2.aruco.DetectorParameters()
@@ -47,6 +70,12 @@ class ImageObserver:
             return self.fixed_K.copy(), self.fixed_extrinsic.copy(), "estimated checkerboard calibration"
         if camera != WRIST_CAMERA:
             raise ValueError("Unknown task camera")
+        if not self.ideal_wrist:
+            bid = self.model.body(self.wrist_gripper_body).id
+            world_T_gripper = transform(data.xpos[bid], data.xmat[bid].reshape(3, 3))
+            return (self.wrist_K.copy(), world_T_gripper @ self.gripper_T_camera,
+                    "estimated wrist checkerboard intrinsics and AX=XB hand-eye plus robot FK")
+        # Explicit historical diagnostic only; never an automatic fallback.
         cid = self.model.camera(camera).id
         bid = self.model.cam_bodyid[cid]
         rotation = np.empty(9)

@@ -8,7 +8,19 @@
 
 [48 次闭环评测](docs/results/visual-feedback-v1/README.md) · [视觉反馈方法](docs/VISUAL_FEEDBACK.md) · [完整连续任务](docs/COMPLETE_WORKSHOP.md) · [演示视频](docs/videos/README.md) · [工具架自装配](docs/RACK_ASSEMBLY.md) · [统一评测](docs/EVALUATION.md) · [安装](docs/SETUP.md) · [小组 PR #3](https://github.com/LewisLYU-HW/ma6216-ur5e-vision-pick-place/pull/3)
 
-## 6D 视觉反馈
+## 最新：腕部估计标定与定位专项评估
+
+已补齐课程 Task 2/3 的腕部图像标定：内参独立验证重投影 **0.02177 px**，手眼误差 **0.852 mm／0.0227°**，冻结整条坐标链的验证重投影 **0.05497 px**。正常工具任务默认加载估计参数并通过机器人 FK 传播，不再直接读取仿真腕部相机内参或安装变换。
+
+Task 4 对当前四工具完成 **50个场景观测、200次定位查询**，覆盖正常、位置与朝向变化、遮挡、深度噪声和目标缺失。正常场景平均 mask IoU **0.887**；160次有目标查询均达到预定 IoU≥0.5，40次目标缺失查询均未误检，保留每组10次的置信区间。另单独保留背景失配的开发故障和失败图片，不混入正常流程统计。
+
+**[Task 2/3/4 实现、坐标链与运行](docs/CALIBRATION_LOCALIZATION.md)** · [腕部标定原始图像与指标](docs/results/wrist-calibration-v1/README.md) · [工具定位指标、全部 mask 与失败案例](docs/results/workshop-localization-v1/README.md)
+
+新标定接入后的无扰动／有扰动两次完整任务均通过，属于开发回归，不作为成功率估计。[接入记录与新录像](docs/results/calibrated-workshop-v1/README.md)。
+
+以下48次视觉反馈结果属于此前的理想腕部标定版本，保持原始数据和冻结提交；不能当成使用本轮估计标定后的成功率。
+
+## 6D 视觉反馈：此前48次配对评测
 
 新增独立的 `--visual-feedback open_loop/staged/iterative` 开关，对比无执行期视觉纠偏、关键阶段纠偏、以及接近插口／挂钩时的重复观察和限幅修正。保留相同的关节控制与接触保护，单独记录视觉残差、实际几何误差和反馈耗时；对遮挡造成的支架估计跳变执行质量检查。[反馈流程、统计协议与复现](docs/VISUAL_FEEDBACK.md)。
 
@@ -159,7 +171,7 @@ flowchart LR
 这里采用 FoundationPose 的 **few-shot model-free** 路线：每件工件使用 24 张参考 RGB-D、mask 和扫描相机标定，先重建，再调用官方 `register()` / `track_one()`。
 工件感知与碰撞规划使用 [仓库内的重建模型包](assets/reconstructed/README.md)，可以直接复现任务；也可按 [重建说明](docs/MODEL_FREE_TASKS.md)自行生成模型。
 
-夹具几何、标记安装关系和操作坐标系由任务定义。当前参考扫描与腕部手眼安装采用理想合成标定；固定任务相机使用棋盘格估计标定。
+夹具几何、标记安装关系和操作坐标系由任务定义。参考扫描采用理想合成标定；固定任务相机和腕部相机现在均使用棋盘图像估计标定，腕部相机再结合机器人 FK 更新世界位姿。此前评测使用的理想腕部假设在对应历史报告中保留。
 工件由摩擦和双侧指垫接触保持，操作期间不通过写物体位置实现搬运。
 
 ## 历史单次演示结果

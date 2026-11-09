@@ -346,7 +346,7 @@ def summarize(source, output, *, allow_partial=False):
             "Primary pose metrics use first fixed-camera target observation per trial; all-observation metrics are diagnostic and depend on executed stages.",
             "Primary pose accuracy requires every initial target within 5 mm and 5 degrees, with a Wilson interval over trials. Per-observation threshold averages in trials.csv are descriptive only.",
             "Continuous intervals bootstrap trial means, not dependent video frames. Missing measurements have explicit n_trials.",
-            "Final errors include failed terminal states where measurable. Simulation depth and wrist hand-eye calibration are ideal.",
+            "Final errors include failed terminal states where measurable. Depth is synthetic; wrist calibration provenance is recorded under calibration.wrist_hand_eye.",
             "Shared GPU serializes inference. Wall throughput includes CPU contention and queueing; fixed virtual sensor latency is separate.",
         ],
     }

@@ -107,8 +107,9 @@ def depth_region_mask(depth, K, world_T_camera, bounds, background=None):
 
 
 class WorkshopObserver(ImageObserver):
-    def __init__(self, model, output, calibration, background_depth=None, fixture_T_marker=WORKSHOP_T_MARKER):
-        super().__init__(model, output, calibration)
+    def __init__(self, model, output, calibration, background_depth=None, fixture_T_marker=WORKSHOP_T_MARKER,
+                 *, wrist_calibration=None, ideal_wrist=False):
+        super().__init__(model, output, calibration, wrist_calibration=wrist_calibration, ideal_wrist=ideal_wrist)
         self.fixture_T_marker = fixture_T_marker
         self.background_depth = background_depth
 

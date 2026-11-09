@@ -60,6 +60,24 @@ def camera_metrics(model, data, observer, calibration):
         },
         "calibration_files_sha256": {},
     }
+    if not getattr(observer, "ideal_wrist", True):
+        from .advanced_scene import WRIST_CAMERA
+        from .pose_insertion import transform
+        cid = model.camera(WRIST_CAMERA).id
+        bid = model.body(observer.wrist_gripper_body).id
+        world_T_camera = transform(data.cam_xpos[cid], data.cam_xmat[cid].reshape(3, 3) @ np.diag([1., -1., -1.]))
+        world_T_gripper = transform(data.xpos[bid], data.xmat[bid].reshape(3, 3))
+        focal = .5 * 960 / np.tan(np.deg2rad(model.cam_fovy[cid]) / 2)
+        result["wrist_hand_eye"] = {
+            "status": "independently estimated; simulator camera truth used only for this evaluation",
+            "measured_error": pose_errors(observer.gripper_T_camera, np.linalg.inv(world_T_gripper) @ world_T_camera),
+            "focal_relative_error": (np.diag(observer.wrist_K)[:2] / focal - 1).tolist(),
+            "validation": observer.wrist_metadata["splits"],
+            "calibration_directory": str(observer.wrist_calibration_dir),
+        }
+        for name in ("cam_K.txt", "gripper_T_camera.txt", "calibration.json"):
+            result["calibration_files_sha256"]["wrist/" + name] = hashlib.sha256(
+                (observer.wrist_calibration_dir / name).read_bytes()).hexdigest()
     folder = Path(calibration)
     for name in ("cam_K.txt", "world_T_camera.txt"):
         result["calibration_files_sha256"][name] = hashlib.sha256((folder / name).read_bytes()).hexdigest()
