@@ -26,6 +26,12 @@
 
 **[首页完整任务演示：24.48 秒，连续 8 倍速＋同步任务时间轴](docs/presentation/media/complete_task_with_timeline.mp4)** · [演示播放器](docs/presentation/demo_player.html)
 
+## 额外应用 Demo：电子产品组装
+
+**[观看一条完整演示（35 秒）](docs/videos/electronics-assembly-demo/electronics_assembly_demo.mp4)**：外壳上料 → 电池入槽 → 电路板安装 → 上盖落座 → 成品出料。全景＋跟随局部特写＋真实腕部相机，三个视角同步，五阶段时间轴同步高亮。
+
+这是独立的脚本化应用展示：采用预设工位坐标、真实夹持接触与关节驱动；零件落座、松爪后以简化连接表示紧固。不是新增视觉方法实验，不计入已有成功率或消融结果。[运行说明与单次记录](docs/videos/electronics-assembly-demo/README.md)。
+
 ## 腕部估计标定与定位专项评估
 
 已补齐课程 Task 2/3 的腕部图像标定：内参独立验证重投影 **0.02177 px**，手眼误差 **0.852 mm／0.0227°**，冻结整条坐标链的验证重投影 **0.05497 px**。正常工具任务默认加载估计参数并通过机器人 FK 传播，不再直接读取仿真腕部相机内参或安装变换。

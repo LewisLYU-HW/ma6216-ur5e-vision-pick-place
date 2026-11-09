@@ -1,0 +1,234 @@
+{
+  "success": true,
+  "error": null,
+  "scope": "scripted application demo, not a visual-method benchmark",
+  "control": "gravity-compensated joint actuators; physical two-sided fingertip grasp; surveyed targets and simulated held offset",
+  "fastening": "seated assembly welds, no gripper welds, no live qpos teleportation",
+  "events": [
+    {
+      "time": 6.899999999999462,
+      "phase": 0,
+      "event": "physical_grasp",
+      "object": "case",
+      "forces": {
+        "left": 42.195251667110234,
+        "right": 42.15278591036335
+      },
+      "normal_dot": -0.9999970084025512
+    },
+    {
+      "time": 15.90000000000198,
+      "phase": 0,
+      "event": "finger_release",
+      "object": "case",
+      "forces": {
+        "left": 0.0,
+        "right": 0.0
+      }
+    },
+    {
+      "time": 15.90000000000198,
+      "phase": 0,
+      "event": "released",
+      "object": "case",
+      "position_error_mm": 2.3982538334041483
+    },
+    {
+      "time": 18.20000000000079,
+      "phase": 1,
+      "event": "task_start",
+      "name": "Battery installation"
+    },
+    {
+      "time": 23.5999999999978,
+      "phase": 1,
+      "event": "physical_grasp",
+      "object": "battery",
+      "forces": {
+        "left": 44.17932680640217,
+        "right": 44.14436287385547
+      },
+      "normal_dot": -1.0
+    },
+    {
+      "time": 32.59999999999388,
+      "phase": 1,
+      "event": "finger_release",
+      "object": "battery",
+      "forces": {
+        "left": 0.0,
+        "right": 0.0
+      }
+    },
+    {
+      "time": 32.59999999999388,
+      "phase": 1,
+      "event": "released",
+      "object": "battery",
+      "position_error_mm": 1.289319439301174
+    },
+    {
+      "time": 32.59999999999388,
+      "phase": 1,
+      "event": "simplified_fastening",
+      "object": "battery",
+      "relative_position": [
+        0.0014824890173056374,
+        -9.742994411201569e-05,
+        0.014988708573399758
+      ]
+    },
+    {
+      "time": 34.89999999999669,
+      "phase": 2,
+      "event": "task_start",
+      "name": "PCB placement"
+    },
+    {
+      "time": 40.30000000000329,
+      "phase": 2,
+      "event": "physical_grasp",
+      "object": "pcb",
+      "forces": {
+        "left": 45.531603789433575,
+        "right": 45.50283947790622
+      },
+      "normal_dot": -1.0000000000000002
+    },
+    {
+      "time": 49.300000000014286,
+      "phase": 2,
+      "event": "finger_release",
+      "object": "pcb",
+      "forces": {
+        "left": 0.0,
+        "right": 0.0
+      }
+    },
+    {
+      "time": 49.300000000014286,
+      "phase": 2,
+      "event": "released",
+      "object": "pcb",
+      "position_error_mm": 1.4651913142422481
+    },
+    {
+      "time": 49.300000000014286,
+      "phase": 2,
+      "event": "simplified_fastening",
+      "object": "pcb",
+      "relative_position": [
+        0.0008123912776909535,
+        0.0005861253486743505,
+        0.03398947421725627
+      ]
+    },
+    {
+      "time": 51.6000000000171,
+      "phase": 3,
+      "event": "task_start",
+      "name": "Cover assembly"
+    },
+    {
+      "time": 57.0000000000237,
+      "phase": 3,
+      "event": "physical_grasp",
+      "object": "lid",
+      "forces": {
+        "left": 38.76280863862303,
+        "right": 38.82689541565353
+      },
+      "normal_dot": -0.9999997580200058
+    },
+    {
+      "time": 66.00000000002758,
+      "phase": 3,
+      "event": "finger_release",
+      "object": "lid",
+      "forces": {
+        "left": 0.0,
+        "right": 0.0
+      }
+    },
+    {
+      "time": 66.00000000002758,
+      "phase": 3,
+      "event": "released",
+      "object": "lid",
+      "position_error_mm": 1.3569307467277627
+    },
+    {
+      "time": 66.00000000002758,
+      "phase": 3,
+      "event": "simplified_fastening",
+      "object": "lid",
+      "relative_position": [
+        0.0015292501602756216,
+        0.0006634841940349787,
+        0.05699307912264693
+      ]
+    },
+    {
+      "time": 68.30000000002222,
+      "phase": 4,
+      "event": "task_start",
+      "name": "Finished unit transfer"
+    },
+    {
+      "time": 73.70000000000964,
+      "phase": 4,
+      "event": "physical_grasp",
+      "object": "lid",
+      "forces": {
+        "left": 50.98956793717457,
+        "right": 51.02518230694711
+      },
+      "normal_dot": -0.9999904541293974
+    },
+    {
+      "time": 82.69999999998866,
+      "phase": 4,
+      "event": "finger_release",
+      "object": "lid",
+      "forces": {
+        "left": 0.0,
+        "right": 0.0
+      }
+    },
+    {
+      "time": 82.69999999998866,
+      "phase": 4,
+      "event": "released",
+      "object": "lid",
+      "position_error_mm": 2.3993277905527712
+    },
+    {
+      "time": 94.89999999996023,
+      "phase": 4,
+      "event": "complete",
+      "positions": {
+        "case": [
+          0.6422436482116396,
+          0.1615197331610991,
+          0.38993395553457566
+        ],
+        "battery": [
+          0.6437257872119196,
+          0.16140649479013758,
+          0.40492258816569643
+        ],
+        "pcb": [
+          0.6430566607859522,
+          0.1620940916210781,
+          0.4239234668453772
+        ],
+        "lid": [
+          0.643781491801535,
+          0.1621618389539039,
+          0.4469270386407594
+        ]
+      }
+    }
+  ],
+  "simulation_seconds": 94.89999999996023
+}
