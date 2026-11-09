@@ -90,7 +90,7 @@ def build(results,out):
     equation(s,[('T',0),('BO',-25000),(' = T',0),('BG',-25000),(' · T',0),('GC',-25000),(' · T',0),('CO',-25000)],.65,1.25,7)
     text(s,'B: robot base   G: gripper   C: wrist camera   O: object',.65,1.95,8,.35,14)
     text(s,'T_AB maps coordinates from B into A.\nFK supplies T_BG; calibration estimates T_GC.\nFoundationPose supplies T_CO from visual observations.',8.65,1.3,4.1,1.25,14)
-    image(s,frames/'driver_align_wrist.jpg',.65,2.65,5.9,3.25);image(s,frames/'regrasp_lift_wrist.jpg',6.85,2.65,5.9,3.25)
+    plate(s,'pose',.45,2.5,12.4,3.65)
     text(s,'Task target: estimated object pose + task-specific geometric offset.\nRegrasp changes the object-to-gripper relationship; observe again before generating the next target.',.65,6.17,12,.7,15)
 
     s=slide('Visual feedback: modes, residuals and correction policy',[8,15],'Methods')
@@ -118,15 +118,15 @@ def build(results,out):
 
     s=slide('Tilted insertion: orientation, contact and released placement',[11],'Representative successful run')
     plate(s,'insertion',.4,1.08,12.4,5.3)
-    caption(s,'Connected insets show identical pixel windows. Contact is partly occluded; physical acceptance comes from the recorded checks.',6.65)
+    caption(s,'Enlarged panels use matched pixel windows. Contact is partly occluded; physical acceptance comes from the recorded checks.',6.65)
 
     s=slide('Physical regrasp: support, clearance and grasp reacquisition',[13],'Representative successful run')
     plate(s,'regrasp',.4,1.08,12.4,5.3)
-    caption(s,'One continuous trajectory. Amber regions identify the grasp interface; new pose observation precedes reacquisition.',6.65)
+    caption(s,'One continuous trajectory. Enlarged views expose the grasp interface; new pose observation precedes reacquisition.',6.65)
 
     s=slide('Hole-over-pin placement: local geometry and final support',[14],'Representative successful run')
     plate(s,'hanging',.4,1.08,12.4,5.3)
-    caption(s,'Four terminal checks passed. Separate passive-stability audit: 30 s. The insets explain geometry, not measured contact forces.',6.65)
+    caption(s,'Four terminal checks passed. Separate passive-stability audit: 30 s. Pose axes are visualization overlays, not measured contact forces.',6.65)
 
     s=slide('Matched-seed comparison: insertion stop versus released placement',[16],'Controlled examples')
     plate(s,'paired',.4,1.08,12.4,5.3)
@@ -164,13 +164,13 @@ def build(results,out):
 
     s=slide('References and reproducibility',[22],'Appendix')
     text(s,'Selected methods\nWen et al. FoundationPose. CVPR, 2024.\nZhang. A flexible new technique for camera calibration. TPAMI, 2000.\nOpenCV. Camera and hand–eye calibration documentation.\nChaumette & Hutchinson. Visual servo control, Part I. RAM, 2006.\nTodorov et al. MuJoCo. IROS, 2012.\n\nReviewed alternatives\nLabbé et al. MegaPose. arXiv:2212.06870, 2022.\nFang et al. GraspNet-1Billion. CVPR, 2020.',.65,1.4,6.6,4.7,15)
-    text(s,'Repository evidence\nCalibration images + robot FK\nPredicted and evaluation masks\n48 complete trial summaries\nOriginal successful and failed replays\n12 annotated image plates (PDF / SVG)\nFrame indices, crop boxes and source hashes\n\nFull references: docs/LITERATURE_AND_SELECTION.md\nExperiment report: visual-feedback-calibrated-v1',7.7,1.4,5.05,4.7,15)
+    text(s,'Repository evidence\nCalibration images + robot FK\nPredicted and evaluation masks\n48 complete trial summaries\nOriginal successful and failed replays\n13 annotated image plates (PDF / SVG)\nFrame indices, crop boxes and source hashes\n\nFull references: docs/LITERATURE_AND_SELECTION.md\nExperiment report: visual-feedback-calibrated-v1',7.7,1.4,5.05,4.7,15)
     caption(s,'Simulation images illustrate observed behavior; quantitative conclusions use all predefined attempted trials.',6.63)
 
     prs.save(out/'vision_guided_manipulation.pptx')
     (out/'slides.json').write_text(json.dumps(notes,indent=2)+'\n')
     (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n18 main slides + 1 reference appendix. Target: approximately 15 minutes.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
-    meta={'revision':'Academic context/detail composites; matched crops and traceable annotations','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':21,'body_font_pt_range':[12,16],'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
+    meta={'revision':'Enlarged task-region figures with reprojected 60 mm estimated-pose axes','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':21,'body_font_pt_range':[12,16],'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
     (out/'provenance.json').write_text(json.dumps(meta,indent=2)+'\n');print({k:meta[k] for k in ['slides','runtime_image_panel_placements','slides_with_runtime_or_calibration_images']})
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();build(a.results.resolve(),a.output.resolve())

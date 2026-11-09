@@ -41,8 +41,7 @@
     "notes": "For the wrist camera, the camera-to-base transform is obtained from robot FK and the independently estimated camera-to-gripper transform. Multiplying by the camera-frame object estimate produces the object pose in the base frame. The notation T sub A B maps coordinates in frame B into frame A. Task-specific geometric offsets then define the desired grasp or insertion target. After a physical regrasp, the object-to-gripper relationship must be observed again; a previous rigid relationship cannot simply be reused.\n\nFoundationPose was selected for its few-shot model-free reference route and object-pose output. The tool CAD is not supplied to the pose estimator; calibrated RGB-D scans are reconstructed into an object-specific representation. This still requires references and pretrained networks. MegaPose and GraspNet were reviewed alternatives: the former estimates model-based object pose, while the latter predicts grasp candidates. They were not executed as external experimental baselines. MuJoCo retains the original robot and contact model; OpenCV provides calibration and image operations.",
     "source": "Final calibrated evaluation | 48 paired attempts | original simulation evidence | Wen et al., CVPR 2024; Labb\u00e9 et al., 2022; Fang et al., CVPR 2020; Todorov et al., IROS 2012",
     "images": [
-      "docs/presentation/frames/driver_align_wrist.jpg",
-      "docs/presentation/frames/regrasp_lift_wrist.jpg"
+      "docs/presentation/plates/pose.png"
     ]
   },
   {
