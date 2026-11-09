@@ -1,0 +1,23 @@
+{
+  "version": 4,
+  "archive_observations": true,
+  "seeds": [400, 401, 402, 403, 404, 405, 406, 407],
+  "schedule_seed": 20261110,
+  "fixed_virtual_sensor_delay_s": 1.0,
+  "common_arguments": ["--feedback-delay", "0.15"],
+  "method_arguments": {
+    "open_loop": ["--method", "full", "--visual-feedback", "open_loop"],
+    "staged": ["--method", "full", "--visual-feedback", "staged"],
+    "iterative": ["--method", "full", "--visual-feedback", "iterative"]
+  },
+  "tasks": {
+    "complete": {"methods": ["open_loop", "staged", "iterative"], "reference": "iterative", "disturbance": "alignment_impulse"}
+  },
+  "confidence_level": 0.95,
+  "success_interval": "Wilson score interval",
+  "continuous_interval": "10000 bootstrap resamples of trial means; seed 6216",
+  "paired_difference_interval": "Conservative Bonferroni-adjusted marginal exact binomial bounds; paired exact McNemar with Holm correction within method/disturbance families",
+  "failure_selection": "First failed seed, none before disturbance: first reference-method task failure and first comparator failure for each comparator in config order. Preserve matched iterative trial regardless of outcome. Hero: lowest successful complete/iterative/none seed, if any.",
+  "supersession": "User requested approximately 50 trials after visual_feedback_v1 began. Its scheduler was stopped; all started trials are retained separately and excluded from this new study. This balanced 48-trial protocol uses fresh seeds 400-407 and the unchanged controller. Only complete four-stage sequences are scored; stage metrics retain reachability counts and do not replace independent-task experiments.",
+  "interpretation": "Frozen three-mode feedback evaluation, independent of historical 240/40 trials and the cancelled visual_feedback_v1 matrix. Development uses seed 0; 400-407 reserved. No guaranteed improvement. Open-loop retains common initial acquisition and visual feed prediction but disables post-grasp and post-release relocalization. Staged and iterative share estimator, depth correction and controller parameters; iterative additionally performs bounded repeated observations/corrections before contact. Dynamics advance by fixed simulated latency at feedback observations; wall inference/planning pauses remain explicit, so this is not a realtime hardware claim. All modes retain joint servo, force and collision guards. Eight trials per configuration give wide uncertainty; report results as exploratory simulation evidence."
+}

@@ -1,0 +1,46 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3497}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 2819}
+{"event": "physical_grasp", "simulation_time_s": 15.806000000001948, "object_id": "rack_frame", "forces_n": {"left": 43.832749450239554, "right": 44.26851019517152}}
+{"event": "object_localized", "simulation_time_s": 18.468000000000643, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 120803}
+{"event": "rack_view_rejected", "simulation_time_s": 18.468000000000643, "reason": "No collision-free offline IK at [0.4420820850592095, 0.1783679965958766, 0.5670405928039053]; best={'p_error': 3.9657269007674516e-14, 'r_error': 4.8376623946962426e-14, 'contacts'"}
+{"event": "rack_localized", "simulation_time_s": 19.91999999999984, "camera": "wrist_camera"}
+{"event": "joint_route_planned", "simulation_time_s": 19.91999999999984, "stage": "ORIENT_RACK_FRAME", "collision_checks": 87, "waypoints": 85, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "object_localized", "simulation_time_s": 29.705999999994415, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 119200}
+{"event": "released", "simulation_time_s": 44.718000000008686, "object_id": "rack_frame"}
+{"event": "joint_route_planned", "simulation_time_s": 46.67000000001107, "stage": "CLEAR_ASSEMBLED_FRAME", "collision_checks": 121, "waypoints": 119, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "object_localized", "simulation_time_s": 62.244000000030105, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3686}
+{"event": "object_localized", "simulation_time_s": 62.244000000030105, "object_id": "spanner", "camera": "vision_camera", "pixels": 2896}
+{"event": "joint_route_planned", "simulation_time_s": 62.244000000030105, "stage": "ROUTE_TO_SPANNER", "collision_checks": 20, "waypoints": 18, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_path_retimed", "simulation_time_s": 70.47200000001716, "stage": "ROUTE_TO_SPANNER", "extra_steps": 3069, "joint_error_limit_rad": 0.01}
+Traceback (most recent call last):
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/scripts/run_workshop.py", line 600, in main
+    robot.grasp(pose)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 579, in grasp
+    self.move(grasp, "GRASP", min_duration=2.)
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 513, in move
+    else self.plan_move(destination, stage, allow_support=allow_support)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/task_control.py", line 323, in plan_move
+    q_next, _ = planner.solve(tcp[:3, 3], tcp[:3, :3], q)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/motion.py", line 111, in solve
+    raise MotionFailure(f'No collision-free offline IK at {pos.tolist()}; best={min(diagnostics,key=lambda d:d["p_error"])}')
+ma6216.motion.MotionFailure: No collision-free offline IK at [0.5624784045300177, -0.0252587292378956, 0.42627745739999745]; best={'p_error': 8.017943793545417e-13, 'r_error': 1.9620845283732993e-12, 'contacts': [{'geom1': 'geom_51', 'geom2': 'target_cube_geom_53', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.003815866029133204}], 'q': [0.203829773854431, -1.7294402915523426, -1.155278991277745, -1.8298503448177867, 1.5528381869941408, -5.861233285188917]}
+{"success": false, "task": "rack", "error": "MotionFailure: No collision-free offline IK at [0.5624784045300177, -0.0252587292378956, 0.42627745739999745]; best={'p_error': 8.017943793545417e-13, 'r_error': 1.9620845283732993e-12, 'contacts': [{'geom1': 'geom_51', 'geom2': 'target_cube_geom_53', 'body1': 'wrist_1_link', 'body2': 'target_cube', 'penetration_m': -0.003815866029133204}], 'q': [0.203829773854431, -1.7294402915523426, -1.155278991277745, -1.8298503448177867, 1.5528381869941408, -5.861233285188917]}", "wall_seconds": 254.00986603699857}

@@ -1,0 +1,218 @@
+{
+  "source_audit": {
+    "source": "scripts/build_presentation_plates.py",
+    "backend": "python",
+    "summary": {
+      "ready": true,
+      "strict": false,
+      "counts": {
+        "PASS": 18,
+        "WARN": 3,
+        "FAIL": 0
+      }
+    },
+    "findings": [
+      {
+        "check_id": "SOURCE-SYNTAX",
+        "level": "PASS",
+        "message": "Python source parses successfully",
+        "evidence": []
+      },
+      {
+        "check_id": "FONT-FAMILY",
+        "level": "PASS",
+        "message": "A publication-safe sans-serif family is configured",
+        "evidence": [
+          "sans-serif"
+        ]
+      },
+      {
+        "check_id": "FONT-SIZE",
+        "level": "PASS",
+        "message": "All detected text sizes are at least 5 pt (minimum 12 pt)",
+        "evidence": []
+      },
+      {
+        "check_id": "FONT-GLYPH-FLOOR",
+        "level": "PASS",
+        "message": "No mathtext superscript/subscript expression detected",
+        "evidence": []
+      },
+      {
+        "check_id": "LEGEND-LABEL-CASE",
+        "level": "PASS",
+        "message": "No auditable literal legend labels detected",
+        "evidence": []
+      },
+      {
+        "check_id": "COLOR-MAP",
+        "level": "PASS",
+        "message": "No rainbow/jet/hsv color mapping detected",
+        "evidence": []
+      },
+      {
+        "check_id": "EDITABLE-TEXT",
+        "level": "PASS",
+        "message": "SVG and PDF editable-text settings are configured",
+        "evidence": []
+      },
+      {
+        "check_id": "EXPORT-VECTOR",
+        "level": "PASS",
+        "message": "Both SVG and PDF exports are present",
+        "evidence": []
+      },
+      {
+        "check_id": "EXPORT-RASTER",
+        "level": "WARN",
+        "message": "PNG preview is present but no TIFF submission raster was found",
+        "evidence": []
+      },
+      {
+        "check_id": "RASTER-DPI",
+        "level": "WARN",
+        "message": "Raster export meets the 300 dpi floor but not the 600 dpi default",
+        "evidence": [
+          "300"
+        ]
+      },
+      {
+        "check_id": "FINAL-WIDTH",
+        "level": "WARN",
+        "message": "Detected width 304.8 mm is not near the common 89/183 mm defaults; verify the target journal",
+        "evidence": []
+      },
+      {
+        "check_id": "DATA-SAMPLING",
+        "level": "PASS",
+        "message": "No high-confidence row-sampling operation detected",
+        "evidence": []
+      },
+      {
+        "check_id": "DATA-EXCLUSION",
+        "level": "PASS",
+        "message": "No high-confidence missing-data exclusion detected",
+        "evidence": []
+      },
+      {
+        "check_id": "DEMO-DATA",
+        "level": "PASS",
+        "message": "No obvious simulated-data generator detected",
+        "evidence": []
+      },
+      {
+        "check_id": "LOG-GUARD",
+        "level": "PASS",
+        "message": "No logarithmic transform or axis detected",
+        "evidence": []
+      },
+      {
+        "check_id": "INTERP-MONOTONIC",
+        "level": "PASS",
+        "message": "No NumPy interpolation requiring an increasing x-grid detected",
+        "evidence": []
+      },
+      {
+        "check_id": "UNCERTAINTY-ENCODING",
+        "level": "PASS",
+        "message": "No stochastic aggregate requiring a variability audit was inferred",
+        "evidence": []
+      },
+      {
+        "check_id": "ROTATION-ANCHOR",
+        "level": "PASS",
+        "message": "No rotated Matplotlib text detected",
+        "evidence": []
+      },
+      {
+        "check_id": "ANNOTATION-WORKAROUND",
+        "level": "PASS",
+        "message": "No high-risk hard-coded label height or opaque white text mask detected",
+        "evidence": []
+      },
+      {
+        "check_id": "PANEL-ALIGNMENT-GATE",
+        "level": "PASS",
+        "message": "Render-time panel-alignment gate is wired into the plotting source",
+        "evidence": [
+          "require_matplotlib_panel_alignment("
+        ]
+      },
+      {
+        "check_id": "BACKEND-EXCLUSIVE",
+        "level": "PASS",
+        "message": "No obvious cross-backend plotting reference found for python",
+        "evidence": []
+      }
+    ]
+  },
+  "all_12_final_pdf_text_and_collision_checks_passed": true,
+  "checks": [
+    [
+      "overview",
+      0,
+      0
+    ],
+    [
+      "calibration",
+      0,
+      0
+    ],
+    [
+      "localization",
+      0,
+      0
+    ],
+    [
+      "hammer",
+      0,
+      0
+    ],
+    [
+      "insertion",
+      0,
+      0
+    ],
+    [
+      "rack",
+      0,
+      0
+    ],
+    [
+      "regrasp",
+      0,
+      0
+    ],
+    [
+      "hanging",
+      0,
+      0
+    ],
+    [
+      "paired",
+      0,
+      0
+    ],
+    [
+      "failure",
+      0,
+      0
+    ],
+    [
+      "correction",
+      0,
+      0
+    ],
+    [
+      "background",
+      0,
+      0
+    ]
+  ],
+  "accepted_source_warnings": {
+    "RASTER-DPI": "300 dpi sufficient for slide annotations; original raster detail is finite.",
+    "FINAL-WIDTH": "12-inch-wide presentation plates, not journal submission figures.",
+    "EXPORT-RASTER": "PNG supplied instead of TIFF for this presentation delivery."
+  },
+  "visual_review": "All 12 plates inspected in final slide renders and detailed image views; labels, common crop scales, mask colors and explanatory ROI boxes are legible. ROI strokes are intentional overlays, not measured contact or pose boundaries."
+}

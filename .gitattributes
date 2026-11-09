@@ -15,3 +15,26 @@
 /assets/palletizing/*.stl binary
 # Keep third-party mesh/XML/texture source hashes stable across operating systems.
 /assets/library/gso/** -text whitespace=-blank-at-eof,-blank-at-eol
+# Preserve image-reconstruction provenance hashes, including exported OBJ EOFs.
+/assets/reconstructed/** -text whitespace=-blank-at-eof
+/assets/reconstructed/*/model.obj linguist-generated=true
+/assets/reconstructed/workshop/*/model.obj linguist-generated=true
+
+# Raw evaluation evidence must keep its recorded bytes on every platform.
+/docs/results/**/*.log -text
+/docs/results/**/*.npz binary
+/docs/results/visual-feedback-v1/**/*.csv -text
+/docs/results/workshop-localization-v1/**/*.csv -text whitespace=cr-at-eol
+/docs/results/calibrated-workshop-v1/**/*.csv -text whitespace=cr-at-eol
+/docs/results/visual-feedback-calibrated-v1/**/*.csv -text whitespace=cr-at-eol
+/docs/results/visual-feedback-calibrated-v1/** linguist-generated=true
+/docs/presentation/*.pptx binary
+/docs/presentation/*.pdf binary
+/docs/results/wrist-calibration-v1/** linguist-generated=true
+/docs/results/workshop-localization-v1/** linguist-generated=true
+/docs/results/calibrated-workshop-v1/** linguist-generated=true
+/docs/results/evaluation-v1/** linguist-generated=true
+/docs/results/rack-revision-v2/** linguist-generated=true
+/docs/results/visual-feedback-v1/** linguist-generated=true
+/docs/results/visual-feedback-calibrated-v1/figures/*.svg -whitespace
+/docs/presentation/plates/*.svg -whitespace

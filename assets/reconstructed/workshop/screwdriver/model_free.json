@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "method": "official FoundationPose few-shot Neural Object Field",
+  "inputs": "RGB + metric depth + foreground masks + calibrated reference camera poses",
+  "cad_used_for_reconstruction": false,
+  "object_pose_ground_truth_input": false,
+  "reference_manifest_sha256": "ea80444f4e4201a771863fb2b821cb1aa813d4303d6d36ccb1eda8f8dd8891b1",
+  "reference_views": 24,
+  "object_id": "screwdriver",
+  "reference_pose_refinement_enabled": false,
+  "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+  "gpu": "NVIDIA RTX 2000 Ada Generation",
+  "mesh_file": "model.obj",
+  "mesh_vertices": 24660,
+  "mesh_faces": 33392,
+  "observed_extents_m": [
+    0.19448005047723047,
+    0.026939733840783332,
+    0.028494476236192338
+  ],
+  "bounds_m": [
+    [
+      -0.09665337043607217,
+      -0.013494018218889004,
+      -0.014204536322110014
+    ],
+    [
+      0.0978266800411583,
+      0.01344571562189433,
+      0.014289939914082323
+    ]
+  ],
+  "training_steps": 1500,
+  "model_frame": "reference scanner frame",
+  "mesh_resolution_mm": 0.8,
+  "export_round_trip_validated": true,
+  "worker_exit_strategy": "one-shot process; skip native interpreter finalizers after synchronized export",
+  "files_sha256": {
+    "material.mtl": "0d90fe7d688a6da0b82b0f8053231a1c8986de34aa839f8113ed53a610c09227",
+    "model.obj": "893a3a368c49273a3b5401368913ea4a4eb078fc1e19117765649268c7c55255",
+    "material_0.png": "d5a4c3de39bdbb42ac82974c9015d95b456ae5dce8b93da4e94425d54cbcf671"
+  },
+  "wall_clock_seconds": 102.8538097160017
+}

@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "method": "official FoundationPose few-shot Neural Object Field",
+  "inputs": "RGB + metric depth + foreground masks + calibrated reference camera poses",
+  "cad_used_for_reconstruction": false,
+  "object_pose_ground_truth_input": false,
+  "reference_manifest_sha256": "ac7865a6b2e055c031bea84c565a52d153241d93394a9ca11dff0f62e81825d2",
+  "reference_views": 24,
+  "object_id": "rack_frame",
+  "reference_pose_refinement_enabled": false,
+  "repository_commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+  "gpu": "NVIDIA RTX 2000 Ada Generation",
+  "mesh_file": "model.obj",
+  "mesh_vertices": 46991,
+  "mesh_faces": 63728,
+  "observed_extents_m": [
+    0.03495285721074395,
+    0.07528405907430966,
+    0.2197065818238892
+  ],
+  "bounds_m": [
+    [
+      -0.017553539404630628,
+      -0.06096944369777489,
+      -0.03686011464710498
+    ],
+    [
+      0.01739931780611332,
+      0.014314615376534761,
+      0.1828464671767842
+    ]
+  ],
+  "training_steps": 1500,
+  "model_frame": "reference scanner frame",
+  "mesh_resolution_mm": 0.8,
+  "export_round_trip_validated": true,
+  "worker_exit_strategy": "one-shot process; skip native interpreter finalizers after synchronized export",
+  "files_sha256": {
+    "material.mtl": "0d90fe7d688a6da0b82b0f8053231a1c8986de34aa839f8113ed53a610c09227",
+    "model.obj": "6a7d854e4627cf2a30741ba288a86fef5d1e22608f4c4ae5024359bf2a6942e1",
+    "material_0.png": "e0eb2ca20e80e7572aaecc471500695d53393abe2b9c70bda66800e49ff85403"
+  },
+  "wall_clock_seconds": 123.20997802599959
+}

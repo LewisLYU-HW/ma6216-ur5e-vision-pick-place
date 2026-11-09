@@ -1,0 +1,95 @@
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+/home/arm-pc/projects/ma6216-ur5e-vision-pick-place/src/ma6216/scene.py:97: UserWarning: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+  model = spec.compile()
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+WARNING: Attach conflict when attaching 'robotiq_2f85' to 'ur5e scene', policy is 'warning'
+impratio: parent has 1 (default), child has 10, keeping parent value
+cone: parent has 0 (default), child has 1, keeping parent value
+
+{"event": "rack_localized", "simulation_time_s": 2.0000000000000013, "camera": "vision_camera"}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "hammer", "camera": "vision_camera", "pixels": 1264}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1764}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 4067}
+{"event": "object_localized", "simulation_time_s": 2.0000000000000013, "object_id": "spanner", "camera": "vision_camera", "pixels": 1473}
+{"event": "task_phase", "simulation_time_s": 2.5999999999999353, "phase": "park_hammer"}
+{"event": "joint_route_planned", "simulation_time_s": 2.5999999999999353, "stage": "ROUTE_TO_HAMMER", "collision_checks": 68, "waypoints": 66, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 10.166000000000064, "stage": "ROUTE_TO_HAMMER", "nominal_steps": 3657, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "physical_grasp", "simulation_time_s": 14.320000000001452, "object_id": "hammer", "forces_n": {"left": 45.828286267557814, "right": 41.19400644762378}}
+{"event": "joint_route_planned", "simulation_time_s": 15.84000000000196, "stage": "CLEAR_TOOL_ACCESS", "collision_checks": 52, "waypoints": 50, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 21.64799999999888, "stage": "CLEAR_TOOL_ACCESS", "nominal_steps": 2778, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "released", "simulation_time_s": 24.385999999997363, "object_id": "hammer"}
+{"event": "task_phase", "simulation_time_s": 28.43599999999512, "phase": "moving_driver_insertion"}
+{"event": "object_localized", "simulation_time_s": 29.835999999994343, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1760}
+{"event": "object_localized", "simulation_time_s": 31.185999999993594, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1751}
+{"event": "object_localized", "simulation_time_s": 32.5359999999938, "object_id": "screwdriver", "camera": "vision_camera", "pixels": 1747}
+{"event": "physical_grasp", "simulation_time_s": 43.41200000000709, "object_id": "screwdriver", "forces_n": {"left": 41.3584057440512, "right": 42.30763540169832}}
+{"event": "object_localized", "simulation_time_s": 46.26200000001057, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 32942}
+{"event": "rack_localized", "simulation_time_s": 48.51600000001333, "camera": "wrist_camera"}
+{"event": "object_localized", "simulation_time_s": 55.16800000002146, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 32043}
+{"event": "object_localized", "simulation_time_s": 56.770000000023416, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 32201}
+{"event": "visual_servo_observation", "simulation_time_s": 56.770000000023416, "object_id": "screwdriver", "iteration": 0, "translation_error_mm": 0.24635364677079252, "rotation_error_deg": 0.12959608481052545, "within_tolerance": true, "command_translation_mm": 0.23781773462431421, "command_rotation_deg": 0.08423745512683894, "consecutive_in_tolerance": 1}
+{"event": "object_localized", "simulation_time_s": 56.9200000000236, "object_id": "screwdriver", "camera": "wrist_camera", "pixels": 32260}
+{"event": "visual_servo_observation", "simulation_time_s": 56.9200000000236, "object_id": "screwdriver", "iteration": 1, "translation_error_mm": 0.39387982596533994, "rotation_error_deg": 0.6296462421769183, "within_tolerance": true, "command_translation_mm": 0.28566659039540027, "command_rotation_deg": 0.409270057414998, "consecutive_in_tolerance": 2}
+{"event": "visual_feedback_stage_finished", "simulation_time_s": 56.9200000000236, "object_id": "screwdriver", "mode": "iterative", "converged": true, "corrections": 0}
+{"event": "released", "simulation_time_s": 69.67600000001902, "object_id": "screwdriver"}
+{"event": "task_phase", "simulation_time_s": 73.6280000000098, "phase": "install_frame"}
+{"event": "object_localized", "simulation_time_s": 73.6280000000098, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 4067}
+{"event": "joint_route_planned", "simulation_time_s": 73.6280000000098, "stage": "ROUTE_TO_FRAME", "collision_checks": 117, "waypoints": 115, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 86.75599999997921, "stage": "ROUTE_TO_FRAME", "nominal_steps": 6438, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "physical_grasp", "simulation_time_s": 90.90999999996953, "object_id": "rack_frame", "forces_n": {"left": 43.8929347583331, "right": 44.15179106484815}}
+{"event": "object_localized", "simulation_time_s": 93.69999999996303, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 119841}
+{"event": "rack_view_rejected", "simulation_time_s": 93.69999999996303, "reason": "No collision-free offline IK at [0.4391234270809359, 0.1829823139147963, 0.5676222166354233]; best={'p_error': 4.239122429972661e-14, 'r_error': 7.61645125303897e-14, 'contacts': ["}
+{"event": "rack_localized", "simulation_time_s": 95.15199999995964, "camera": "wrist_camera"}
+{"event": "joint_route_planned", "simulation_time_s": 95.15199999995964, "stage": "ORIENT_RACK_FRAME", "collision_checks": 87, "waypoints": 85, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 104.9099999999369, "stage": "ORIENT_RACK_FRAME", "nominal_steps": 4753, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "object_localized", "simulation_time_s": 105.05999999993655, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 112470}
+{"event": "object_localized", "simulation_time_s": 106.66199999993282, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 115589}
+{"event": "visual_servo_observation", "simulation_time_s": 106.66199999993282, "object_id": "rack_frame", "iteration": 0, "translation_error_mm": 0.503008144070424, "rotation_error_deg": 0.6379124682867214, "within_tolerance": true, "command_translation_mm": 0.4586429771542569, "command_rotation_deg": 0.41464310438636215, "consecutive_in_tolerance": 1}
+{"event": "object_localized", "simulation_time_s": 106.81199999993247, "object_id": "rack_frame", "camera": "wrist_camera", "pixels": 116572}
+{"event": "visual_servo_observation", "simulation_time_s": 106.81199999993247, "object_id": "rack_frame", "iteration": 1, "translation_error_mm": 0.22550619618767637, "rotation_error_deg": 0.5718163819287571, "within_tolerance": true, "command_translation_mm": 0.4288571528052456, "command_rotation_deg": 0.37168064825369507, "consecutive_in_tolerance": 2}
+{"event": "visual_feedback_stage_finished", "simulation_time_s": 106.81199999993247, "object_id": "rack_frame", "mode": "iterative", "converged": true, "corrections": 0}
+{"event": "released", "simulation_time_s": 120.37199999990086, "object_id": "rack_frame"}
+{"event": "joint_route_planned", "simulation_time_s": 122.32399999989632, "stage": "CLEAR_ASSEMBLED_FRAME", "collision_checks": 110, "waypoints": 108, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 134.73399999991523, "stage": "CLEAR_ASSEMBLED_FRAME", "nominal_steps": 6079, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "object_localized", "simulation_time_s": 136.8839999999255, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 3732}
+{"event": "task_phase", "simulation_time_s": 136.8839999999255, "phase": "regrasp_and_hang_spanner"}
+{"event": "object_localized", "simulation_time_s": 136.8839999999255, "object_id": "spanner", "camera": "vision_camera", "pixels": 2805}
+{"event": "joint_route_planned", "simulation_time_s": 136.8839999999255, "stage": "ROUTE_TO_SPANNER", "collision_checks": 24, "waypoints": 22, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 139.43199999993766, "stage": "ROUTE_TO_SPANNER", "nominal_steps": 1148, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "physical_grasp", "simulation_time_s": 143.5859999999575, "object_id": "spanner", "forces_n": {"left": 44.34951253758943, "right": 44.03111046113122}}
+{"event": "joint_route_planned", "simulation_time_s": 145.83599999996824, "stage": "TRANSFER_TO_REGRASP", "collision_checks": 17, "waypoints": 15, "method": "joint interpolation", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 147.6519999999769, "stage": "TRANSFER_TO_REGRASP", "nominal_steps": 782, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "released", "simulation_time_s": 150.57199999999085, "object_id": "spanner"}
+{"event": "object_localized", "simulation_time_s": 153.02200000000255, "object_id": "spanner", "camera": "vision_camera", "pixels": 2472}
+{"event": "physical_grasp", "simulation_time_s": 158.2260000000274, "object_id": "spanner", "forces_n": {"left": 44.354103800929295, "right": 43.460041938989434}}
+{"event": "object_localized", "simulation_time_s": 160.69200000003917, "object_id": "spanner", "camera": "wrist_camera", "pixels": 90797}
+{"event": "rack_localized", "simulation_time_s": 160.69200000003917, "camera": "wrist_camera"}
+{"event": "joint_route_planned", "simulation_time_s": 160.69200000003917, "stage": "REORIENT_AND_APPROACH_RACK", "collision_checks": 915, "waypoints": 112, "method": "RRT-Connect", "reconstructed_payload": true, "self_clearance_mm": 3.0, "obstacle_clearance_mm": {"rack_frame": 20.0}}
+{"event": "joint_velocity_feedforward", "simulation_time_s": 173.4940000001003, "stage": "REORIENT_AND_APPROACH_RACK", "nominal_steps": 6275, "recovery_steps": 0, "reference": "collision-checked joint path"}
+{"event": "object_localized", "simulation_time_s": 173.64400000010102, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 371}
+{"event": "visual_target_update_rejected", "simulation_time_s": 173.64400000010102, "object_id": "rack_frame", "accepted": false, "translation_jump_mm": 24.69212544524751, "rotation_jump_deg": 10.0820011027661, "plane_rmse_mm": null, "policy": "valid depth alignment and stationary support continuity"}
+{"event": "object_localized", "simulation_time_s": 173.79400000010173, "object_id": "spanner", "camera": "wrist_camera", "pixels": 94257}
+{"event": "visual_servo_observation", "simulation_time_s": 173.79400000010173, "object_id": "spanner", "iteration": 0, "translation_error_mm": 0.6373780025445588, "rotation_error_deg": 1.432687005531774, "within_tolerance": true, "command_translation_mm": 0.39987581484264517, "command_rotation_deg": 0.931246553595525, "consecutive_in_tolerance": 1}
+{"event": "object_localized", "simulation_time_s": 173.94400000010245, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 371}
+{"event": "visual_target_update_rejected", "simulation_time_s": 173.94400000010245, "object_id": "rack_frame", "accepted": false, "translation_jump_mm": 25.140978650044357, "rotation_jump_deg": 10.155989559930465, "plane_rmse_mm": null, "policy": "valid depth alignment and stationary support continuity"}
+{"event": "object_localized", "simulation_time_s": 174.09400000010316, "object_id": "spanner", "camera": "wrist_camera", "pixels": 94613}
+{"event": "visual_servo_observation", "simulation_time_s": 174.09400000010316, "object_id": "spanner", "iteration": 1, "translation_error_mm": 0.4631304100933051, "rotation_error_deg": 1.7358242981489322, "within_tolerance": false, "command_translation_mm": 0.2912305503938924, "command_rotation_deg": 1.128285793796705, "consecutive_in_tolerance": 0}
+{"event": "object_localized", "simulation_time_s": 174.74600000010628, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 454}
+{"event": "visual_target_update_rejected", "simulation_time_s": 174.74600000010628, "object_id": "rack_frame", "accepted": false, "translation_jump_mm": 27.609386097892635, "rotation_jump_deg": 17.406298014617757, "plane_rmse_mm": 2.5138839113597817, "policy": "valid depth alignment and stationary support continuity"}
+{"event": "object_localized", "simulation_time_s": 174.896000000107, "object_id": "spanner", "camera": "wrist_camera", "pixels": 94158}
+{"event": "visual_servo_observation", "simulation_time_s": 174.896000000107, "object_id": "spanner", "iteration": 2, "translation_error_mm": 0.38183094670804846, "rotation_error_deg": 0.6172431149673837, "within_tolerance": true, "command_translation_mm": 0.22047437158956876, "command_rotation_deg": 0.4012080247287395, "consecutive_in_tolerance": 1}
+{"event": "object_localized", "simulation_time_s": 175.0460000001077, "object_id": "rack_frame", "camera": "vision_camera", "pixels": 467}
+{"event": "visual_target_update_rejected", "simulation_time_s": 175.0460000001077, "object_id": "rack_frame", "accepted": false, "translation_jump_mm": 24.96970530315458, "rotation_jump_deg": 11.392165779957338, "plane_rmse_mm": 2.460348018987948, "policy": "valid depth alignment and stationary support continuity"}
+{"event": "object_localized", "simulation_time_s": 175.19600000010843, "object_id": "spanner", "camera": "wrist_camera", "pixels": 94223}
+{"event": "visual_servo_observation", "simulation_time_s": 175.19600000010843, "object_id": "spanner", "iteration": 3, "translation_error_mm": 0.28561751233678273, "rotation_error_deg": 0.745900347356666, "within_tolerance": true, "command_translation_mm": 0.2080132972933456, "command_rotation_deg": 0.4848352257817458, "consecutive_in_tolerance": 2}
+{"event": "visual_feedback_stage_finished", "simulation_time_s": 175.19600000010843, "object_id": "spanner", "mode": "iterative", "converged": true, "corrections": 1}
+{"event": "released", "simulation_time_s": 186.74600000016358, "object_id": "spanner"}
+{"success": true, "task": "complete", "error": null, "wall_seconds": 922.1702478110092}

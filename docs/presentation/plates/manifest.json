@@ -1,0 +1,1472 @@
+{
+  "overview": [
+    {
+      "source": "docs/presentation/frames/initial_overview.jpg",
+      "source_sha256": "a5c7fc7b078288413dddf01717cb765bcbe64f6adc291bd6dac04c5bd54549f0",
+      "crop_xyxy": null,
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Initial workcell",
+      "caption": "t = 0.00 s | object pickup stations",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/final_overview.jpg",
+      "source_sha256": "df381c5e0cacd4cd4d21dad5c3d6d01cf3a78398f20b4086aaa2bc888524040a",
+      "crop_xyxy": null,
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Released final state",
+      "caption": "t = 195.00 s | four acceptance checks passed",
+      "contrast_or_color_change": false
+    }
+  ],
+  "calibration": [
+    {
+      "source": "docs/results/wrist-calibration-v1/examples/intrinsic_train.jpg",
+      "source_sha256": "e0006525b9f43aa265a8bcb992b9e387b466cfdebee2bec9e4f6d6091481da93",
+      "crop_xyxy": [
+        120,
+        70,
+        1160,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Checkerboard observations",
+      "caption": "Image-based corner detection",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/wrist-calibration-v1/examples/hand_eye_validation.jpg",
+      "source_sha256": "775f3a5a30abb307dbf5ec994251961c58398aa162bf2054b073c545a9774d80",
+      "crop_xyxy": [
+        120,
+        70,
+        1160,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Held-out hand\u2013eye view",
+      "caption": "PnP + robot FK; frozen validation chain",
+      "contrast_or_color_change": false
+    }
+  ],
+  "localization": [
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__hammer__sample__500.jpg",
+      "source_sha256": "c9bb355551defef18863120db550e4bb5317ef6079d4fc39a35f331b51c019fe",
+      "crop_xyxy": [
+        570,
+        440,
+        820,
+        690
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Hammer",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__screwdriver__sample__500.jpg",
+      "source_sha256": "d6e4140671469264001f59a16ad4a07ec544eeb823908d72166d58bcec7992a4",
+      "crop_xyxy": [
+        360,
+        440,
+        610,
+        690
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Screwdriver",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__rack_frame__sample__500.jpg",
+      "source_sha256": "1e9dac87b8d876e6e127b6241bdafa62b8b44ca279b723482bfb2805728be8e7",
+      "crop_xyxy": [
+        480,
+        390,
+        730,
+        640
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "Rack frame",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__spanner__sample__500.jpg",
+      "source_sha256": "43accb4108c3c195af34ae3562c7fe780cf0483d23e8daaf91494f231a420459",
+      "crop_xyxy": [
+        530,
+        390,
+        780,
+        640
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "d",
+      "title": "Spanner",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    }
+  ],
+  "hammer": [
+    {
+      "source": "docs/presentation/frames/hammer_lift_overview.jpg",
+      "source_sha256": "a20bc137457bbe98d63b39929a58f4a097cfffd7e05c9c937e135779087c7d36",
+      "crop_xyxy": [
+        190,
+        100,
+        800,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Lift and transport",
+      "caption": "t = 13.60 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/hammer_released_overview.jpg",
+      "source_sha256": "2aee1a81470681c9d0ac3299bafc3d51bd0af1ddbde32933b5a89fedd3e92047",
+      "crop_xyxy": [
+        190,
+        100,
+        800,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Released tray placement",
+      "caption": "t = 25.00 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "insertion": [
+    {
+      "source": "docs/presentation/frames/driver_orient_wrist.jpg",
+      "source_sha256": "85bdb60c43148701261075fbdd3d950969098af57de4e1a34536bccb32eb7e51",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "a",
+      "title": "Reorient",
+      "caption": "Wrist view during orientation change.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "50.00 s",
+      "detail_label": "Tool / gripper",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            473.15541441685906,
+            417.86405832751143
+          ],
+          [
+            479.1605691008109,
+            303.4119301440569
+          ],
+          [
+            353.95824670740734,
+            372.7821503271644
+          ],
+          [
+            395.98581302489896,
+            558.2009692817766
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.5919152494931171,
+            -0.2137858478391026,
+            -0.7771306832610991,
+            0.5237895353828029
+          ],
+          [
+            0.2064593241766375,
+            0.9722291530871066,
+            -0.11020326762358937,
+            0.06344981756815765
+          ],
+          [
+            0.7791089893247155,
+            -0.09521467761664618,
+            0.6196151649987206,
+            0.5866858878807125
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1250,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/driver_insert_wrist.jpg",
+      "source_sha256": "88e74e1ad408b086ddc9c8c6c03adf231d7e6e9a0e08d411ffc663dae7b2d8ee",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "b",
+      "title": "Insert",
+      "caption": "Socket contact is partly occluded by the gripper.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "60.00 s",
+      "detail_label": "Insertion region",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            473.654933907447,
+            417.2517993560292
+          ],
+          [
+            480.7136176096359,
+            302.38482524921807
+          ],
+          [
+            361.7547873347734,
+            364.49943301494505
+          ],
+          [
+            382.38676082546385,
+            548.9174428105453
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.21175515371316472,
+            -0.3423398974885016,
+            -0.9154032778574746,
+            0.6450894498528824
+          ],
+          [
+            0.0714712366217795,
+            0.9395600623039984,
+            -0.3348406603210533,
+            0.09809438988409153
+          ],
+          [
+            0.974705864907984,
+            0.005479312766917033,
+            0.2234241298639463,
+            0.5582900829504928
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1500,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/driver_done_wrist.jpg",
+      "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "c",
+      "title": "Release",
+      "caption": "Released placement; acceptance is checked in the log.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "70.00 s",
+      "detail_label": "Placed tool",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            475.7317025812247,
+            272.83997449257413
+          ],
+          [
+            480.2172320163486,
+            183.5330634140087
+          ],
+          [
+            400.63875225842673,
+            247.77459582910922
+          ],
+          [
+            423.22604126254646,
+            322.72147690270987
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.21074777080458115,
+            -0.3424441852468282,
+            -0.9155967218658739,
+            0.6409111203143811
+          ],
+          [
+            0.07137000023670269,
+            0.9395235218078792,
+            -0.33496548335004867,
+            0.09661495348702745
+          ],
+          [
+            0.9749316387147928,
+            0.0052470906562102175,
+            0.2224427294216038,
+            0.5278146670469213
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1750,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "rack": [
+    {
+      "source": "docs/presentation/frames/rack_lift_overview.jpg",
+      "source_sha256": "0baa49d5d9a6e669862bc643c67fce490c1b9e6dea88ba3dcc2bd414d749d2d7",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Independent frame pickup",
+      "caption": "t = 91.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/rack_insert_wrist.jpg",
+      "source_sha256": "0cb9fb9691bc1d580adb3b7675885a769c60d9221b806fb644511f12acf02426",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Frame\u2013base seating",
+      "caption": "t = 112.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/rack_done_overview.jpg",
+      "source_sha256": "3e02c2a57dc49d4573abe6ab1c2bac0730574c48983aae82ac1ef4d9bd4eb7a4",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "Released fixture",
+      "caption": "t = 134.40 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "regrasp": [
+    {
+      "source": "docs/presentation/frames/regrasp_place_wrist.jpg",
+      "source_sha256": "99daab6319e9246174bede2a7d7ce75e61c56e8f4cd25e92699b6a9cec1c6f7e",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "a",
+      "title": "Place on support",
+      "caption": "Supported tool before opening the fingers.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "147.00 s",
+      "detail_label": "Original grasp",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            479.5022698266976,
+            259.0855735436405
+          ],
+          [
+            479.5017761757055,
+            401.9524996303121
+          ],
+          [
+            684.4896979593125,
+            259.0855627597016
+          ],
+          [
+            479.5038352629278,
+            420.9131512155798
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9999997731750235,
+            2.258907063502831e-05,
+            0.0006731564704433681,
+            0.34515698325933514
+          ],
+          [
+            -2.2809377318903855e-05,
+            0.9999999461876171,
+            0.0003272682286515289,
+            0.015056334534663386
+          ],
+          [
+            -0.0006731490415340825,
+            -0.0003272835086988431,
+            0.9999997198778964,
+            0.45782180159430874
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 3675,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/regrasp_clear_wrist.jpg",
+      "source_sha256": "019965a142ec418d0352d8db43ffe39d85cfe929bb2a3fbd7dfcf4d93dd28afa",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "b",
+      "title": "Clear fingers",
+      "caption": "Tool remains on support while the fingers withdraw.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "150.40 s",
+      "detail_label": "Open clearance",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            479.4972299751582,
+            150.88039621773677
+          ],
+          [
+            479.49516059464867,
+            253.83641496496665
+          ],
+          [
+            595.0223502839128,
+            150.87341494306662
+          ],
+          [
+            479.54338615353055,
+            191.00913318772834
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9999998167483461,
+            1.4931101474094889e-05,
+            0.0006052109838462943,
+            0.34505857094980386
+          ],
+          [
+            -1.5110606470936894e-05,
+            0.9999999559013721,
+            0.0002965955526371918,
+            0.01501480084937737
+          ],
+          [
+            -0.0006052065286590288,
+            -0.0002966046433905685,
+            0.9999997728753451,
+            0.4549166301309217
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 3760,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/regrasp_lift_wrist.jpg",
+      "source_sha256": "6caa297d76ea2015cc4951b0841ca780a357f26798df23c3cb15d62a06bfe163",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "c",
+      "title": "Acquire new grasp",
+      "caption": "Reobservation precedes the new grasp and lift.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "158.20 s",
+      "detail_label": "New grasp region",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            479.5004542411097,
+            326.9092236913478
+          ],
+          [
+            479.5003765810808,
+            444.92979709610074
+          ],
+          [
+            663.7567246947366,
+            326.90923086028516
+          ],
+          [
+            479.50065855702366,
+            500.67212592849114
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9999951971593816,
+            0.0030320265895327093,
+            -0.0006422405539658045,
+            0.34500397474908373
+          ],
+          [
+            -0.0030182304645904063,
+            0.999785480303382,
+            0.020491062915268535,
+            0.015488328647070343
+          ],
+          [
+            0.000704232228323894,
+            -0.020489026069953682,
+            0.99978982984809,
+            0.5830956800793011
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 3955,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "hanging": [
+    {
+      "source": "docs/presentation/frames/hang_align_wrist.jpg",
+      "source_sha256": "5fa65bf4198dc476baf79ed900b27c7c8c0c1c4027f841bc3bab1412a51a74b1",
+      "context_crop_xyxy": [
+        210,
+        0,
+        770,
+        560
+      ],
+      "panel": "a",
+      "title": "Align",
+      "caption": "Precontact view; the hole and pin are visible.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "171.00 s",
+      "detail_label": "Ring / pin interface",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            481.32922752438543,
+            321.567993611693
+          ],
+          [
+            482.8803065876394,
+            439.4952313830348
+          ],
+          [
+            663.7290715828136,
+            318.8440755226685
+          ],
+          [
+            484.45049222572686,
+            489.8000477085327
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            -0.003908511874944896,
+            0.9286159050970925,
+            0.37102207172177804,
+            0.4865989506238217
+          ],
+          [
+            0.02169256031578178,
+            0.37101636703290863,
+            -0.9283729334560368,
+            0.08907692952153921
+          ],
+          [
+            -0.9997569519754044,
+            0.004419860550814442,
+            -0.021594225500070032,
+            0.6088021521998161
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 4275,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/hang_thread_wrist.jpg",
+      "source_sha256": "05a3d669af735db98ad74b3b5ed847dc75913b0de376a4682b67ac8f5958e8b3",
+      "context_crop_xyxy": [
+        210,
+        0,
+        770,
+        560
+      ],
+      "panel": "b",
+      "title": "Thread",
+      "caption": "The enlarged view exposes the local relationship.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "179.00 s",
+      "detail_label": "Pin inside ring",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            480.4367652378745,
+            319.0086429111248
+          ],
+          [
+            480.8447022971226,
+            435.9420600601041
+          ],
+          [
+            660.7665679681705,
+            315.23161616767754
+          ],
+          [
+            489.13226977742687,
+            487.2168895707864
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            -0.003990787811812618,
+            0.9286239903294652,
+            0.37100099525431185,
+            0.4655934629162986
+          ],
+          [
+            0.021672957723046095,
+            0.37099717596733456,
+            -0.9283810311258573,
+            0.1416672985155669
+          ],
+          [
+            -0.9997570303872565,
+            0.0043357190401749944,
+            -0.021606689919688872,
+            0.6100194963385001
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 4475,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/final_wrist.jpg",
+      "source_sha256": "b7363874dc64cb4e6fd005e06d0ba5f89545bfaae295cc253705a121147935fc",
+      "context_crop_xyxy": [
+        210,
+        0,
+        770,
+        560
+      ],
+      "panel": "c",
+      "title": "Release",
+      "caption": "Gripper withdrawn; terminal checks pass in the log.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "195.00 s",
+      "detail_label": "Released support",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            480.08872203179254,
+            205.37336169893734
+          ],
+          [
+            480.4126926248488,
+            300.0405170316546
+          ],
+          [
+            594.277969011479,
+            203.6395204188804
+          ],
+          [
+            484.5772084759092,
+            262.16215194655507
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            -0.0037180954868811177,
+            0.9286059685177945,
+            0.37104864425906864,
+            0.4586441374220158
+          ],
+          [
+            0.021687850702264085,
+            0.3710388447001552,
+            -0.9283639723077908,
+            0.15884174082434319
+          ],
+          [
+            -0.9997578831891681,
+            0.004595501749508367,
+            -0.02151906987032871,
+            0.604292019279146
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 4875,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "paired": [
+    {
+      "source": "docs/presentation/frames/open_failure_wrist.jpg",
+      "source_sha256": "7aaed32d094cd123d05b7a7e6c74a90cbce6c73dc14ce385b448e210ffb40a30",
+      "context_crop_xyxy": [
+        210,
+        70,
+        770,
+        630
+      ],
+      "panel": "a",
+      "title": "Open loop / seed 400",
+      "caption": "Endpoint from the failure replay; cause identified from logs.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "57.96 s",
+      "detail_label": "Insertion guard stop",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            478.05871429594623,
+            423.2035561181141
+          ],
+          [
+            479.4816002342608,
+            293.0332331534623
+          ],
+          [
+            328.3576086230251,
+            417.1794634955718
+          ],
+          [
+            467.99657503044455,
+            589.2307324905407
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.2080110483835599,
+            -0.33271378772677196,
+            -0.9198004779816533,
+            0.6514719172451733
+          ],
+          [
+            0.0690287270015298,
+            0.9430182654669018,
+            -0.32550137155924547,
+            0.09376974337725277
+          ],
+          [
+            0.9756876335750035,
+            0.004215321221231368,
+            0.2191249558410827,
+            0.6033983273859972
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1449,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__open_loop__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "b2c5a7321a474edbfd602eb534000722430166ea1a245461a278b02cd557bbbf",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/driver_done_wrist.jpg",
+      "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
+      "context_crop_xyxy": [
+        210,
+        70,
+        770,
+        630
+      ],
+      "panel": "b",
+      "title": "Iterative / seed 400",
+      "caption": "Matched seed, no disturbance; different endpoint times.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "70.00 s",
+      "detail_label": "Released placement",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            475.7317025812247,
+            272.83997449257413
+          ],
+          [
+            480.2172320163486,
+            183.5330634140087
+          ],
+          [
+            400.63875225842673,
+            247.77459582910922
+          ],
+          [
+            423.22604126254646,
+            322.72147690270987
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.21074777080458115,
+            -0.3424441852468282,
+            -0.9155967218658739,
+            0.6409111203143811
+          ],
+          [
+            0.07137000023670269,
+            0.9395235218078792,
+            -0.33496548335004867,
+            0.09661495348702745
+          ],
+          [
+            0.9749316387147928,
+            0.0052470906562102175,
+            0.2224427294216038,
+            0.5278146670469213
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1750,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "failure": [
+    {
+      "source": "docs/presentation/frames/staged_failure_wrist.jpg",
+      "source_sha256": "4a94485a0462aecd43bfd3059c581b2dbfe7d8b101622a4f8ddb9f0d690afbfc",
+      "context_crop_xyxy": [
+        210,
+        70,
+        770,
+        630
+      ],
+      "panel": "a",
+      "title": "Staged / seed 401",
+      "caption": "Gripper-closure failure before downstream insertion control.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "40.24 s",
+      "detail_label": "Pickup guard stop",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            476.6853746791155,
+            420.62908677255075
+          ],
+          [
+            477.399741344171,
+            290.7751619748396
+          ],
+          [
+            326.9652063199879,
+            417.1588312178568
+          ],
+          [
+            470.44036530718097,
+            584.2130570577211
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9810814639121616,
+            -0.1915267820503608,
+            0.02822038587372533,
+            0.3892826762143904
+          ],
+          [
+            0.19060791423503318,
+            0.9811345501584161,
+            0.03230583299515927,
+            -0.20239189636789212
+          ],
+          [
+            -0.033875505660119494,
+            -0.02631560938463795,
+            0.9990796472100303,
+            0.42818510087183126
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1006,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__staged__none__401/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "b0d83cacfc26e08a57951fc9becb495e25ad77f39d7cb1527f3abb71e1474559",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/iter_failure_wrist.jpg",
+      "source_sha256": "aeb8308cace5d155d5eb5107b73eac5fda1054bd80a282fee893aea08b9b2a57",
+      "context_crop_xyxy": [
+        210,
+        70,
+        770,
+        630
+      ],
+      "panel": "b",
+      "title": "Iterative / seed 401",
+      "caption": "Matched seed and stage; retained in whole-task statistics.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "40.24 s",
+      "detail_label": "Same failure stage",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            476.6853746791155,
+            420.62908677255075
+          ],
+          [
+            477.399741344171,
+            290.7751619748396
+          ],
+          [
+            326.9652063199879,
+            417.1588312178568
+          ],
+          [
+            470.44036530718097,
+            584.2130570577211
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9810814639121616,
+            -0.1915267820503608,
+            0.02822038587372533,
+            0.3892826762143904
+          ],
+          [
+            0.19060791423503318,
+            0.9811345501584161,
+            0.03230583299515927,
+            -0.20239189636789212
+          ],
+          [
+            -0.033875505660119494,
+            -0.02631560938463795,
+            0.9990796472100303,
+            0.42818510087183126
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1006,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__401/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "b0d83cacfc26e08a57951fc9becb495e25ad77f39d7cb1527f3abb71e1474559",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "correction": [
+    {
+      "source": "docs/presentation/frames/pulse_before.jpg",
+      "source_sha256": "9f51366950db23b0026bf5e3cd36ca0d85c0ef801ebfd6837d0bbb378b91efe0",
+      "context_crop_xyxy": [
+        210,
+        0,
+        770,
+        560
+      ],
+      "panel": "a",
+      "title": "Before correction",
+      "caption": "Logged pose residual; separate perturbed integration run.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "171.64 s",
+      "detail_label": "Visual residual: 1.60\u00b0",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            480.53908585078966,
+            314.6993420060417
+          ],
+          [
+            480.54274383535784,
+            435.9395262758521
+          ],
+          [
+            660.7883918419037,
+            312.4426692886033
+          ],
+          [
+            486.7391429598611,
+            474.60087025296457
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            -0.012280846399136692,
+            0.9249647937011937,
+            0.37985438052220427,
+            0.4841647151327285
+          ],
+          [
+            0.01970319591719662,
+            0.380033089559792,
+            -0.9247631128888418,
+            0.0888232697024481
+          ],
+          [
+            -0.9997304698455852,
+            -0.003872528287937605,
+            -0.022891932212954953,
+            0.6098108676855578
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 4291,
+        "trajectory": "docs/results/calibrated-workshop-v1/trials/complete__iterative__alignment_impulse__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "384845d875ed7fcc6d9213d6d519e2d26d0501a8f8970ffd04adfa7cbf5f561f",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/pulse_after.jpg",
+      "source_sha256": "ddf72f979fff9eed1506648f0d3f72eb58c2b47f03b9c50c990c6f2a1cc56e49",
+      "context_crop_xyxy": [
+        210,
+        0,
+        770,
+        560
+      ],
+      "panel": "b",
+      "title": "After reobservation",
+      "caption": "One logged correction. Images alone do not measure angular error.",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "172.76 s",
+      "detail_label": "Visual residual: 0.74\u00b0",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            479.96340060296563,
+            314.83543579278916
+          ],
+          [
+            480.3255857524371,
+            435.66887531097507
+          ],
+          [
+            660.0291272395434,
+            312.000207041356
+          ],
+          [
+            486.7091434583358,
+            475.2290799404142
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            -0.006600308158110123,
+            0.9302679350765851,
+            0.3668216129043408,
+            0.4841868059590405
+          ],
+          [
+            0.024992036827653257,
+            0.36686847296073366,
+            -0.9299371278430268,
+            0.08833489421319286
+          ],
+          [
+            -0.9996658295086861,
+            0.0030297444701179376,
+            -0.025670789726326203,
+            0.6089955950764381
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 4319,
+        "trajectory": "docs/results/calibrated-workshop-v1/trials/complete__iterative__alignment_impulse__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "384845d875ed7fcc6d9213d6d519e2d26d0501a8f8970ffd04adfa7cbf5f561f",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "background": [
+    {
+      "source": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+      "source_sha256": "c4d0a909d0cea8177d39c09da57f80ba51b3ccd5f261b46adc3e5d0a41d1bc2b",
+      "crop_xyxy": [
+        200,
+        100,
+        1100,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": [
+        425,
+        420,
+        90,
+        75
+      ],
+      "panel": "a",
+      "title": "Target-absent scene",
+      "caption": "Separate background-mismatch diagnosis",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+      "source_sha256": "c4d0a909d0cea8177d39c09da57f80ba51b3ccd5f261b46adc3e5d0a41d1bc2b",
+      "crop_xyxy": [
+        580,
+        470,
+        760,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Magnified false-positive region",
+      "caption": "Red pixels: predicted foreground without target",
+      "contrast_or_color_change": false
+    }
+  ],
+  "pose": [
+    {
+      "source": "docs/presentation/frames/driver_align_wrist.jpg",
+      "source_sha256": "4d4b1e6e2ce27413c139573a89a944ee4e876a79b45d7e7cb7ce911262980e99",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "a",
+      "title": "Screwdriver pose",
+      "caption": "",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "54.40 s",
+      "detail_label": "Estimated object frame",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            473.6660510316914,
+            417.03577229212294
+          ],
+          [
+            480.7005124441234,
+            302.29051343850455
+          ],
+          [
+            361.6947086490487,
+            364.3358110941381
+          ],
+          [
+            382.5816757534774,
+            548.808112539866
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.21203615204116247,
+            -0.34048338986100296,
+            -0.9160304458578556,
+            0.6483770885810475
+          ],
+          [
+            0.07145837464842486,
+            0.9402363059999811,
+            -0.33293980610539464,
+            0.09928584443359911
+          ],
+          [
+            0.9746457151886215,
+            0.005137370556683291,
+            0.2236942889305447,
+            0.5834930649222179
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "screwdriver",
+        "snapshot_index": 1360,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    },
+    {
+      "source": "docs/presentation/frames/regrasp_lift_wrist.jpg",
+      "source_sha256": "6caa297d76ea2015cc4951b0841ca780a357f26798df23c3cb15d62a06bfe163",
+      "context_crop_xyxy": [
+        250,
+        80,
+        750,
+        580
+      ],
+      "panel": "b",
+      "title": "Spanner pose after regrasp",
+      "caption": "",
+      "annotation": "Enlarged task-region crop; XYZ reprojected from archived estimated pose, 60 mm axes",
+      "contrast_or_color_change": false,
+      "time": "158.20 s",
+      "detail_label": "Estimated object frame",
+      "pose_overlay": {
+        "pixels_origin_xyz": [
+          [
+            479.5004542411097,
+            326.9092236913478
+          ],
+          [
+            479.5003765810808,
+            444.92979709610074
+          ],
+          [
+            663.7567246947366,
+            326.90923086028516
+          ],
+          [
+            479.50065855702366,
+            500.67212592849114
+          ]
+        ],
+        "axis_length_m": 0.06,
+        "estimated_pose": [
+          [
+            0.9999951971593816,
+            0.0030320265895327093,
+            -0.0006422405539658045,
+            0.34500397474908373
+          ],
+          [
+            -0.0030182304645904063,
+            0.999785480303382,
+            0.020491062915268535,
+            0.015488328647070343
+          ],
+          [
+            0.000704232228323894,
+            -0.020489026069953682,
+            0.99978982984809,
+            0.5830956800793011
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "object_id": "spanner",
+        "snapshot_index": 3955,
+        "trajectory": "docs/results/visual-feedback-calibrated-v1/replay_inputs/complete__iterative__none__400/motion/trajectory_evaluation_only.npz",
+        "trajectory_sha256": "e85a5c1c451e37a12579eb448aa3afa2908c4c2fb6a43443543f256a4a411419",
+        "projection": "Recorded estimated world pose; replay camera transform for visualization only; original crop y-offset 56 px",
+        "camera": "wrist_camera"
+      }
+    }
+  ],
+  "processing_observation": [
+    {
+      "source": "docs/presentation/pipeline_source/rgb.png",
+      "source_sha256": "6399f2c7853cd8889c74551c274f955800e21f13a1854cf04960aecb02b3f392",
+      "caption": "See pipeline_source/manifest.json for capture and transformation provenance"
+    },
+    {
+      "source": "docs/presentation/pipeline_source/depth.npy",
+      "source_sha256": "a7482c3637175671a522fe768ba1a0d9cc99b1f012f276007dc086bf71ab3dca",
+      "caption": "See pipeline_source/manifest.json for capture and transformation provenance"
+    },
+    {
+      "source": "docs/presentation/pipeline_source/mask.png",
+      "source_sha256": "00a46d07c9a7a8c6d333f763d7791680f5dc2579d235cc0c17a17393eb3f5625",
+      "caption": "See pipeline_source/manifest.json for capture and transformation provenance"
+    }
+  ],
+  "processing_pose": [
+    {
+      "source": "docs/presentation/pipeline_source/reference_surface.png",
+      "source_sha256": "0661f70edaf48f3724fdfe9455d83a777c976ba03ae1b11765129fb6d50f7129",
+      "caption": "See pipeline_source/manifest.json for capture and transformation provenance"
+    },
+    {
+      "source": "docs/presentation/pipeline_source/pose_result.json",
+      "source_sha256": "ac3e77b93e44bfcbf612df70814682f27904af78dd90f14b4a473cf405c6e39a",
+      "caption": "See pipeline_source/manifest.json for capture and transformation provenance"
+    },
+    {
+      "source": "docs/presentation/frames/final_wrist.jpg",
+      "source_sha256": "b7363874dc64cb4e6fd005e06d0ba5f89545bfaae295cc253705a121147935fc",
+      "caption": "Later outcome, same trial"
+    }
+  ]
+}

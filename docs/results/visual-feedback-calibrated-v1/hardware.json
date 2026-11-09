@@ -1,0 +1,26 @@
+{
+  "cpu": "Intel(R) Core(TM) i7-10700TE CPU @ 2.00GHz",
+  "logical_cpus": 16,
+  "memory": "MemTotal:       65691692 kB",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "python": "3.11.14 (main, Dec  9 2025, 19:02:23) [Clang 21.1.4 ]",
+  "parallel_trials": 8,
+  "gpu_inference": "single shared worker",
+  "timing_context": "shared GPU and concurrent CPU simulation; not exclusive-device latency",
+  "trial_timeout_seconds": 2400,
+  "invocation": [
+    ".venv/bin/python",
+    "scripts/run_benchmark.py",
+    "--config",
+    "configs/visual_feedback_calibrated_48.json",
+    "--jobs",
+    "8",
+    "--timeout",
+    "2400",
+    "--foundationpose-python",
+    "/home/arm-pc/miniconda3/envs/any6d/bin/python",
+    "--output",
+    "artifacts/visual_feedback_calibrated_48"
+  ],
+  "gpu": "NVIDIA RTX 2000 Ada Generation, 16380 MiB, 580.178.04"
+}

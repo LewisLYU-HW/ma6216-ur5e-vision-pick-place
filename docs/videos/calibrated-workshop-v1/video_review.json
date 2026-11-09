@@ -1,0 +1,45 @@
+{
+  "video": "overview-wrist.mp4",
+  "sha256": "53c876da4e8694e2141ebad0887cf355494416f5c035c6f71fd0f306909d5c03",
+  "review_scope": "Sampled visual review, not frame-by-frame observation of the entire video; separate full decode and physics audits are linked below.",
+  "contact_sheet_video_seconds": [
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190
+  ],
+  "additional_video_seconds": [
+    172.5,
+    173.0,
+    196.0
+  ],
+  "observations": [
+    "All four task phases are visible in the sampled overview and wrist frames.",
+    "At video time 172.5 s (simulation 174.5 s), the wrist view shows spanner alignment with VISION residual 0.28 mm / 0.97 deg, observation 2. These are estimated residuals, not ground-truth errors.",
+    "The final sampled frame shows the released tools and withdrawn gripper."
+  ],
+  "decode_validation": "manifest.json",
+  "independent_physics_audit": "../../results/calibrated-workshop-v1/hero_motion_audit.json",
+  "local_review_images": {
+    "artifacts/calibrated_workshop_v2_video_review/contact_sheet.jpg": "385e6cf0e63ba0dc280c993369d111d88f3c0cb624d994f6067326e53a980507",
+    "artifacts/calibrated_workshop_v2_video_review/feedback.png": "915f54173f29accf61a3a367837692f41fb2d881e9fb7cbd9ba19eeaa2cf481f",
+    "artifacts/calibrated_workshop_v2_video_review/loop.png": "1d81897206fd791c4ad72f434eb4cc6a497ec2289961f78cd2017865b3d2fa3b",
+    "artifacts/calibrated_workshop_v2_video_review/final.png": "69a439f076755e2a6a6d5e03526af51462ea16f7d83f4a23c51d1a6a3a883f1a"
+  }
+}
