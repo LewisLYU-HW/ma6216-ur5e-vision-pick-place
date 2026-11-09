@@ -1,4 +1,4 @@
-# Academic research presentation — English
+# Compact academic research presentation — English
 
 ![Selected pages from the academic presentation](preview.jpg)
 
@@ -11,11 +11,11 @@
 - [Course evidence map](../FINAL_PROJECT.md) · [Literature review](../LITERATURE_AND_SELECTION.md)
 - [Complete quantitative report](../results/visual-feedback-calibrated-v1/README.md) · [Original videos](../videos/visual-feedback-calibrated-v1/README.md)
 
-This academic revision replaces the previous files at the same paths. It contains **22 English slides: 21 main slides and one reference appendix**, designed for approximately 12–15 minutes. All slides retain real simulation or calibration imagery. There are 48 runtime/calibration panel placements and one statistical chart.
+This academic revision replaces the previous files at the same paths. It contains **16 English slides: 15 main slides and one reference appendix**, designed for approximately 12–15 minutes. Fourteen slides contain real simulation or calibration imagery, with 38 runtime/calibration panel placements and one statistical chart. Titles are 21 pt; body text and captions are mainly 12–16 pt. Large takeaway banners have been removed. Related operation sequences and paired controls share pages, accompanied by concise technical tables and captions.
 
-The argument follows the research question, technical selection, calibrated observation-to-control method, physical operation evidence, paired experimental design, quantitative results, failure analysis and limitations. Coordinate transforms and pose residuals use editable equation text; the architecture is composed of editable PowerPoint shapes. Detailed interpretation is in the English notes.
+The argument follows the research question, technical selection, calibrated observation-to-control method, physical operation evidence, paired experimental design, quantitative results, failure analysis and limitations. Coordinate transforms and pose residuals use editable equation text; the architecture is composed of editable PowerPoint shapes. Detailed interpretation is in the English notes. [content.json](content.json) retains the source narrative used by the compact-deck builder.
 
-Twelve processed image plates use consistent cropping, matched temporal views, lowercase panel identifiers, explanatory region outlines and a magnified false-positive region. Original frames and outcomes are unchanged. Each plate is supplied as PNG plus editable-text PDF/SVG with a crop/source manifest and rendered quality checks. The PNGs are embedded in PowerPoint; text within a plate is edited through its source SVG or plotting script, while slide titles, equations and explanatory text are native PowerPoint objects.
+The source package retains twelve processed image plates with consistent cropping, matched temporal views, lowercase panel identifiers, explanatory region outlines and a magnified false-positive region. Original frames and outcomes are unchanged. Each plate is supplied as PNG plus editable-text PDF/SVG with a crop/source manifest and rendered quality checks. The PNGs are embedded in PowerPoint; text within a plate is edited through its source SVG or plotting script, while slide titles, equations and explanatory text are native PowerPoint objects.
 
 The main manipulation plates follow iterative/no-disturbance seed 400. Qualitative controls show the matched open-loop failure in seed 400 and both staged/iterative pickup failures in seed 401. The correction example is a **separate integration run**; the background diagnosis is a **separate localization experiment**. Neither changes the denominator of the final 48 attempts. The result does not establish architectural superiority, equivalence or real-robot reliability.
 
