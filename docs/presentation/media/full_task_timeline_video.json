@@ -4,55 +4,56 @@
   "timeline_source": "docs/presentation/media/full_task_timeline.json",
   "timeline_sha256": "799b851d18e3c0a3f782f8e1169e82ce78ef3f1d8e6c95553724cb62c632f3b5",
   "output": "docs/presentation/media/complete_task_with_timeline.mp4",
-  "output_sha256": "17c771cf56895c7dc896cd7f6fe1cf44d1b7774b0c6e64d90e1728b0ad4eda82",
-  "duration_s": 195.88,
+  "output_sha256": "f17b7c36ee37609c12e94cafc393e6d1390a955c36f3f72a9d8311ca7f408c94",
+  "duration_s": 39.16,
+  "playback_speed": 5.0,
   "fps": 25,
-  "frame_count": 4897,
+  "frame_count": 979,
   "dimensions": [
     1920,
     860
   ],
-  "transformation": "Append 140-pixel task strip; preserve original 1920x720 viewport, all frames, order and original playback speed. Re-encode only for presentation overlay.",
+  "transformation": "Append 140-pixel task strip; preserve original 1920x720 viewport and complete chronological sequence; play at 5x speed and resample to 25 fps. Chapter timestamps use presentation time; original replay is retained separately.",
   "chapters": [
     {
-      "start": 0,
+      "start": 0.0,
       "title": "Hammer return",
       "detail": "Initial observation, pickup and released tray placement",
       "basis": "Video start; park_hammer starts at 0.598 s",
-      "end": 26.37,
+      "end": 5.274,
       "first_active_frame": 0
     },
     {
-      "start": 26.37,
+      "start": 5.274,
       "title": "Moving screwdriver",
       "detail": "Moving pickup, reorientation and tilted insertion",
       "basis": "task_phase: moving_driver_insertion",
-      "end": 71.38,
-      "first_active_frame": 660
+      "end": 14.276,
+      "first_active_frame": 132
     },
     {
-      "start": 71.38,
+      "start": 14.276,
       "title": "Rack installation",
       "detail": "Independent frame pickup, seating and release",
       "basis": "task_phase: install_frame",
-      "end": 134.624,
-      "first_active_frame": 1785
+      "end": 26.924799999999998,
+      "first_active_frame": 357
     },
     {
-      "start": 134.624,
+      "start": 26.924799999999998,
       "title": "Spanner regrasp",
       "detail": "Supported placement, finger clearance and new grasp",
       "basis": "task_phase: regrasp_and_hang_spanner",
-      "end": 158.518,
-      "first_active_frame": 3366
+      "end": 31.7036,
+      "first_active_frame": 674
     },
     {
-      "start": 158.518,
+      "start": 31.7036,
       "title": "Hole-over-pin hanging",
       "detail": "Alignment, threading, release and stability check",
       "basis": "First recorded REORIENT_AND_APPROACH_RACK snapshot",
-      "end": 195.88,
-      "first_active_frame": 3963
+      "end": 39.176,
+      "first_active_frame": 793
     }
   ]
 }
