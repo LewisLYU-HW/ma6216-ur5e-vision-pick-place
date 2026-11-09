@@ -11,7 +11,7 @@
 - [Course evidence map](../FINAL_PROJECT.md) · [Literature review](../LITERATURE_AND_SELECTION.md)
 - [Complete quantitative report](../results/visual-feedback-calibrated-v1/README.md) · [Original videos](../videos/visual-feedback-calibrated-v1/README.md)
 
-This academic revision replaces the previous files at the same paths. It contains **16 English slides: 15 main slides and one reference appendix**, designed for approximately 12–15 minutes. Fourteen slides contain real simulation or calibration imagery, with 38 runtime/calibration panel placements and one statistical chart. Titles are 21 pt; body text and captions are mainly 12–16 pt. Large takeaway banners have been removed. Related operation sequences and paired controls share pages, accompanied by concise technical tables and captions.
+This academic revision replaces the previous files at the same paths. It contains **19 English slides: 18 main slides and one reference appendix**, designed for approximately 12–15 minutes. Seventeen slides contain real simulation or calibration imagery, with 40 runtime/calibration panel placements and one statistical chart. Titles are 21 pt; body text and captions are mainly 12–16 pt. Large takeaway banners have been removed. Key manipulation and control-comparison figures occupy dedicated pages, with linked context/detail views.
 
 The argument follows the research question, technical selection, calibrated observation-to-control method, physical operation evidence, paired experimental design, quantitative results, failure analysis and limitations. Coordinate transforms and pose residuals use editable equation text; the architecture is composed of editable PowerPoint shapes. Detailed interpretation is in the English notes. [content.json](content.json) retains the source narrative used by the compact-deck builder.
 
@@ -24,9 +24,12 @@ No image-generative enhancement, scene retouching, contrast adjustment or invent
 ```bash
 python3 scripts/extract_presentation_frames.py
 python3 scripts/build_presentation_plates.py --qa-tools /path/to/nature-figure/scripts
+python3 scripts/refine_presentation_evidence.py --qa-tools /path/to/nature-figure/scripts
 python3 scripts/build_project_presentation.py \
   --results docs/results/visual-feedback-calibrated-v1 \
   --output artifacts/presentation_rebuilt
 ```
 
 Rebuilding requires ffmpeg, Pillow, matplotlib and python-pptx; figure alignment uses the supplied skill audit interface. LibreOffice exports the PDF. The final files are included for immediate use without rebuilding. Add actual group names and course identifiers if required by the class.
+
+Figure-design sources and inspected paper figures: [design references](FIGURE_DESIGN_REFERENCES.md). Six evidence composites now include matched source-pixel insets, correspondence leaders and explicit visible-versus-logged interpretations.

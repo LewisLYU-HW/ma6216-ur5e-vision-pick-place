@@ -101,33 +101,40 @@ def build(results,out):
     text(s,'Cap: 4 mm / 2° per step\nConverged: two observations within\n1.5 mm / 1.5°\nDiscrete precontact control; no stability proof.',8.3,4.91,4.45,1.3,14)
     caption(s,'Correction images: separate perturbed integration run, one logged correction; 1.60° → 0.74° are visual residuals, not true geometric errors.',6.63)
 
+    s=slide('Visual correction: matched detail views before and after action',[15],'Separate integration diagnosis')
+    plate(s,'correction',.4,1.08,12.4,5.3)
+    caption(s,'One logged correction in a separate perturbed run. 1.60° and 0.74° are estimated angular residuals, not ground-truth errors.',6.65)
+
     s=slide('Experimental design and metric definitions',[9,18],'Evaluation protocol')
     table(s,['Factor','Levels / unit','Control'],[['Feedback','Open loop / staged / iterative','Same pose estimator and camera calibration'],['Disturbance','None / alignment force–torque pulse','Delivery logged; early failures retained'],['Randomization','8 seeds per cell; 48 attempts','Initial states paired within seed'],['Primary outcome','All four final physical checks','Geometry + support + release + stability']],.55,1.2,12.2,2.5,14)
     image(s,frames/'initial_overview.jpg',.65,4.05,4.1,2.7)
     heading(s,'Statistical reporting',5.15,4.15)
     text(s,'Success: Wilson 95% confidence intervals.\nPaired comparisons: exact tests with Holm adjustment.\nContinuous metrics: trial-level summaries and bootstrap intervals.\nSeeds 400–407 are reused: paired replication, not a new holdout.\nNo task failures are removed or pooled with historical studies.',5.15,4.62,7.5,2.0,15)
 
-    s=slide('Execution evidence I: tool return and tilted insertion',[10,11],'Representative successful run')
-    sequence(s,['hammer_lift_overview','hammer_released_overview'],['Lift / 13.60 s','Released placement / 25.00 s'],1.12)
-    text(s,'a–b  Hammer: held transport → released tray placement. Support and stability determine acceptance.',.65,3.45,12,.36,13)
-    sequence(s,['driver_orient_wrist','driver_insert_wrist','driver_done_wrist'],['Reorientation / 50.00 s','Insertion / 60.00 s','Released / 70.00 s'],3.94)
-    caption(s,'a–c  Screwdriver: reorientation → guarded insertion → released placement. Initial moving-target acquisition precedes these frames.',6.57)
+    s=slide('Execution evidence: hammer return and rack installation',[10,12],'Representative successful run')
+    plate(s,'hammer',.4,1.08,12.4,2.5)
+    plate(s,'rack',.4,3.78,12.4,2.5)
+    caption(s,'Continuous run: hammer release precedes independent rack installation. Time labels refer to the original replay.',6.65)
 
-    s=slide('Execution evidence II: rack installation and physical regrasp',[12,13],'Representative successful run')
-    sequence(s,['rack_lift_overview','rack_insert_wrist','rack_done_overview'],['Frame pickup / 91.00 s','Seating / 112.00 s','Released fixture / 134.40 s'],1.12)
-    text(s,'a–c  Rack: independent frame → seating → released fixture; relocalize before the next operation.',.65,3.45,12,.36,13)
-    sequence(s,['regrasp_place_wrist','regrasp_clear_wrist','regrasp_lift_wrist'],['Supported / 147.00 s','Finger clearance / 150.40 s','New grasp / 158.20 s'],3.94)
-    caption(s,'a–c  Spanner: supported placement → finger clearance → new grasp after observation. One continuous original trajectory.',6.57)
+    s=slide('Tilted insertion: orientation, contact and released placement',[11],'Representative successful run')
+    plate(s,'insertion',.4,1.08,12.4,5.3)
+    caption(s,'Connected insets show identical pixel windows. Contact is partly occluded; physical acceptance comes from the recorded checks.',6.65)
 
-    s=slide('Hole-over-pin placement and terminal acceptance',[14],'Representative successful run')
-    plate(s,'hanging',.4,1.08,12.4,4.2)
-    table(s,['Visual relationship','Controller / physical evidence','Interpretation'],[['Visual alignment','Thread → seat → release','Explanatory ROI outlines'],['Final support','Four terminal checks passed','Single feasible trajectory'],['Passive stability','30 s stable after release','Separate diagnostic']],.55,5.45,12.2,1.35,13)
+    s=slide('Physical regrasp: support, clearance and grasp reacquisition',[13],'Representative successful run')
+    plate(s,'regrasp',.4,1.08,12.4,5.3)
+    caption(s,'One continuous trajectory. Amber regions identify the grasp interface; new pose observation precedes reacquisition.',6.65)
 
-    s=slide('Paired qualitative comparison and failure boundary',[16,17],'Controlled examples')
-    sequence(s,['open_failure_wrist','driver_done_wrist'],['Open loop / guard stop / 57.96 s','Iterative / released / 70.00 s'],1.12)
-    text(s,'Seed 400, no disturbance: open-loop insertion guard stop vs iterative released placement. Different endpoint times.',.65,3.46,12,.38,13)
-    sequence(s,['staged_failure_wrist','iter_failure_wrist'],['Staged / pickup stop / 40.24 s','Iterative / pickup stop / 40.24 s'],3.94)
-    caption(s,'Seed 401: both staged and iterative modes stop at gripper closure. Contact causes come from logs, not visual inference.',6.57)
+    s=slide('Hole-over-pin placement: local geometry and final support',[14],'Representative successful run')
+    plate(s,'hanging',.4,1.08,12.4,5.3)
+    caption(s,'Four terminal checks passed. Separate passive-stability audit: 30 s. The insets explain geometry, not measured contact forces.',6.65)
+
+    s=slide('Matched-seed comparison: insertion stop versus released placement',[16],'Controlled examples')
+    plate(s,'paired',.4,1.08,12.4,5.3)
+    caption(s,'Seed 400, no disturbance; endpoint times differ. A selected paired example does not establish statistical superiority.',6.65)
+
+    s=slide('Shared failure boundary: gripper closure before insertion',[17],'Controlled examples')
+    plate(s,'failure',.4,1.08,12.4,5.3)
+    caption(s,'Seed 401: both modes stop at gripper closure. Stage and guard attribution are from logs; all failed attempts remain in the analysis.',6.65)
 
     s=slide('Whole-sequence results and statistical uncertainty',[18],'Quantitative results')
     image(s,results/'figures/success_rates.png',.45,1.15,8.0,4.05)
@@ -162,8 +169,8 @@ def build(results,out):
 
     prs.save(out/'vision_guided_manipulation.pptx')
     (out/'slides.json').write_text(json.dumps(notes,indent=2)+'\n')
-    (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n15 main slides + 1 reference appendix. Target: approximately 12–15 minutes.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
-    meta={'revision':'Compact academic layout; no takeaway banners','slides':16,'main_slides':15,'appendix_slides':1,'language':'English','title_font_pt':21,'body_font_pt_range':[12,16],'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
+    (out/'speaker_notes.md').write_text('# English speaker notes — compact academic version\n\n18 main slides + 1 reference appendix. Target: approximately 15 minutes.\n\n'+'\n\n'.join(f"## {n['slide']}. {n['title']}\n\n{n['notes']}\n\nSource: {n['source']}" for n in notes)+'\n')
+    meta={'revision':'Academic context/detail composites; matched crops and traceable annotations','slides':len(prs.slides),'main_slides':len(prs.slides)-1,'appendix_slides':1,'language':'English','title_font_pt':21,'body_font_pt_range':[12,16],'results':str(results.relative_to(ROOT)),'summary_sha256':sha(results/'summary.json'),'image_assets_sha256':assets,'image_plate_manifest_sha256':sha(plates/'manifest.json'),'content_source':'content.json','content_sha256':sha(ROOT/'docs/presentation/content.json'),'slides_with_runtime_or_calibration_images':sum(any('/figures/' not in p for p in n['images']) for n in notes),'statistical_chart_placements':1,'runtime_image_panel_placements':sum(len(pm[Path(p).stem]) if '/plates/' in p else int('/figures/' not in p) for n in notes for p in n['images'])}
     (out/'provenance.json').write_text(json.dumps(meta,indent=2)+'\n');print({k:meta[k] for k in ['slides','runtime_image_panel_placements','slides_with_runtime_or_calibration_images']})
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--results',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();build(a.results.resolve(),a.output.resolve())

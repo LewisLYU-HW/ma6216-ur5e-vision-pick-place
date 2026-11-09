@@ -151,47 +151,71 @@
     {
       "source": "docs/presentation/frames/driver_orient_wrist.jpg",
       "source_sha256": "85bdb60c43148701261075fbdd3d950969098af57de4e1a34536bccb32eb7e51",
-      "crop_xyxy": [
-        200,
-        100,
-        800,
-        620
+      "context_crop_xyxy": [
+        150,
+        0,
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        320,
+        170,
+        640,
+        490
+      ],
       "panel": "a",
-      "title": "Reorientation",
-      "caption": "t = 50.00 s",
-      "contrast_or_color_change": false
+      "title": "Reorient",
+      "caption": "Wrist view during orientation change.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "50.00 s",
+      "detail_label": "Tool / gripper"
     },
     {
       "source": "docs/presentation/frames/driver_insert_wrist.jpg",
       "source_sha256": "88e74e1ad408b086ddc9c8c6c03adf231d7e6e9a0e08d411ffc663dae7b2d8ee",
-      "crop_xyxy": [
-        200,
-        100,
-        800,
-        620
+      "context_crop_xyxy": [
+        150,
+        0,
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        320,
+        170,
+        640,
+        490
+      ],
       "panel": "b",
-      "title": "Guarded insertion",
-      "caption": "t = 60.00 s",
-      "contrast_or_color_change": false
+      "title": "Insert",
+      "caption": "Socket contact is partly occluded by the gripper.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "60.00 s",
+      "detail_label": "Insertion region"
     },
     {
       "source": "docs/presentation/frames/driver_done_wrist.jpg",
       "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
-      "crop_xyxy": [
-        200,
-        100,
-        800,
-        620
+      "context_crop_xyxy": [
+        150,
+        0,
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        320,
+        170,
+        640,
+        490
+      ],
       "panel": "c",
-      "title": "Released placement",
-      "caption": "t = 70.00 s",
-      "contrast_or_color_change": false
+      "title": "Release",
+      "caption": "Released placement; acceptance is checked in the log.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "70.00 s",
+      "detail_label": "Placed tool"
     }
   ],
   "rack": [
@@ -245,205 +269,286 @@
     {
       "source": "docs/presentation/frames/regrasp_place_wrist.jpg",
       "source_sha256": "99daab6319e9246174bede2a7d7ce75e61c56e8f4cd25e92699b6a9cec1c6f7e",
-      "crop_xyxy": [
-        180,
+      "context_crop_xyxy": [
+        150,
         0,
-        820,
+        810,
         600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        325,
+        230,
+        635,
+        530
+      ],
       "panel": "a",
-      "title": "Supported placement",
-      "caption": "t = 147.00 s",
-      "contrast_or_color_change": false
+      "title": "Place on support",
+      "caption": "Supported tool before opening the fingers.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "147.00 s",
+      "detail_label": "Original grasp"
     },
     {
       "source": "docs/presentation/frames/regrasp_clear_wrist.jpg",
       "source_sha256": "019965a142ec418d0352d8db43ffe39d85cfe929bb2a3fbd7dfcf4d93dd28afa",
-      "crop_xyxy": [
-        180,
+      "context_crop_xyxy": [
+        150,
         0,
-        820,
+        810,
         600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        325,
+        230,
+        635,
+        530
+      ],
       "panel": "b",
-      "title": "Complete finger clearance",
-      "caption": "t = 150.40 s",
-      "contrast_or_color_change": false
+      "title": "Clear fingers",
+      "caption": "Tool remains on support while the fingers withdraw.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "150.40 s",
+      "detail_label": "Open clearance"
     },
     {
       "source": "docs/presentation/frames/regrasp_lift_wrist.jpg",
       "source_sha256": "6caa297d76ea2015cc4951b0841ca780a357f26798df23c3cb15d62a06bfe163",
-      "crop_xyxy": [
-        180,
+      "context_crop_xyxy": [
+        150,
         0,
-        820,
+        810,
         600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        325,
+        230,
+        635,
+        530
+      ],
       "panel": "c",
-      "title": "New grasp after observation",
-      "caption": "t = 158.20 s",
-      "contrast_or_color_change": false
+      "title": "Acquire new grasp",
+      "caption": "Reobservation precedes the new grasp and lift.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "158.20 s",
+      "detail_label": "New grasp region"
     }
   ],
   "hanging": [
     {
       "source": "docs/presentation/frames/hang_align_wrist.jpg",
       "source_sha256": "5fa65bf4198dc476baf79ed900b27c7c8c0c1c4027f841bc3bab1412a51a74b1",
-      "crop_xyxy": [
-        260,
+      "context_crop_xyxy": [
+        150,
         0,
-        730,
-        560
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": [
-        120,
-        30,
-        230,
-        200
+      "detail_crop_xyxy": [
+        350,
+        0,
+        610,
+        250
       ],
       "panel": "a",
-      "title": "Precontact alignment",
-      "caption": "t = 171.00 s",
-      "contrast_or_color_change": false
+      "title": "Align",
+      "caption": "Precontact view; the hole and pin are visible.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "171.00 s",
+      "detail_label": "Ring / pin interface"
     },
     {
       "source": "docs/presentation/frames/hang_thread_wrist.jpg",
       "source_sha256": "05a3d669af735db98ad74b3b5ed847dc75913b0de376a4682b67ac8f5958e8b3",
-      "crop_xyxy": [
-        260,
+      "context_crop_xyxy": [
+        150,
         0,
-        730,
-        560
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": [
-        120,
-        30,
-        230,
-        200
+      "detail_crop_xyxy": [
+        350,
+        0,
+        610,
+        250
       ],
       "panel": "b",
-      "title": "Hole-over-pin threading",
-      "caption": "t = 179.00 s",
-      "contrast_or_color_change": false
+      "title": "Thread",
+      "caption": "The enlarged view exposes the local relationship.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "179.00 s",
+      "detail_label": "Pin inside ring"
     },
     {
       "source": "docs/presentation/frames/final_wrist.jpg",
       "source_sha256": "b7363874dc64cb4e6fd005e06d0ba5f89545bfaae295cc253705a121147935fc",
-      "crop_xyxy": [
-        260,
+      "context_crop_xyxy": [
+        150,
         0,
-        730,
-        560
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": [
-        120,
-        30,
-        230,
-        200
+      "detail_crop_xyxy": [
+        350,
+        0,
+        610,
+        250
       ],
       "panel": "c",
-      "title": "Released hanging state",
-      "caption": "t = 195.00 s",
-      "contrast_or_color_change": false
+      "title": "Release",
+      "caption": "Gripper withdrawn; terminal checks pass in the log.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "195.00 s",
+      "detail_label": "Released support"
     }
   ],
   "paired": [
     {
       "source": "docs/presentation/frames/open_failure_wrist.jpg",
       "source_sha256": "7aaed32d094cd123d05b7a7e6c74a90cbce6c73dc14ce385b448e210ffb40a30",
-      "crop_xyxy": [
-        180,
-        90,
-        820,
-        620
+      "context_crop_xyxy": [
+        150,
+        0,
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        310,
+        170,
+        650,
+        510
+      ],
       "panel": "a",
-      "title": "Open loop: guard stop",
-      "caption": "Seed 400 | t = 57.96 s",
-      "contrast_or_color_change": false
+      "title": "Open loop / seed 400",
+      "caption": "Endpoint from the failure replay; cause identified from logs.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "57.96 s",
+      "detail_label": "Insertion guard stop"
     },
     {
       "source": "docs/presentation/frames/driver_done_wrist.jpg",
       "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
-      "crop_xyxy": [
-        180,
-        90,
-        820,
-        620
+      "context_crop_xyxy": [
+        150,
+        0,
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        310,
+        170,
+        650,
+        510
+      ],
       "panel": "b",
-      "title": "Iterative: released driver",
-      "caption": "Seed 400 | t = 70.00 s",
-      "contrast_or_color_change": false
+      "title": "Iterative / seed 400",
+      "caption": "Matched seed, no disturbance; different endpoint times.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "70.00 s",
+      "detail_label": "Released placement"
     }
   ],
   "failure": [
     {
       "source": "docs/presentation/frames/staged_failure_wrist.jpg",
       "source_sha256": "4a94485a0462aecd43bfd3059c581b2dbfe7d8b101622a4f8ddb9f0d690afbfc",
-      "crop_xyxy": [
-        120,
+      "context_crop_xyxy": [
+        150,
         0,
-        850,
-        620
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        310,
+        170,
+        650,
+        510
+      ],
       "panel": "a",
-      "title": "Staged feedback",
-      "caption": "Seed 401 | contact guard at gripper closure",
-      "contrast_or_color_change": false
+      "title": "Staged / seed 401",
+      "caption": "Gripper-closure failure before downstream insertion control.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "40.24 s",
+      "detail_label": "Pickup guard stop"
     },
     {
       "source": "docs/presentation/frames/iter_failure_wrist.jpg",
       "source_sha256": "aeb8308cace5d155d5eb5107b73eac5fda1054bd80a282fee893aea08b9b2a57",
-      "crop_xyxy": [
-        120,
+      "context_crop_xyxy": [
+        150,
         0,
-        850,
-        620
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        310,
+        170,
+        650,
+        510
+      ],
       "panel": "b",
-      "title": "Iterative feedback",
-      "caption": "Seed 401 | same early failure stage",
-      "contrast_or_color_change": false
+      "title": "Iterative / seed 401",
+      "caption": "Matched seed and stage; retained in whole-task statistics.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "40.24 s",
+      "detail_label": "Same failure stage"
     }
   ],
   "correction": [
     {
       "source": "docs/presentation/frames/pulse_before.jpg",
       "source_sha256": "9f51366950db23b0026bf5e3cd36ca0d85c0ef801ebfd6837d0bbb378b91efe0",
-      "crop_xyxy": [
-        260,
+      "context_crop_xyxy": [
+        150,
         0,
-        730,
-        560
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        350,
+        0,
+        610,
+        250
+      ],
       "panel": "a",
-      "title": "Before corrective action",
-      "caption": "Visual angular residual: 1.60\u00b0",
-      "contrast_or_color_change": false
+      "title": "Before correction",
+      "caption": "Logged pose residual; separate perturbed integration run.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "171.64 s",
+      "detail_label": "Visual residual: 1.60\u00b0"
     },
     {
       "source": "docs/presentation/frames/pulse_after.jpg",
       "source_sha256": "ddf72f979fff9eed1506648f0d3f72eb58c2b47f03b9c50c990c6f2a1cc56e49",
-      "crop_xyxy": [
-        260,
+      "context_crop_xyxy": [
+        150,
         0,
-        730,
-        560
+        810,
+        600
       ],
-      "annotation_roi_xywh_in_crop": null,
+      "detail_crop_xyxy": [
+        350,
+        0,
+        610,
+        250
+      ],
       "panel": "b",
-      "title": "After correction and reobservation",
-      "caption": "Visual angular residual: 0.74\u00b0",
-      "contrast_or_color_change": false
+      "title": "After reobservation",
+      "caption": "One logged correction. Images alone do not measure angular error.",
+      "annotation": "Manual explanatory ROI with connected detail inset; not an estimated detection",
+      "contrast_or_color_change": false,
+      "time": "172.76 s",
+      "detail_label": "Visual residual: 0.74\u00b0"
     }
   ],
   "background": [

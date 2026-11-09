@@ -1,6 +1,6 @@
 # English speaker notes — compact academic version
 
-15 main slides + 1 reference appendix. Target: approximately 12–15 minutes.
+18 main slides + 1 reference appendix. Target: approximately 15 minutes.
 
 ## 1. Calibrated 6D vision for sequential tool manipulation
 
@@ -46,7 +46,13 @@ This example is from a separately archived calibration integration run with an a
 
 Source: Chaumette & Hutchinson, IEEE RAM 2006 | project-specific discrete pose alignment | VISUAL_FEEDBACK.md | Calibrated integration | iterative / alignment impulse / seed 400 | original log + original frames
 
-## 7. Experimental design and metric definitions
+## 7. Visual correction: matched detail views before and after action
+
+This example is from a separately archived calibration integration run with an alignment impulse. One spanner correction is logged. The estimated angular residual decreases from 1.60 to 0.74 degrees; those numbers come from original visual observations, not measurements drawn on the images. The visual change is small, so the figure should not be used to estimate a geometric displacement. This run is not an additional attempt in the final forty-eight-trial comparison.
+
+Source: Calibrated integration | iterative / alignment impulse / seed 400 | original log + original frames
+
+## 8. Experimental design and metric definitions
 
 The experiment uses three feedback modes, two disturbance conditions and eight seeds per cell: forty-eight complete attempts. Initial physical states are paired by seed. Estimated wrist calibration, pose estimator, control thresholds and physical acceptance remain fixed. The seeds were used previously, making this a paired replication rather than a fresh holdout. Failures before alignment or disturbance delivery stay in the denominator. We report Wilson success intervals, trial-level bootstrap intervals, paired exact tests and Holm correction.
 
@@ -54,49 +60,57 @@ The complete-sequence success rates are low, and uncertainty is wide. Open-loop 
 
 Source: Final calibrated evaluation | 48 paired attempts | original simulation evidence | n = 8 per mode × condition | Wilson 95% confidence intervals | exact paired tests with Holm correction
 
-## 8. Execution evidence I: tool return and tilted insertion
+## 9. Execution evidence: hammer return and rack installation
 
 The hammer operation clears tool access before the feed operation. These matched crops show a held tool and the released tray state from the same continuous run. Image-estimated object pose determines the target; checked motion and joint control execute it. Support, geometry and stability determine acceptance. Hammer approach planning failures are retained in the full comparison, rather than treating only reached placements as attempted trials.
+
+The independent frame is picked up and physically seated on its base. Because seating can change the fixture pose, the rack is checked and observed again before the spanner approaches it. The three panels have complementary roles: initial independent object, contact-mediated installation, and released assembled fixture. All prior tools remain in the same scene. The fixture observation is part of the staged and iterative control modes.
+
+Source: Representative original run | iterative / no disturbance / seed 400 | playback time
+
+## 10. Tilted insertion: orientation, contact and released placement
 
 The screwdriver is first localized on a moving feed and intercepted using prediction. The image sequence begins after acquisition, showing reorientation, guarded insertion and the released screwdriver. Every feedback mode includes initial visual acquisition and moving-target prediction. The comparison concerns execution-period corrections, not vision versus no vision. Frames illustrate the mechanism; the physical acceptance logs establish successful support after release.
 
 Source: Representative original run | iterative / no disturbance / seed 400 | playback time
 
-## 9. Execution evidence II: rack installation and physical regrasp
-
-The independent frame is picked up and physically seated on its base. Because seating can change the fixture pose, the rack is checked and observed again before the spanner approaches it. The three panels have complementary roles: initial independent object, contact-mediated installation, and released assembled fixture. All prior tools remain in the same scene. The fixture observation is part of the staged and iterative control modes.
+## 11. Physical regrasp: support, clearance and grasp reacquisition
 
 The sequence documents actual physical regrasp rather than changing a software attachment. The spanner is placed on a support, the fingers open and clear the object, and the robot acquires a new grasp after observation. The common crop makes the change in finger-object relationship visible. The image order and timestamps follow one original trajectory. Contact logs and the recorded regrasp event provide independent evidence for the operation.
 
 Source: Representative original run | iterative / no disturbance / seed 400 | playback time
 
-## 10. Hole-over-pin placement and terminal acceptance
+## 12. Hole-over-pin placement: local geometry and final support
 
 The highlighted region identifies the hole and pin relationship, not a metric error measurement. The images show precontact alignment, threading, and the released final state. No axis or contact force is inferred from the colored annotation. The original trial passes all four terminal checks. A separate thirty-second passive diagnostic retains these outcomes; it does not replace the original score or inspect every five-hundred-hertz physics step.
 
 Source: Representative original run | iterative / no disturbance / seed 400 | playback time
 
-## 11. Paired qualitative comparison and failure boundary
+## 13. Matched-seed comparison: insertion stop versus released placement
 
 Both runs share initial seed four hundred without disturbance. The open-loop trial stops at the insertion contact guard, while the iterative trial releases the screwdriver and completes the full sequence. The panels are aligned by task outcome, not by playback time. The failure cause is taken from the recorded guard, since a rendered image alone cannot establish the contact violation. This favorable pair must be interpreted with the full paired statistics.
 
+Source: Final 48 attempts | open_loop vs iterative / no disturbance / seed 400
+
+## 14. Shared failure boundary: gripper closure before insertion
+
 Seed four hundred one produces an unexpected robot contact during moving-screwdriver gripper closure in both staged and iterative modes. The iterative failure is shown rather than hidden. The failure occurs before later insertion alignment, so it is a reachability bottleneck for evaluating the feedback loop. The contact violation can be submillimeter and need not look dramatic in a screenshot. Its classification comes from the original controller log.
 
-Source: Final 48 attempts | open_loop vs iterative / no disturbance / seed 400 | Final 48 attempts | staged vs iterative / no disturbance / seed 401
+Source: Final 48 attempts | staged vs iterative / no disturbance / seed 401
 
-## 12. Whole-sequence results and statistical uncertainty
+## 15. Whole-sequence results and statistical uncertainty
 
 The complete-sequence success rates are low, and uncertainty is wide. Open-loop succeeds zero of eight with and without disturbance. Staged feedback succeeds three of eight without and two of eight with disturbance. Iterative feedback succeeds three of eight in both conditions. All four method comparisons have Holm-adjusted p equal to one. This establishes neither superiority nor equivalence. The images demonstrate feasible behavior but do not override the full attempted-trial results.
 
 Source: n = 8 per mode × condition | Wilson 95% confidence intervals | exact paired tests with Holm correction
 
-## 13. Diagnostic results: pose accuracy and physical failures
+## 16. Diagnostic results: pose accuracy and physical failures
 
 The initial fixed-camera pose errors average 2.60 millimeters and 1.44 degrees; ADD and ADD-S are 3.17 and 2.29 millimeters. Those common initial observations do not directly predict whole-sequence success. Of thirty-seven failures, twenty-four stop at moving-pickup closure, six at hammer approach settling, six during open-loop insertion retraction and one after loss of bilateral spanner grasp. This separates perception accuracy, stage reachability and physical reliability. Execution error and visual timing remain in the full report with sample counts.
 
 Source: Final calibrated evaluation | 48 paired attempts | original simulation evidence
 
-## 14. Generalization boundary: background-dependent localization
+## 17. Generalization boundary: background-dependent localization
 
 This separate development diagnosis uses mismatched background geometry. The rack target is absent, but the overlay contains a false-positive red region. The right panel magnifies the region marked on the context image. It is not pooled into the formal fifty-scene localization audit, which uses matched per-scene empty backgrounds. The example exposes a practical limitation: known pickup stations and consistent background references remain assumptions. No artificial failure or scene retouching was introduced.
 
@@ -104,7 +118,7 @@ The project demonstrates a complete calibrated vision-to-action pipeline and a p
 
 Source: Separate localization diagnosis | target absent / rack frame / seed 500 | not a robot-trial outcome | Final calibrated evaluation | 48 paired attempts | original simulation evidence
 
-## 15. Conclusions and priorities for further experiments
+## 18. Conclusions and priorities for further experiments
 
 The project demonstrates a complete calibrated vision-to-action pipeline and a physically released four-operation sequence. The evidence supports feasibility and inspectability, not superior architecture or real-world reliability. The controlled replication has no statistically established feedback gain. Immediate priorities are pickup/contact reliability, background robustness and then feedback scheduling or pose bias. Future validation requires unseen seeds, broader clutter and occlusion, external pose estimators under matched conditions, and eventually hardware. Reference scanning, rigid mounts, FK and basic depth rendering retain ideal assumptions.
 
@@ -112,7 +126,7 @@ We study vision-guided manipulation in a simulated maintenance workcell. The sys
 
 Source: Final calibrated evaluation | 48 paired attempts | original simulation evidence | UR5e + Robotiq 2F-85 | MuJoCo | Model-free reference reconstruction + FoundationPose
 
-## 16. References and reproducibility
+## 19. References and reproducibility
 
 These references underpin the implemented methods and reviewed alternatives. FoundationPose is the selected pose estimator. Zhang and OpenCV support calibration, Chaumette and Hutchinson provide visual-servoing concepts, and MuJoCo provides the simulator. MegaPose and GraspNet are literature alternatives rather than executed external baselines. The repository retains source code, calibration images and FK, segmentation masks, complete trial summaries, original replays and all image-plate crop manifests.
 
