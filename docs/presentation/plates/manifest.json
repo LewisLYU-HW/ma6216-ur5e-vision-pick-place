@@ -1,0 +1,486 @@
+{
+  "overview": [
+    {
+      "source": "docs/presentation/frames/initial_overview.jpg",
+      "source_sha256": "a5c7fc7b078288413dddf01717cb765bcbe64f6adc291bd6dac04c5bd54549f0",
+      "crop_xyxy": null,
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Initial workcell",
+      "caption": "t = 0.00 s | object pickup stations",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/final_overview.jpg",
+      "source_sha256": "df381c5e0cacd4cd4d21dad5c3d6d01cf3a78398f20b4086aaa2bc888524040a",
+      "crop_xyxy": null,
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Released final state",
+      "caption": "t = 195.00 s | four acceptance checks passed",
+      "contrast_or_color_change": false
+    }
+  ],
+  "calibration": [
+    {
+      "source": "docs/results/wrist-calibration-v1/examples/intrinsic_train.jpg",
+      "source_sha256": "e0006525b9f43aa265a8bcb992b9e387b466cfdebee2bec9e4f6d6091481da93",
+      "crop_xyxy": [
+        120,
+        70,
+        1160,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Checkerboard observations",
+      "caption": "Image-based corner detection",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/wrist-calibration-v1/examples/hand_eye_validation.jpg",
+      "source_sha256": "775f3a5a30abb307dbf5ec994251961c58398aa162bf2054b073c545a9774d80",
+      "crop_xyxy": [
+        120,
+        70,
+        1160,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Held-out hand\u2013eye view",
+      "caption": "PnP + robot FK; frozen validation chain",
+      "contrast_or_color_change": false
+    }
+  ],
+  "localization": [
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__hammer__sample__500.jpg",
+      "source_sha256": "c9bb355551defef18863120db550e4bb5317ef6079d4fc39a35f331b51c019fe",
+      "crop_xyxy": [
+        570,
+        440,
+        820,
+        690
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Hammer",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__screwdriver__sample__500.jpg",
+      "source_sha256": "d6e4140671469264001f59a16ad4a07ec544eeb823908d72166d58bcec7992a4",
+      "crop_xyxy": [
+        360,
+        440,
+        610,
+        690
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Screwdriver",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__rack_frame__sample__500.jpg",
+      "source_sha256": "1e9dac87b8d876e6e127b6241bdafa62b8b44ca279b723482bfb2805728be8e7",
+      "crop_xyxy": [
+        480,
+        390,
+        730,
+        640
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "Rack frame",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/examples/nominal__spanner__sample__500.jpg",
+      "source_sha256": "43accb4108c3c195af34ae3562c7fe780cf0483d23e8daaf91494f231a420459",
+      "crop_xyxy": [
+        530,
+        390,
+        780,
+        640
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "d",
+      "title": "Spanner",
+      "caption": "Nominal scene | seed 500",
+      "contrast_or_color_change": false
+    }
+  ],
+  "hammer": [
+    {
+      "source": "docs/presentation/frames/hammer_lift_overview.jpg",
+      "source_sha256": "a20bc137457bbe98d63b39929a58f4a097cfffd7e05c9c937e135779087c7d36",
+      "crop_xyxy": [
+        190,
+        100,
+        800,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Lift and transport",
+      "caption": "t = 13.60 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/hammer_released_overview.jpg",
+      "source_sha256": "2aee1a81470681c9d0ac3299bafc3d51bd0af1ddbde32933b5a89fedd3e92047",
+      "crop_xyxy": [
+        190,
+        100,
+        800,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Released tray placement",
+      "caption": "t = 25.00 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "insertion": [
+    {
+      "source": "docs/presentation/frames/driver_orient_wrist.jpg",
+      "source_sha256": "85bdb60c43148701261075fbdd3d950969098af57de4e1a34536bccb32eb7e51",
+      "crop_xyxy": [
+        200,
+        100,
+        800,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Reorientation",
+      "caption": "t = 50.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/driver_insert_wrist.jpg",
+      "source_sha256": "88e74e1ad408b086ddc9c8c6c03adf231d7e6e9a0e08d411ffc663dae7b2d8ee",
+      "crop_xyxy": [
+        200,
+        100,
+        800,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Guarded insertion",
+      "caption": "t = 60.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/driver_done_wrist.jpg",
+      "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
+      "crop_xyxy": [
+        200,
+        100,
+        800,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "Released placement",
+      "caption": "t = 70.00 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "rack": [
+    {
+      "source": "docs/presentation/frames/rack_lift_overview.jpg",
+      "source_sha256": "0baa49d5d9a6e669862bc643c67fce490c1b9e6dea88ba3dcc2bd414d749d2d7",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Independent frame pickup",
+      "caption": "t = 91.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/rack_insert_wrist.jpg",
+      "source_sha256": "0cb9fb9691bc1d580adb3b7675885a769c60d9221b806fb644511f12acf02426",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Frame\u2013base seating",
+      "caption": "t = 112.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/rack_done_overview.jpg",
+      "source_sha256": "3e02c2a57dc49d4573abe6ab1c2bac0730574c48983aae82ac1ef4d9bd4eb7a4",
+      "crop_xyxy": [
+        100,
+        0,
+        850,
+        642
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "Released fixture",
+      "caption": "t = 134.40 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "regrasp": [
+    {
+      "source": "docs/presentation/frames/regrasp_place_wrist.jpg",
+      "source_sha256": "99daab6319e9246174bede2a7d7ce75e61c56e8f4cd25e92699b6a9cec1c6f7e",
+      "crop_xyxy": [
+        180,
+        0,
+        820,
+        600
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Supported placement",
+      "caption": "t = 147.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/regrasp_clear_wrist.jpg",
+      "source_sha256": "019965a142ec418d0352d8db43ffe39d85cfe929bb2a3fbd7dfcf4d93dd28afa",
+      "crop_xyxy": [
+        180,
+        0,
+        820,
+        600
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Complete finger clearance",
+      "caption": "t = 150.40 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/regrasp_lift_wrist.jpg",
+      "source_sha256": "6caa297d76ea2015cc4951b0841ca780a357f26798df23c3cb15d62a06bfe163",
+      "crop_xyxy": [
+        180,
+        0,
+        820,
+        600
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "c",
+      "title": "New grasp after observation",
+      "caption": "t = 158.20 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "hanging": [
+    {
+      "source": "docs/presentation/frames/hang_align_wrist.jpg",
+      "source_sha256": "5fa65bf4198dc476baf79ed900b27c7c8c0c1c4027f841bc3bab1412a51a74b1",
+      "crop_xyxy": [
+        260,
+        0,
+        730,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": [
+        120,
+        30,
+        230,
+        200
+      ],
+      "panel": "a",
+      "title": "Precontact alignment",
+      "caption": "t = 171.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/hang_thread_wrist.jpg",
+      "source_sha256": "05a3d669af735db98ad74b3b5ed847dc75913b0de376a4682b67ac8f5958e8b3",
+      "crop_xyxy": [
+        260,
+        0,
+        730,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": [
+        120,
+        30,
+        230,
+        200
+      ],
+      "panel": "b",
+      "title": "Hole-over-pin threading",
+      "caption": "t = 179.00 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/final_wrist.jpg",
+      "source_sha256": "b7363874dc64cb4e6fd005e06d0ba5f89545bfaae295cc253705a121147935fc",
+      "crop_xyxy": [
+        260,
+        0,
+        730,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": [
+        120,
+        30,
+        230,
+        200
+      ],
+      "panel": "c",
+      "title": "Released hanging state",
+      "caption": "t = 195.00 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "paired": [
+    {
+      "source": "docs/presentation/frames/open_failure_wrist.jpg",
+      "source_sha256": "7aaed32d094cd123d05b7a7e6c74a90cbce6c73dc14ce385b448e210ffb40a30",
+      "crop_xyxy": [
+        180,
+        90,
+        820,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Open loop: guard stop",
+      "caption": "Seed 400 | t = 57.96 s",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/driver_done_wrist.jpg",
+      "source_sha256": "51e186dd771aa7084c067d99e73ef035951bf9c2d0975f1c8ed0708563306474",
+      "crop_xyxy": [
+        180,
+        90,
+        820,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Iterative: released driver",
+      "caption": "Seed 400 | t = 70.00 s",
+      "contrast_or_color_change": false
+    }
+  ],
+  "failure": [
+    {
+      "source": "docs/presentation/frames/staged_failure_wrist.jpg",
+      "source_sha256": "4a94485a0462aecd43bfd3059c581b2dbfe7d8b101622a4f8ddb9f0d690afbfc",
+      "crop_xyxy": [
+        120,
+        0,
+        850,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Staged feedback",
+      "caption": "Seed 401 | contact guard at gripper closure",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/iter_failure_wrist.jpg",
+      "source_sha256": "aeb8308cace5d155d5eb5107b73eac5fda1054bd80a282fee893aea08b9b2a57",
+      "crop_xyxy": [
+        120,
+        0,
+        850,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Iterative feedback",
+      "caption": "Seed 401 | same early failure stage",
+      "contrast_or_color_change": false
+    }
+  ],
+  "correction": [
+    {
+      "source": "docs/presentation/frames/pulse_before.jpg",
+      "source_sha256": "9f51366950db23b0026bf5e3cd36ca0d85c0ef801ebfd6837d0bbb378b91efe0",
+      "crop_xyxy": [
+        260,
+        0,
+        730,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "a",
+      "title": "Before corrective action",
+      "caption": "Visual angular residual: 1.60\u00b0",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/presentation/frames/pulse_after.jpg",
+      "source_sha256": "ddf72f979fff9eed1506648f0d3f72eb58c2b47f03b9c50c990c6f2a1cc56e49",
+      "crop_xyxy": [
+        260,
+        0,
+        730,
+        560
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "After correction and reobservation",
+      "caption": "Visual angular residual: 0.74\u00b0",
+      "contrast_or_color_change": false
+    }
+  ],
+  "background": [
+    {
+      "source": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+      "source_sha256": "c4d0a909d0cea8177d39c09da57f80ba51b3ccd5f261b46adc3e5d0a41d1bc2b",
+      "crop_xyxy": [
+        200,
+        100,
+        1100,
+        850
+      ],
+      "annotation_roi_xywh_in_crop": [
+        425,
+        420,
+        90,
+        75
+      ],
+      "panel": "a",
+      "title": "Target-absent scene",
+      "caption": "Separate background-mismatch diagnosis",
+      "contrast_or_color_change": false
+    },
+    {
+      "source": "docs/results/workshop-localization-v1/background_mismatch_diagnostic/target_absent__rack_frame__failure__500.jpg",
+      "source_sha256": "c4d0a909d0cea8177d39c09da57f80ba51b3ccd5f261b46adc3e5d0a41d1bc2b",
+      "crop_xyxy": [
+        580,
+        470,
+        760,
+        620
+      ],
+      "annotation_roi_xywh_in_crop": null,
+      "panel": "b",
+      "title": "Magnified false-positive region",
+      "caption": "Red pixels: predicted foreground without target",
+      "contrast_or_color_change": false
+    }
+  ]
+}

@@ -1,36 +1,32 @@
-# Final project presentation — English, image-led revision
+# Academic research presentation — English
 
-![Selected pages from the revised presentation](preview.jpg)
+![Selected pages from the academic presentation](preview.jpg)
 
 - [Editable PowerPoint](vision_guided_manipulation.pptx)
 - [PDF viewing copy](vision_guided_manipulation.pdf)
 - [English speaker notes](speaker_notes.md), also embedded in PowerPoint
-- [Slide content and image placements](slides.json) · [Asset provenance](provenance.json)
-- [Presentation validation](validation.json)
-- [Screenshot source manifest](frames/manifest.json): original video, SHA-256, frame index, playback time and camera-panel crop
-- [Course requirement and evidence map](../FINAL_PROJECT.md)
-- [Technical selection and references](../LITERATURE_AND_SELECTION.md)
-- [Final 48-attempt evaluation](../results/visual-feedback-calibrated-v1/README.md)
-- [Original complete and failure videos](../videos/visual-feedback-calibrated-v1/README.md)
+- [Slide content](slides.json) · [Provenance](provenance.json) · [Validation](validation.json)
+- [Processed scientific image plates](plates/README.md) · [Figure contract](FIGURE_CONTRACT.md)
+- [Original frame manifest](frames/manifest.json): video hashes, frame indices, timestamps and camera-panel crops
+- [Course evidence map](../FINAL_PROJECT.md) · [Literature review](../LITERATURE_AND_SELECTION.md)
+- [Complete quantitative report](../results/visual-feedback-calibrated-v1/README.md) · [Original videos](../videos/visual-feedback-calibrated-v1/README.md)
 
-This revision **replaces the previous deck at the same paths**. It contains 26 English slides: 24 main slides for approximately 12–15 minutes and two backup slides. All 26 slides contain actual simulation or calibration images. There are 52 runtime/calibration image placements and only one statistical chart. The original source package contains 66 extracted stills; the deck selects 38 distinct image assets, including calibration, segmentation and the single statistical chart.
+This academic revision replaces the previous files at the same paths. It contains **22 English slides: 21 main slides and one reference appendix**, designed for approximately 12–15 minutes. All slides retain real simulation or calibration imagery. There are 48 runtime/calibration panel placements and one statistical chart.
 
-The main visual story follows hammer return, moving screwdriver pickup and tilted insertion, independent rack installation, relocalization, physical spanner release/regrasp and through-hole hanging. Wrist views and overview views show complementary details. Success/failure pairs use the same seed; captions identify their different playback times. The iterative method's own failure is retained.
+The argument follows the research question, technical selection, calibrated observation-to-control method, physical operation evidence, paired experimental design, quantitative results, failure analysis and limitations. Coordinate transforms and pose residuals use editable equation text; the architecture is composed of editable PowerPoint shapes. Detailed interpretation is in the English notes.
 
-The pulse-correction example comes from the separately archived calibration integration run, and the background-mismatch image is a separate localization diagnosis. Neither is added to the final 48-trial statistics. Correction residuals are logged visual estimates, not geometric errors inferred from the screenshots. Small or invisible contact violations are explained from the original failure logs.
+Twelve processed image plates use consistent cropping, matched temporal views, lowercase panel identifiers, explanatory region outlines and a magnified false-positive region. Original frames and outcomes are unchanged. Each plate is supplied as PNG plus editable-text PDF/SVG with a crop/source manifest and rendered quality checks. The PNGs are embedded in PowerPoint; text within a plate is edited through its source SVG or plotting script, while slide titles, equations and explanatory text are native PowerPoint objects.
 
-Images are real recorded simulation renders: camera panels are cropped from the original videos, and localization details are enlarged with recorded rectangular crops. No generated imagery or changed physical outcome is used. Text, labels and image placements are editable PowerPoint objects. Detailed methods and caveats are in the English notes rather than covering the images with paragraphs. The statistical plot's [SVG/PDF and source data](../results/visual-feedback-calibrated-v1/figures/README.md) remain available separately.
+The main manipulation plates follow iterative/no-disturbance seed 400. Qualitative controls show the matched open-loop failure in seed 400 and both staged/iterative pickup failures in seed 401. The correction example is a **separate integration run**; the background diagnosis is a **separate localization experiment**. Neither changes the denominator of the final 48 attempts. The result does not establish architectural superiority, equivalence or real-robot reliability.
 
-Complete videos remain separate for review; the deck does not embed large movies. The playback timestamps are simulation replay times, not wall-clock processing times. Add actual group member names and course identifiers before submission if required.
+No image-generative enhancement, scene retouching, contrast adjustment or invented metric scale is used. Source videos provide finite raster resolution; high-DPI exports improve annotations but do not invent image detail. Rectangles identify visual regions, not measured coordinate axes or contact forces. Full-length movies remain separate from the presentation.
 
 ```bash
-# Regenerate the still-image package from the published videos.
 python3 scripts/extract_presentation_frames.py
-
-# Rebuild the presentation from the final report and traceable images.
+python3 scripts/build_presentation_plates.py --qa-tools /path/to/nature-figure/scripts
 python3 scripts/build_project_presentation.py \
   --results docs/results/visual-feedback-calibrated-v1 \
   --output artifacts/presentation_rebuilt
 ```
 
-The tools require ffmpeg, Python with python-pptx and Pillow. PDF export uses LibreOffice. Presentation dependencies are separate from the simulation environment. All final files are included for immediate viewing.
+Rebuilding requires ffmpeg, Pillow, matplotlib and python-pptx; figure alignment uses the supplied skill audit interface. LibreOffice exports the PDF. The final files are included for immediate use without rebuilding. Add actual group names and course identifiers if required by the class.
